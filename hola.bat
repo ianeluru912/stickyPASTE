@@ -1,0 +1,1 @@
+stickytape src/main.py --add-python-path src --output-file compilado2.py
