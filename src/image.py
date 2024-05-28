@@ -7,7 +7,7 @@ class ImageProcessor:
     def __init__(self):
         self.letra_img = None
         # self.img_a_convertir = None
-        
+
 
     def es_victima(self):
         salida = None
@@ -59,7 +59,7 @@ class ImageProcessor:
             alto, ancho=thresh.shape[0], thresh.shape[1]
             M=cv2.getRotationMatrix2D((ancho/2,alto/2),angulo,1)
             thresh_rot=cv2.warpAffine(thresh,M,(ancho,alto))
-            imagen_rot=cv2.warpAffine(img,M,(ancho,alto))
+            imagen_rot=cv2.warpAffine(self.img,M,(ancho,alto))
             contours,_ = cv2.findContours(thresh_rot, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             approx=cv2.minAreaRect(contours[0])
             x=int(approx[0][0])
