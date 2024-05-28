@@ -11,7 +11,6 @@ MAX_VEL = 3.14  # Reduzco la velocidad para minimizar desvío
 
 class Robot:
     def __init__(self):
-        self.converted_img = None
 
         self.robot = WebotsRobot()
         self.emitter = self.robot.getDevice("emitter")
@@ -153,13 +152,12 @@ class Robot:
         mensaje = struct.pack("i i c", pos1, pos2, let) 
         self.emitter.send(mensaje)
 
-    def enviarMensajeVoC(self, salida):
+    def enviarMensajeVoC(self, entrada):
         self.parar()
         self.delay(1200)
-        self.enviarMensaje(int(self.position.x * 100), int(self.position.y * 100), salida)
+        self.enviarMensaje(int(self.position.x * 100), int(self.position.y * 100), entrada)
 
     def convertir_camara(self, img, alto, ancho):  
-        if img is not None:
-            self.converted_img = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
-        else:
-            pass
+            img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
+            return img_a_convertir
+

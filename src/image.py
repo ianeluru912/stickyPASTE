@@ -1,20 +1,23 @@
 import cv2
 import numpy as np
 
+
 class ImageProcessor:
+
     def __init__(self):
-        self.salida = None
+        self.letra_img = None
+        # self.img_a_convertir = None
+        
 
     def es_victima(self):
-        if self.img is None:
-            return None
+        salida = None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gris, 127, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         contorno_img = np.copy(self.img)
         for cont in contours:
             cv2.drawContours(contorno_img, [cont], -1, (0, 255, 0), 2)
-        return contours if len(contours) == 1 and len(contours[0]) <= 10 else None
+        return contours if len(contours) == 1 and len(contours[0]) <= 10 else salida
 
     def devolver_letra_victimas(self):
         salida = None
@@ -46,33 +49,29 @@ class ImageProcessor:
         return salida
 
     def reconocer_limpiar_cartel(self):
-        gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 0:
-            return None
-        approx = cv2.minAreaRect(contours[0])
-        angulo = approx[2]
-        if abs(angulo) == 45:
-            alto, ancho = thresh.shape[0], thresh.shape[1]
-            M = cv2.getRotationMatrix2D((ancho / 2, alto / 2), angulo, 1)
-            thresh_rot = cv2.warpAffine(thresh, M, (ancho, alto))
-            imagen_rot = cv2.warpAffine(self.img, M, (ancho, alto))
-            contours, _ = cv2.findContours(thresh_rot, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            if len(contours) == 0:
-                return None
-            approx = cv2.minAreaRect(contours[0])
-            x = int(approx[0][0])
-            y = int(approx[0][1])
-            mitad_ancho = int(approx[1][0] / 2)
-            mitad_alto = int(approx[1][1] / 2)
-            if y - mitad_alto < 0 or y + mitad_alto > imagen_rot.shape[0] or x - mitad_ancho < 0 or x + mitad_ancho > imagen_rot.shape[1]:
-                return None
-            rect = imagen_rot[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
+        salida = None
+        gris=cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+        _, thresh=cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
+        contours,_ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        approx=cv2.minAreaRect(contours[0])
+        angulo=approx[2]
+        if abs(angulo)==45:
+            alto, ancho=thresh.shape[0], thresh.shape[1]
+            M=cv2.getRotationMatrix2D((ancho/2,alto/2),angulo,1)
+            thresh_rot=cv2.warpAffine(thresh,M,(ancho,alto))
+            imagen_rot=cv2.warpAffine(img,M,(ancho,alto))
+            contours,_ = cv2.findContours(thresh_rot, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            approx=cv2.minAreaRect(contours[0])
+            x=int(approx[0][0])
+            y=int(approx[0][1])
+            mitad_ancho=int(approx[1][0]/2)
+            mitad_alto=int(approx[1][1]/2)
+            rect=imagen_rot[y-mitad_alto:y+mitad_alto, x-mitad_ancho:x+mitad_ancho]
             return rect, True
-        return None
+        return salida   
 
     def devolver_letra_carteles(self):
+        salida = None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contornos, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -97,7 +96,6 @@ class ImageProcessor:
                 return None
             rect = imagen_rot[y - mitadAlto:y + mitadAlto, x - mitadAncho:x + mitadAncho]
             amarillo, rojo, negro, blanco = 0, 0, 0, 0
-            salida = None
             for x in range(rect.shape[0]):
                 for y in range(rect.shape[1]):
                     b, g, r = rect[x, y]
@@ -110,26 +108,27 @@ class ImageProcessor:
                     elif b < 10 and g > 190 and r > 195:
                         amarillo += 1
             if (rojo + blanco) > (negro + amarillo) and rojo > blanco and blanco > negro:
-                salida = 'F'
+                return salida == 'F'
             elif (blanco + negro) > (amarillo + rojo) and blanco > negro:
-                salida = 'P'
+                return salida == 'P'
             elif (blanco + negro) > (amarillo + rojo):
-                salida = 'C'
+                return salida == 'C'
             elif (rojo + amarillo) > (negro + blanco):
-                salida = 'O'
+                return salida == 'O'
             return salida
-        return None
+        return salida
 
-    def procesar(self, converted_img):
-        if converted_img is None:
-            return None
-        self.img = converted_img
-        salida = None
+# Nuevo argumento
+    def procesar(self, resultado):
+        self.letra = None
+        self.img = resultado
         if self.es_victima() is not None:
-            salida = self.devolver_letra_victimas()
+            return self.letra_img == self.devolver_letra_victimas()
         else:
             resultado = self.reconocer_limpiar_cartel()
             if resultado is not None:
-                salida = self.devolver_letra_carteles()
-        return salida
+                return self.letra_img == self.devolver_letra_carteles()
+            return self.letra_img
+
+
 
