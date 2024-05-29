@@ -14,7 +14,7 @@ while robot.step() != -1:
     alto = robot.camI.getHeight()
     ancho = robot.camI.getWidth()
     resultado = robot.convertir_camara(img, alto, ancho)
-    entrada = image_processor.procesar(resultado) #River perdió con argentinos juniors
+    entrada = image_processor.procesar(resultado) 
     if not robot.hayAlgoIzquierda():
         robot.girarIzquierda90() 
         image_processor.procesar(resultado)
