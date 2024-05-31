@@ -146,7 +146,7 @@ class ImageProcessor:
             print("Error: La imagen es None o está vacía")
             return None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gris, 127, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(contours) == 0:
             return None
@@ -188,13 +188,11 @@ class ImageProcessor:
 
     def reconocer_limpiar_cartel(self):
         if self.img is None or self.img.size == 0:
-            print("Error: La imagen es None o está vacía")
             return None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(contours) == 0:
-            print("No se encontraron contornos.")
             return None
         approx = cv2.minAreaRect(contours[0])
         angulo = approx[2]
@@ -205,7 +203,6 @@ class ImageProcessor:
             imagen_rot = cv2.warpAffine(self.img, M, (ancho, alto))
             contours, _ = cv2.findContours(thresh_rot, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             if len(contours) == 0:
-                print("No se encontraron contornos después de rotar.")
                 return None
             approx = cv2.minAreaRect(contours[0])
             x = int(approx[0][0])
@@ -213,7 +210,6 @@ class ImageProcessor:
             mitad_ancho = int(approx[1][0] / 2)
             mitad_alto = int(approx[1][1] / 2)
             if y - mitad_alto < 0 or y + mitad_alto > imagen_rot.shape[0] or x - mitad_ancho < 0 or x + mitad_ancho > imagen_rot.shape[1]:
-                print("El rectángulo está fuera de los límites de la imagen.")
                 return None
             rect = imagen_rot[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
             return rect, True
@@ -225,7 +221,6 @@ class ImageProcessor:
         _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contornos, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(contornos) == 0:
-            print("No se encontraron contornos.")
             return None
         approx = cv2.minAreaRect(contornos[0])
         angulo = approx[2]
@@ -236,7 +231,6 @@ class ImageProcessor:
             imagen_rot = cv2.warpAffine(self.img, M, (ancho, alto))
             contornos, _ = cv2.findContours(thresh_rot, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             if len(contornos) == 0:
-                print("No se encontraron contornos después de rotar.")
                 return None
             approx = cv2.minAreaRect(contornos[0])
             x = int(approx[0][0])
@@ -244,7 +238,6 @@ class ImageProcessor:
             mitadAncho = int(approx[1][0] / 2)
             mitadAlto = int(approx[1][1] / 2)
             if y - mitadAlto < 0 or y + mitadAlto > imagen_rot.shape[0] or x - mitadAncho < 0 or x + mitadAncho > imagen_rot.shape[1]:
-                print("El rectángulo está fuera de los límites de la imagen.")
                 return None
             rect = imagen_rot[y - mitadAlto:y + mitadAlto, x - mitadAncho:x + mitadAncho]
             amarillo, rojo, negro, blanco = 0, 0, 0, 0
@@ -272,7 +265,6 @@ class ImageProcessor:
 
     def procesar(self, converted_img):
         if converted_img is None or converted_img.size == 0:
-            print("Error: La imagen convertida es None o está vacía")
             return None
         self.img = converted_img
         self.salida = None
