@@ -160,4 +160,18 @@ class Robot:
     def convertir_camara(self, img, alto, ancho):  
             img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
             return img_a_convertir
-
+    def detectar_color(r, g, b):
+        colores = {
+            "verde": (abs(r - 48) < 15 and abs(g - 255) < 15 and abs(b - 48) < 15),
+            "rojo": (abs(r - 255) < 15 and abs(g - 91) < 15 and abs(b - 91) < 15),
+            "azul": (abs(r - 91) < 15 and abs(g - 91) < 15 and abs(b - 255) < 15),
+            "violeta": (abs(r - 193) < 15 and abs(g - 93) < 15 and abs(b - 251) < 15),
+            "del_suelo": (abs(r - 252) < 2 and abs(g - 252) < 2 and abs(b - 252) < 2),
+            "checkpoint": (abs(r - 255) < 2 and abs(g - 255) < 2 and abs(b - 255) < 2),
+            "huecos": (abs(r - 60) < 15 and abs(g - 60) < 15 and abs(b - 60) < 15),
+            "pantanos": (abs(r - 255) < 15 and abs(g - 222) < 15 and abs(b - 142) < 15)
+        }
+        for color, condicion in colores.items():
+            if condicion:
+                return color
+        return  None  

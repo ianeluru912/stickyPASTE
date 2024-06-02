@@ -15,6 +15,7 @@ while robot.step() != -1:
     ancho = robot.camI.getWidth()
     resultado = robot.convertir_camara(img, alto, ancho)
     entrada = image_processor.procesar(resultado) 
+    color = robot.detectar_color(r, g, b)
     if not robot.hayAlgoIzquierda():
         robot.girarIzquierda90() 
         image_processor.procesar(resultado)
