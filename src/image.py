@@ -11,14 +11,12 @@ class ImageProcessor:
             print("Error: La imagen es None o está vacía")
             return None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(gris, 100, 255, cv2.THRESH_BINARY)
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 0:
-            return None
         contorno_img = np.copy(self.img)
         for cont in contours:
             cv2.drawContours(contorno_img, [cont], -1, (0, 255, 0), 2)
-        return contours if len(contours) == 1 and len(contours[0]) <= 10 else None
+        return contours if len(contours) == 1 and len(contours[0]) <= 10 else 'no es victima', None
 
     def devolver_letra_victimas(self):
         self.salida = None
@@ -120,7 +118,7 @@ class ImageProcessor:
                         rojo += 1
                     elif b < 10 and g > 190 and r > 195:
                         amarillo += 1
-            if (rojo + blanco) > (negro + amarillo) and rojo > blanco and blanco > negro:
+            if (rojo + blanco) > (negro + amarillo) and rojo > blanco and blanco >= negro:
                 self.salida = 'F'
             elif (blanco + negro) > (amarillo + rojo) and blanco > negro:
                 self.salida = 'P'
@@ -134,12 +132,18 @@ class ImageProcessor:
     def procesar(self, converted_img):
         if converted_img is None or converted_img.size == 0:
             return None
-        self.salida = None
+        salida = None
         self.img = converted_img
-        if self.es_victima() is not None:
-            self.salida = self.devolver_letra_victimas()
+        victima = self.es_victima()
+        if victima is not None:
+            print('es victima')
+            salida = self.devolver_letra_victimas()
+            print('letra', salida)
+            return salida
         else:
-            resultado = self.reconocer_limpiar_cartel()
-            if resultado is not None:
-                self.salida = self.devolver_letra_carteles()
-        return self.salida
+            cartel = self.reconocer_limpiar_cartel()
+            if cartel is not None:
+                salida = self.devolver_letra_carteles()
+                print('cartel', salida)
+                return salida
+        return salida
