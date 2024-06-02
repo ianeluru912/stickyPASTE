@@ -1,32 +1,29 @@
 import cv2
 import numpy as np
 
+
 class ImageProcessor:
+
     def __init__(self):
-        self.img = None
-        self.salida = None
+        self.letra_img = None
+        # self.img_a_convertir = None
 
     def es_victima(self):
-        if self.img is None or self.img.size == 0:
-            print("Error: La imagen es None o está vacía")
-            return None
+        
+        # self.img = cv2.imread(self.img)
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gris, 127, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 0:
-            return None
         contorno_img = np.copy(self.img)
         for cont in contours:
             cv2.drawContours(contorno_img, [cont], -1, (0, 255, 0), 2)
         return contours if len(contours) == 1 and len(contours[0]) <= 10 else None
 
     def devolver_letra_victimas(self):
-        self.salida = None
+        salida = None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 0:
-            return self.salida
         thresh_img = np.copy(thresh)
         for cont in contours:
             cv2.drawContours(thresh_img, [cont], -1, (0, 255, 0), 2)
@@ -43,54 +40,45 @@ class ImageProcessor:
                 pixeles_negros_arriba = np.count_nonzero(cuadritoArriba == 0)
                 pixeles_negros_abajo = np.count_nonzero(cuadritoAbajo == 0)
                 if pixeles_negros_abajo <= 5 and pixeles_negros_arriba <= 5:
-                    self.salida = 'H'
+                    salida = 'H'
+                    return salida
                 elif pixeles_negros_abajo >= 13 and pixeles_negros_arriba >= 13:
-                    self.salida = 'S'
+                    salida = 'S'
+                    return salida
                 elif pixeles_negros_abajo >= 15 and pixeles_negros_arriba <= 5:
-                    self.salida = 'U'
-                return self.salida
-        return self.salida
+                    salida = 'U'
+                    return salida
+                return salida
+        return salida
 
     def reconocer_limpiar_cartel(self):
-        if self.img is None or self.img.size == 0:
-            print("Error: La imagen es None o está vacía limpiar_cartel")
-            return None
-        gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 0:
-            print("No se encontraron contornos en limpiar_cartel.")
-            return None
-        approx = cv2.minAreaRect(contours[0])
-        angulo = approx[2]
-        if abs(angulo) == 45:
-            alto, ancho = thresh.shape[0], thresh.shape[1]
-            M = cv2.getRotationMatrix2D((ancho / 2, alto / 2), angulo, 1)
-            thresh_rot = cv2.warpAffine(thresh, M, (ancho, alto))
-            imagen_rot = cv2.warpAffine(self.img, M, (ancho, alto))
-            contours, _ = cv2.findContours(thresh_rot, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            if len(contours) == 0:
-                print("No se encontraron contornos después de rotar.")
-                return None
-            approx = cv2.minAreaRect(contours[0])
-            x = int(approx[0][0])
-            y = int(approx[0][1])
-            mitad_ancho = int(approx[1][0] / 2)
-            mitad_alto = int(approx[1][1] / 2)
-            if y - mitad_alto < 0 or y + mitad_alto > imagen_rot.shape[0] or x - mitad_ancho < 0 or x + mitad_ancho > imagen_rot.shape[1]:
-                print("El rectángulo está fuera de los límites de la imagen.")
-                return None
-            rect = imagen_rot[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
+        salida = None
+        gris=cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+        _, thresh=cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
+        contours,_ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        approx=cv2.minAreaRect(contours[0])
+        angulo=approx[2]
+        if abs(angulo)==45:
+            alto, ancho=thresh.shape[0], thresh.shape[1]
+            M=cv2.getRotationMatrix2D((ancho/2,alto/2),angulo,1)
+            thresh_rot=cv2.warpAffine(thresh,M,(ancho,alto))
+            imagen_rot=cv2.warpAffine(self.img,M,(ancho,alto))
+            contours,_ = cv2.findContours(thresh_rot, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            approx=cv2.minAreaRect(contours[0])
+            x=int(approx[0][0])
+            y=int(approx[0][1])
+            mitad_ancho=int(approx[1][0]/2)
+            mitad_alto=int(approx[1][1]/2)
+            rect=imagen_rot[y-mitad_alto:y+mitad_alto, x-mitad_ancho:x+mitad_ancho]
             return rect, True
-        return None
+        return salida   
 
     def devolver_letra_carteles(self):
-        self.salida = None
+        salida = None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contornos, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(contornos) == 0:
-            print("No se encontraron contornos en devolver_letra_cartel.")
             return None
         approx = cv2.minAreaRect(contornos[0])
         angulo = approx[2]
@@ -101,7 +89,6 @@ class ImageProcessor:
             imagen_rot = cv2.warpAffine(self.img, M, (ancho, alto))
             contornos, _ = cv2.findContours(thresh_rot, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             if len(contornos) == 0:
-                print("No se encontraron contornos después de rotar.")
                 return None
             approx = cv2.minAreaRect(contornos[0])
             x = int(approx[0][0])
@@ -109,7 +96,6 @@ class ImageProcessor:
             mitadAncho = int(approx[1][0] / 2)
             mitadAlto = int(approx[1][1] / 2)
             if y - mitadAlto < 0 or y + mitadAlto > imagen_rot.shape[0] or x - mitadAncho < 0 or x + mitadAncho > imagen_rot.shape[1]:
-                print("El rectángulo está fuera de los límites de la imagen.")
                 return None
             rect = imagen_rot[y - mitadAlto:y + mitadAlto, x - mitadAncho:x + mitadAncho]
             amarillo, rojo, negro, blanco = 0, 0, 0, 0
@@ -125,26 +111,25 @@ class ImageProcessor:
                     elif b < 10 and g > 190 and r > 195:
                         amarillo += 1
             if (rojo + blanco) > (negro + amarillo) and rojo > blanco and blanco > negro:
-                self.salida = 'F'
+                return salida == 'F'
             elif (blanco + negro) > (amarillo + rojo) and blanco > negro:
-                self.salida = 'P'
+                return salida == 'P'
             elif (blanco + negro) > (amarillo + rojo):
-                self.salida = 'C'
+                return salida == 'C'
             elif (rojo + amarillo) > (negro + blanco):
-                self.salida = 'O'
-            return self.salida
-        return self.salida
+                return salida == 'O'
+            return salida
+        return salida
 
-    def procesar(self, converted_img):
-        if converted_img is None or converted_img.size == 0:
-            print("Error: La imagen convertida es None o está vacía")
-            return None
-        self.salida = None
-        self.img = converted_img
+# Nuevo argumento
+    def procesar(self, resultado):
+        self.img = resultado
         if self.es_victima() is not None:
-            self.salida = self.devolver_letra_victimas()
+            self.letra_img = self.devolver_letra_victimas()
+            return self.letra_img 
         else:
             resultado = self.reconocer_limpiar_cartel()
             if resultado is not None:
-                self.salida = self.devolver_letra_carteles()
-        return self.salida
+                self.letra_img == self.devolver_letra_carteles()  
+                return self.letra_img
+            return self.letra_img
