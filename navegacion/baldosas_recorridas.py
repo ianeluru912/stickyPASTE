@@ -118,6 +118,15 @@ def evaluar_baldosa_izquierda():
     baldosa_izquierda_a_evaluar = coordenada_x - 0.12
     return baldosa_izquierda_a_evaluar
 
+
+def isVisited(visitedTiles, pos):
+    gridIndex = positionToGrid(pos)
+    return gridIndex in visitedTiles
+
+
+def positionToGrid(pos): # devuelve las coordenadas dentro de la grilla
+    return (0, 0) # TODO(Richo): Implementar!!
+
 def avanzarBien(difurcaciones, baldosas_recorridas, nro_baldosa):
     baldosa_avanzada = 0
     if distF < 0.13:
@@ -131,11 +140,13 @@ def avanzarBien(difurcaciones, baldosas_recorridas, nro_baldosa):
             girar(-0.25 * math.tau)
     else:
         avanzar(0.12)
+        print(isVisited(baldosas_recorridas, position))
         # print(difurcaciones)
-        nro_baldosa += 1
-        baldosas_recorridas['baldosa', nro_baldosa] = position.copy() 
-        for (key1, key2), value in baldosas_recorridas.items():
-            print(f'{key1} {key2}: {value}')
+        
+        baldosas_recorridas[positionToGrid(position)] = True # TODO(Richo): Hacer un objeto que representa a la baldosa
+        for k, value in baldosas_recorridas.items():
+            print(f'{k}: {value}')
+        print("---")
         baldosa_avanzada = 1
         if distI >= 0.13 or distD >= 0.13 and distF <= 0.08:
             if baldosa_avanzada == 1 and len(difurcaciones) == 0:
@@ -148,6 +159,7 @@ def avanzarBien(difurcaciones, baldosas_recorridas, nro_baldosa):
                 difurcaciones.append(position.copy())
                 print(difurcaciones)
     return nro_baldosa
+
 
 difurcaciones = []
 baldosas_recorridas = {}
