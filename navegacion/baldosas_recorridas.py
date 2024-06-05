@@ -155,6 +155,7 @@ nro_baldosa = 0
 start_time = robot.getTime()
 me_aleje_de_difurcacion = False
 
+
 while step() != -1:
     distI = di.getValue()
     distD = dd.getValue()
