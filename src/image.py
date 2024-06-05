@@ -31,7 +31,7 @@ class ImageProcessor:
         if len(contours) == 1 and len(contours[0]) <= 10:
             approx = cv2.minAreaRect(contours[0])
             angulo = approx[2]
-            if angulo % 90 == 0:
+            if angulo % 90 == 0: #si
                 x = int(approx[0][0])
                 y = int(approx[0][1])
                 mitad_ancho = int(approx[1][0] / 2)
@@ -130,8 +130,8 @@ class ImageProcessor:
         return self.salida
 
     def procesar(self, converted_img):
-        if converted_img is None or converted_img.size == 0:
-            return None
+        # if converted_img is None or converted_img.size == 0:
+        #     return None
         salida = None
         self.img = converted_img
         victima = self.es_victima()

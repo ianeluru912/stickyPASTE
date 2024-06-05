@@ -60,29 +60,29 @@ with __stickytape_temporary_dir() as __stickytape_working_dir:
             robot.girarIzquierda90() 
             image_processor.procesar(resultado)
             if entrada is not None:
-                print(robot.enviarMensajeVoC(entrada))
+                robot.enviarMensajeVoC(entrada)
             robot.avanzarBaldosa()
             image_processor.procesar(resultado)
             if entrada is not None:
-                print(robot.enviarMensajeVoC(entrada))
+                robot.enviarMensajeVoC(entrada)
         elif not robot.hayAlgoAdelante():
             robot.avanzarBaldosa()
             image_processor.procesar(resultado)
             if entrada is not None: 
-                print(robot.enviarMensajeVoC(entrada))
+                robot.enviarMensajeVoC(entrada)
         elif not robot.hayAlgoDerecha():
             robot.girarDerecha90()
             image_processor.procesar(resultado)
             if entrada is not None:
-                print(robot.enviarMensajeVoC(entrada))
+                robot.enviarMensajeVoC(entrada)
             robot.avanzarBaldosa()
             image_processor.procesar(resultado)
             if entrada is not None:
-                print(robot.enviarMensajeVoC(entrada))
+                robot.enviarMensajeVoC(entrada)
         else:
             robot.girarMediaVuelta()
             robot.avanzarBaldosa()
             image_processor.procesar(resultado)
             if entrada is not None:
-                print(robot.enviarMensajeVoC(entrada))
+                robot.enviarMensajeVoC(entrada)
     
