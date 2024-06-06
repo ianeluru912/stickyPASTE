@@ -119,13 +119,19 @@ def evaluar_baldosa_izquierda():
     return baldosa_izquierda_a_evaluar
 
 
-def isVisited(visitedTiles, pos):
-    gridIndex = positionToGrid(pos)
+def isVisited(visitedTiles):
+    gridIndex = positionToGrid() # Saqué argumento pos de isVisited y de positionToGrid
     return gridIndex in visitedTiles
 
 
-def positionToGrid(pos): # devuelve las coordenadas dentro de la grilla
-    return (0, 0) # TODO(Richo): Implementar!!
+def positionToGrid(): # devuelve las coordenadas dentro de la grilla
+    grilla = []
+    columna = round(position['x'] / 0.12)
+    grilla.append(columna)
+    fila = round((position['y'] - 0.12) / 0.12) #agregamos esta resta para que las filas comiencen en -0
+    grilla.append(fila)
+    tupla_grilla = tuple(grilla)
+    return tupla_grilla
 
 def avanzarBien(difurcaciones, baldosas_recorridas, nro_baldosa):
     baldosa_avanzada = 0
@@ -140,13 +146,16 @@ def avanzarBien(difurcaciones, baldosas_recorridas, nro_baldosa):
             girar(-0.25 * math.tau)
     else:
         avanzar(0.12)
-        print(isVisited(baldosas_recorridas, position))
+        print(isVisited(baldosas_recorridas)) #saqué argumento position
         # print(difurcaciones)
         
-        baldosas_recorridas[positionToGrid(position)] = True # TODO(Richo): Hacer un objeto que representa a la baldosa
-        for k, value in baldosas_recorridas.items():
-            print(f'{k}: {value}')
-        print("---")
+        if not positionToGrid() in baldosas_recorridas: # agrego nuevo if, que solo marque True si lo que devuelve positionToGrid no está en baldosas_recorridas
+            baldosas_recorridas[positionToGrid()] = True # saco argumento position
+            for k, value in baldosas_recorridas.items():
+                print(f'{k}: {value}')
+            print("---")
+        # else:
+        #     baldosas_recorridas[positionToGrid()] = False
         baldosa_avanzada = 1
         if distI >= 0.13 or distD >= 0.13 and distF <= 0.08:
             if baldosa_avanzada == 1 and len(difurcaciones) == 0:
@@ -167,7 +176,7 @@ nro_baldosa = 0
 start_time = robot.getTime()
 me_aleje_de_difurcacion = False
 
-
+step()
 while step() != -1:
     distI = di.getValue()
     distD = dd.getValue()
