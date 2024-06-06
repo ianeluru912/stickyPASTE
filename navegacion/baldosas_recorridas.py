@@ -120,7 +120,7 @@ def evaluar_baldosa_izquierda():
 
 
 def isVisited(visitedTiles):
-    gridIndex = positionToGrid() # Saqué argumento pos de isVisited y de positionToGrid
+    gridIndex = positionToGrid()
     return gridIndex in visitedTiles
 
 
@@ -146,7 +146,7 @@ def avanzarBien(difurcaciones, baldosas_recorridas, nro_baldosa):
             girar(-0.25 * math.tau)
     else:
         avanzar(0.12)
-        print(isVisited(baldosas_recorridas)) #saqué argumento position
+        print(isVisited(baldosas_recorridas))
         # print(difurcaciones)
         
         if not positionToGrid() in baldosas_recorridas: # agrego nuevo if, que solo marque True si lo que devuelve positionToGrid no está en baldosas_recorridas
