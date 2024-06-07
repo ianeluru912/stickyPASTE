@@ -120,15 +120,14 @@ def evaluar_baldosa_izquierda():
 
 
 def isVisited(visitedTiles):
-    gridIndex = positionToGrid()
+    gridIndex = positionToGrid(position)
     return gridIndex in visitedTiles
 
-
-def positionToGrid(): # devuelve las coordenadas dentro de la grilla
+def positionToGrid(position): # devuelve las coordenadas dentro de la grilla
     grilla = []
     columna = round(position['x'] / 0.12)
     grilla.append(columna)
-    fila = round((position['y'] - 0.12) / 0.12) #agregamos esta resta para que las filas comiencen en -0
+    fila = round(position['y'] / 0.12) #agregamos esta resta para que las filas comiencen en -0
     grilla.append(fila)
     tupla_grilla = tuple(grilla)
     return tupla_grilla
@@ -149,8 +148,8 @@ def avanzarBien(difurcaciones, baldosas_recorridas, nro_baldosa):
         print(isVisited(baldosas_recorridas))
         # print(difurcaciones)
         
-        if not positionToGrid() in baldosas_recorridas: # agrego nuevo if, que solo marque True si lo que devuelve positionToGrid no está en baldosas_recorridas
-            baldosas_recorridas[positionToGrid()] = True # saco argumento position
+        if not positionToGrid(position) in baldosas_recorridas: 
+            baldosas_recorridas[positionToGrid(position)] = True # saco argumento position
             for k, value in baldosas_recorridas.items():
                 print(f'{k}: {value}')
             print("---")
@@ -177,6 +176,7 @@ start_time = robot.getTime()
 me_aleje_de_difurcacion = False
 
 step()
+posicion_inicial = position.copy()
 while step() != -1:
     distI = di.getValue()
     distD = dd.getValue()

@@ -143,6 +143,19 @@ class Robot:
     def avanzarBaldosa(self):
         self.avanzar(0.12)
 
+    def isVisited(self, visitedTiles):
+        gridIndex = self.positionToGrid()
+        return gridIndex in visitedTiles
+    
+    def positionToGrid(self):
+        grilla = []
+        columna = round(self.position['x'] / 0.12)
+        grilla.append(columna)
+        fila = round((self.position['y'] - 0.12) / 0.12)
+        grilla.append(fila)
+        tupla_grilla = tuple(grilla)
+        return tupla_grilla
+
     def parar(self):
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
