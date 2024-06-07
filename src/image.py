@@ -109,7 +109,8 @@ class ImageProcessor:
             amarillo, rojo, negro, blanco = 0, 0, 0, 0
             for x in range(rect.shape[0]):
                 for y in range(rect.shape[1]):
-                    b, g, r = rect[x, y]
+                    pixel = rect[x, y]
+                    b, g, r = pixel[:3]
                     if b > 200 and g > 200 and r > 200:
                         blanco += 1
                     elif b <= 1 and g <= 1 and r <= 1:
@@ -134,12 +135,10 @@ class ImageProcessor:
         #     return None
         salida = None
         self.img = converted_img
-        victima = self.es_victima()
+        victima = self.devolver_letra_victimas()
         if victima is not None:
-            print('es victima')
-            salida = self.devolver_letra_victimas()
-            print('letra', salida)
-            return salida
+            print('letra', victima)
+            return victima
         else:
             cartel = self.reconocer_limpiar_cartel()
             if cartel is not None:
