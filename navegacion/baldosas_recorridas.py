@@ -120,15 +120,17 @@ def evaluar_baldosa_izquierda():
 
 
 def isVisited(visitedTiles):
-    gridIndex = positionToGrid() # Saqué argumento pos de isVisited y de positionToGrid
+    gridIndex = positionToGrid(posicion_inicial) # Saqué argumento pos de isVisited y de positionToGrid
     return gridIndex in visitedTiles
 
 
-def positionToGrid(): # devuelve las coordenadas dentro de la grilla
+def positionToGrid(posicion_inicial): # devuelve las coordenadas dentro de la grilla
     grilla = []
-    columna = round(position['x'] / 0.12)
+    position_x_to_evaluate = position['x'] - posicion_inicial['x']
+    columna = round(position_x_to_evaluate / 0.12)
     grilla.append(columna)
-    fila = round((position['y'] - 0.12) / 0.12) #agregamos esta resta para que las filas comiencen en -0
+    position_y_to_evaluate = position['y'] - posicion_inicial['y']
+    fila = round(position_y_to_evaluate / 0.12)
     grilla.append(fila)
     tupla_grilla = tuple(grilla)
     return tupla_grilla
@@ -149,8 +151,8 @@ def avanzarBien(difurcaciones, baldosas_recorridas, nro_baldosa):
         print(isVisited(baldosas_recorridas)) #saqué argumento position
         # print(difurcaciones)
         
-        if not positionToGrid() in baldosas_recorridas: # agrego nuevo if, que solo marque True si lo que devuelve positionToGrid no está en baldosas_recorridas
-            baldosas_recorridas[positionToGrid()] = True # saco argumento position
+        if not positionToGrid(posicion_inicial) in baldosas_recorridas: # agrego nuevo if, que solo marque True si lo que devuelve positionToGrid no está en baldosas_recorridas
+            baldosas_recorridas[positionToGrid(posicion_inicial)] = True # saco argumento position
             for k, value in baldosas_recorridas.items():
                 print(f'{k}: {value}')
             print("---")
@@ -177,6 +179,8 @@ start_time = robot.getTime()
 me_aleje_de_difurcacion = False
 
 step()
+posicion_inicial = position.copy()
+print('posicion inicial:', posicion_inicial)
 while step() != -1:
     distI = di.getValue()
     distD = dd.getValue()
@@ -192,3 +196,6 @@ while step() != -1:
         me_aleje_de_difurcacion = False
     if (robot.getTime() - start_time) * 1000.0 >= 120000:
         break
+
+
+
