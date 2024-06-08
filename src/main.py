@@ -5,14 +5,14 @@ from image import ImageProcessor
 robot = Robot()
 image_processor = ImageProcessor()
 
-# Obtener lo leído de la cámara
+# Obtener lo leido de la camara
 while robot.step() != -1:
     img = robot.camI.getImage() 
     alto = robot.camI.getHeight()
     ancho = robot.camI.getWidth()
     resultado = robot.convertir_camara(img, alto, ancho)
     
-    # Procesar la imagen y determinar la letra o el tipo de cartel/víctima
+    # Procesar la imagen y determinar la letra o el tipo de cartel/victima
     entrada = image_processor.procesar(resultado)
     
     if not robot.hayAlgoIzquierda():
