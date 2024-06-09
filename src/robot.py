@@ -143,19 +143,6 @@ class Robot:
     def avanzarBaldosa(self):
         self.avanzar(0.12)
 
-    def isVisited(self, visitedTiles):
-        gridIndex = self.positionToGrid()
-        return gridIndex in visitedTiles
-    
-    def positionToGrid(self):
-        grilla = []
-        columna = round(self.position['x'] / 0.12)
-        grilla.append(columna)
-        fila = round((self.position['y'] - 0.12) / 0.12)
-        grilla.append(fila)
-        tupla_grilla = tuple(grilla)
-        return tupla_grilla
-
     def parar(self):
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
@@ -187,4 +174,32 @@ class Robot:
         for color, condicion in colores.items():
             if condicion:
                 return color
-        return  None  
+        return  None
+    def evaluar_baldosa_delantera(self):
+        coordenada_y = self.position['y']
+        baldosa_delantera_a_evaluar = coordenada_y - 0.12
+        return baldosa_delantera_a_evaluar
+
+    def evaluar_baldosa_derecha(self):
+        coordenada_x = self.position['x']
+        baldosa_derecha_a_evaluar = coordenada_x + 0.12
+        return baldosa_derecha_a_evaluar
+
+    def evaluar_baldosa_izquierda(self):
+        coordenada_x = self.position['x']
+        baldosa_izquierda_a_evaluar = coordenada_x - 0.12
+        return baldosa_izquierda_a_evaluar
+
+    def isVisited(self, visitedTiles):
+        gridIndex = self.positionToGrid(posicion_inicial)
+        return gridIndex in visitedTiles
+
+    def positionToGrid(self, posicion_inicial):
+        grilla = []
+        columna = round((self.position.x - posicion_inicial['x']) / 0.12) # Accedo a los elementos usando el "."
+        grilla.append(columna)
+        fila = round((self.position.x - posicion_inicial['y']) / 0.12)
+        grilla.append(fila)
+        # tupla_grilla = tuple(grilla)
+        # return tupla_grilla  
+        return grilla
