@@ -48,6 +48,8 @@ class Robot:
         self.wheelR.setVelocity(0)
         self.step()
 
+        self.posicion_inicial = None
+
     def step(self):
         result = self.robot.step(TIME_STEP)
         self.updateVars()
@@ -190,16 +192,18 @@ class Robot:
         baldosa_izquierda_a_evaluar = coordenada_x - 0.12
         return baldosa_izquierda_a_evaluar
 
-    def isVisited(self, visitedTiles):
+    def isVisited(self, baldosas_recorridas, posicion_inicial):
         gridIndex = self.positionToGrid(posicion_inicial)
-        return gridIndex in visitedTiles
+        if not gridIndex in baldosas_recorridas:
+            baldosas_recorridas.append(gridIndex)
+            return baldosas_recorridas
+        return True
 
     def positionToGrid(self, posicion_inicial):
         grilla = []
-        columna = round((self.position.x - posicion_inicial['x']) / 0.12) # Accedo a los elementos usando el "."
+        columna = round((self.position.x - posicion_inicial['x']) / 0.12)
         grilla.append(columna)
-        fila = round((self.position.x - posicion_inicial['y']) / 0.12)
+        fila = round((self.position.y - posicion_inicial['y']) / 0.12) 
         grilla.append(fila)
-        # tupla_grilla = tuple(grilla)
-        # return tupla_grilla  
-        return grilla
+        tupla_grilla = tuple(grilla)
+        return tupla_grilla

@@ -1,5 +1,3 @@
-from robot import Robot
-
 class Mapa:
     def __init__(self):
         self.robot = Robot()
