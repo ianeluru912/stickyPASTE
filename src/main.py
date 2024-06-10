@@ -3,6 +3,14 @@ from image import ImageProcessor
 
 robot = Robot()
 image_processor = ImageProcessor()
+robot.step()
+posicion_inicial = {'x': robot.position.x, 'y': robot.position.y}
+baldosas_recorridas = []
+baldosa_inicial = robot.positionToGrid(posicion_inicial)
+baldosas_recorridas.append(baldosa_inicial)
+baldosa_izquierda = robot.evaluar_baldosa_izquierda()
+baldosa_derecha = robot.evaluar_baldosa_derecha()
+baldosa_delantera = robot.evaluar_baldosa_delantera()
 
 while robot.step() != -1:
     imgIzq = robot.camI.getImage() 
