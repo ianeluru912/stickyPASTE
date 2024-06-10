@@ -9,8 +9,8 @@ baldosas_recorridas = []
 baldosa_inicial = robot.positionToGrid(posicion_inicial)
 baldosas_recorridas.append(baldosa_inicial)
 baldosa_izquierda = robot.evaluar_baldosa_izquierda()
-baldosa_derecha = robot.evaluar_baldosa_derecha()
 baldosa_delantera = robot.evaluar_baldosa_delantera()
+baldosa_derecha = robot.evaluar_baldosa_derecha()
 while robot.step() != -1:
     imgIzq = robot.camI.getImage()
     altoIzq = robot.camI.getHeight()
