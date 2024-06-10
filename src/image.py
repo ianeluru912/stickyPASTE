@@ -8,7 +8,7 @@ class ImageProcessor:
 
     def es_victima(self):
         if self.img is None or self.img.size == 0:
-            print("Error: La imagen es None o está vacía")
+            print("La imagen es None o está vacía")
             return None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(gris, 100, 255, cv2.THRESH_BINARY)
@@ -31,23 +31,38 @@ class ImageProcessor:
         if len(contours) == 1 and len(contours[0]) <= 10:
             approx = cv2.minAreaRect(contours[0])
             angulo = approx[2]
-            if angulo % 90 == 0: #si
+            if angulo % 90 == 0:
                 x = int(approx[0][0])
                 y = int(approx[0][1])
                 mitad_ancho = int(approx[1][0] / 2)
                 mitad_alto = int(approx[1][1] / 2)
                 cuadritoArriba = thresh[y - mitad_alto:y - int(mitad_alto / 3), x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
                 cuadritoAbajo = thresh[y + int(mitad_alto / 3):y + mitad_alto, x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
+                rect = thresh[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
+
+                tamanio = rect.shape[0] * rect.shape[1]
+                if tamanio == 0: return None
+
+                pixeles_negros = np.count_nonzero(rect == 0)
+                if pixeles_negros == 0: 
+                    return None
+
+                porcentaje_negros = pixeles_negros / tamanio
+                if porcentaje_negros < 0.1:
+                    return None
+
+                if abs(rect.shape[0] - rect.shape[1]) > 2:
+                    return None
+
                 pixeles_negros_arriba = np.count_nonzero(cuadritoArriba == 0)
                 pixeles_negros_abajo = np.count_nonzero(cuadritoAbajo == 0)
                 if pixeles_negros_abajo <= 5 and pixeles_negros_arriba <= 5:
-                    self.salida = 'H'
+                    return 'H'
                 elif pixeles_negros_abajo >= 13 and pixeles_negros_arriba >= 13:
-                    self.salida = 'S'
+                    return 'S'
                 elif pixeles_negros_abajo >= 15 and pixeles_negros_arriba <= 5:
-                    self.salida = 'U'
-                return self.salida
-        return self.salida
+                    return 'U'
+        return None
 
     def reconocer_limpiar_cartel(self):
         if self.img is None or self.img.size == 0:
@@ -77,6 +92,8 @@ class ImageProcessor:
             if y - mitad_alto < 0 or y + mitad_alto > imagen_rot.shape[0] or x - mitad_ancho < 0 or x + mitad_ancho > imagen_rot.shape[1]:
                 return None
             rect = imagen_rot[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
+            if rect.size == 0:
+                return None
             return rect, True
         return None
 
@@ -131,10 +148,10 @@ class ImageProcessor:
         return self.salida
 
     def procesar(self, converted_img):
-        # if converted_img is None or converted_img.size == 0:
-        #     return None
-        salida = None
+        if converted_img is None or converted_img.size == 0:
+            return None
         self.img = converted_img
+        salida = None
         victima = self.devolver_letra_victimas()
         if victima is not None:
             print('letra', victima)
