@@ -178,17 +178,17 @@ class Robot:
                 return color
         return  None
     def evaluar_baldosa_delantera(self):
-        coordenada_y = self.position['y']
+        coordenada_y = self.position.y
         baldosa_delantera_a_evaluar = coordenada_y - 0.12
         return baldosa_delantera_a_evaluar
 
     def evaluar_baldosa_derecha(self):
-        coordenada_x = self.position['x']
+        coordenada_x = self.position.x
         baldosa_derecha_a_evaluar = coordenada_x + 0.12
         return baldosa_derecha_a_evaluar
 
     def evaluar_baldosa_izquierda(self):
-        coordenada_x = self.position['x']
+        coordenada_x = self.position.x
         baldosa_izquierda_a_evaluar = coordenada_x - 0.12
         return baldosa_izquierda_a_evaluar
 
