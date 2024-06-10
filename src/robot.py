@@ -208,13 +208,13 @@ class Robot:
         tupla_grilla = tuple(grilla)
         return tupla_grilla
 
-    def coordenada_baldosa_delantera(self, posicion_inicial):
-        baldosa_actual = self.positionToGrid(posicion_inicial)
-        list(baldosa_actual)
-        baldosa_delantera = []
-        baldosa_delantera.append(baldosa_actual[0])
-        baldosa_delantera.append(baldosa_actual[1] - 1)
-        return baldosa_delantera
+    # def coordenada_baldosa_delantera(self, posicion_inicial):
+    #     baldosa_actual = self.positionToGrid(posicion_inicial)
+    #     list(baldosa_actual)
+    #     baldosa_delantera = []
+    #     baldosa_delantera.append(baldosa_actual[0])
+    #     baldosa_delantera.append(baldosa_actual[1] - 1)
+    #     return baldosa_delantera
     
     def coordenada_baldosa_izquierda(self, posicion_inicial):
         baldosa_actual = self.positionToGrid(posicion_inicial)
@@ -229,5 +229,5 @@ class Robot:
         list(baldosa_actual)
         baldosa_derecha = []
         baldosa_derecha.append(baldosa_actual[0] - 1)
-        baldosa_derecha.append(baldosa_actual[1])
-        return baldosa_derecha
+        baldosa_derecha.append(baldosa_actual[1] - 1)
+        return baldosa_derecha 
