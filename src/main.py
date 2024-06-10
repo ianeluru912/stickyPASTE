@@ -1,100 +1,78 @@
 from robot import Robot
 from image import ImageProcessor
 
-# Inicializar el robot y procesar la imagen obtenida
 robot = Robot()
 image_processor = ImageProcessor()
 
-# Obtener lo leido de la camara
 while robot.step() != -1:
-    img = robot.camI.getImage() 
-    alto = robot.camI.getHeight()
-    ancho = robot.camI.getWidth()
-    resultado = robot.convertir_camara(img, alto, ancho)
+    imgIzq = robot.camI.getImage() 
+    altoIzq = robot.camI.getHeight()
+    anchoIzq = robot.camI.getWidth()
+    imgDer = robot.camD.getImage()
+    altoDer = robot.camD.getHeight()
+    anchoDer = robot.camD.getWidth()
+    resultadoIzq = robot.convertir_camara(imgIzq, altoIzq, anchoIzq)
+    resultadoDer = robot.convertir_camara(imgDer, altoDer, anchoDer)
     
-    # Procesar la imagen y determinar la letra o el tipo de cartel/victima
-    entrada = image_processor.procesar(resultado)
+    entradaIzq = image_processor.procesar(resultadoIzq)
+    entradaDer = image_processor.procesar(resultadoDer)
     
     if not robot.hayAlgoIzquierda():
         robot.girarIzquierda90()
-        resultado = robot.convertir_camara(robot.camI.getImage(), alto, ancho)
-        entrada = image_processor.procesar(resultado)
-        if entrada is not None:
-            robot.enviarMensajeVoC(entrada)
+        resultadoIzq = robot.convertir_camara(robot.camI.getImage(), altoIzq, anchoIzq)
+        resultadoDer = robot.convertir_camara(robot.camD.getImage(), altoDer, anchoDer)
+        entradaIzq = image_processor.procesar(resultadoIzq)
+        entradaDer = image_processor.procesar(resultadoDer)
+        if entradaIzq is not None:
+            robot.enviarMensajeVoC(entradaIzq)
+        if entradaDer is not None:
+            robot.enviarMensajeVoC(entradaDer)
         robot.avanzarBaldosa()
-        resultado = robot.convertir_camara(robot.camI.getImage(), alto, ancho)
-        entrada = image_processor.procesar(resultado)
-        if entrada is not None:
-            robot.enviarMensajeVoC(entrada)
+        resultadoIzq = robot.convertir_camara(robot.camI.getImage(), altoIzq, anchoIzq)
+        resultadoDer = robot.convertir_camara(robot.camD.getImage(), altoDer, anchoDer)
+        entradaIzq = image_processor.procesar(resultadoIzq)
+        entradaDer = image_processor.procesar(resultadoDer)
+        if entradaIzq is not None:
+            robot.enviarMensajeVoC(entradaIzq)
+        if entradaDer is not None:
+            robot.enviarMensajeVoC(entradaDer)
     elif not robot.hayAlgoAdelante():
         robot.avanzarBaldosa()
-        resultado = robot.convertir_camara(robot.camI.getImage(), alto, ancho)
-        entrada = image_processor.procesar(resultado)
-        if entrada is not None:
-            print(robot.enviarMensajeVoC(entrada))
+        resultadoIzq = robot.convertir_camara(robot.camI.getImage(), altoIzq, anchoIzq)
+        resultadoDer = robot.convertir_camara(robot.camD.getImage(), altoDer, anchoDer)
+        entradaIzq = image_processor.procesar(resultadoIzq)
+        entradaDer = image_processor.procesar(resultadoDer)
+        if entradaIzq is not None:
+            robot.enviarMensajeVoC(entradaIzq)
+        if entradaDer is not None:
+            robot.enviarMensajeVoC(entradaDer)
     elif not robot.hayAlgoDerecha():
         robot.girarDerecha90()
-        resultado = robot.convertir_camara(robot.camI.getImage(), alto, ancho)
-        entrada = image_processor.procesar(resultado)
-        if entrada is not None:
-            robot.enviarMensajeVoC(entrada)
+        resultadoIzq = robot.convertir_camara(robot.camI.getImage(), altoIzq, anchoIzq)
+        resultadoDer = robot.convertir_camara(robot.camD.getImage(), altoDer, anchoDer)
+        entradaIzq = image_processor.procesar(resultadoIzq)
+        entradaDer = image_processor.procesar(resultadoDer)
+        if entradaIzq is not None:
+            robot.enviarMensajeVoC(entradaIzq)
+        if entradaDer is not None:
+            robot.enviarMensajeVoC(entradaDer)
         robot.avanzarBaldosa()
-        resultado = robot.convertir_camara(robot.camI.getImage(), alto, ancho)
-        entrada = image_processor.procesar(resultado)
-        if entrada is not None:
-            robot.enviarMensajeVoC(entrada)
+        resultadoIzq = robot.convertir_camara(robot.camI.getImage(), altoIzq, anchoIzq)
+        resultadoDer = robot.convertir_camara(robot.camD.getImage(), altoDer, anchoDer)
+        entradaIzq = image_processor.procesar(resultadoIzq)
+        entradaDer = image_processor.procesar(resultadoDer)
+        if entradaIzq is not None:
+            robot.enviarMensajeVoC(entradaIzq)
+        if entradaDer is not None:
+            robot.enviarMensajeVoC(entradaDer)
     else:
         robot.girarMediaVuelta()
         robot.avanzarBaldosa()
-        resultado = robot.convertir_camara(robot.camI.getImage(), alto, ancho)
-        entrada = image_processor.procesar(resultado)
-        if entrada is not None:
-            print(robot.enviarMensajeVoC(entrada))
-
-# from robot import Robot
-# from image import ImageProcessor
-
-# # Inicializar el robot y procesar la imagen obtenida
-# robot = Robot()
-# image_processor = ImageProcessor()  
-
-# # Obtener lo leido de la camara -
-
-# # entrada = image_processor.procesar(robot.img_a_convertir, image_processor.letra_img)
-
-# while robot.step() != -1:
-#     img = robot.camI.getImage() 
-#     alto = robot.camI.getHeight()
-#     ancho = robot.camI.getWidth()
-#     resultado = robot.convertir_camara(img, alto, ancho)
-#     entrada = image_processor.procesar(resultado) 
-#     # color = robot.detectar_color(r, g, b)
-#     if not robot.hayAlgoIzquierda():
-#         robot.girarIzquierda90() 
-#         image_processor.procesar(resultado)
-#         if entrada is not None:
-#             print(robot.enviarMensajeVoC(entrada))
-#         robot.avanzarBaldosa()
-#         image_processor.procesar(resultado)
-#         if entrada is not None:
-#             print(robot.enviarMensajeVoC(entrada))
-#     elif not robot.hayAlgoAdelante():
-#         robot.avanzarBaldosa()
-#         image_processor.procesar(resultado)
-#         if entrada is not None: 
-#             print(robot.enviarMensajeVoC(entrada))
-#     elif not robot.hayAlgoDerecha():
-#         robot.girarDerecha90()
-#         image_processor.procesar(resultado)
-#         if entrada is not None:
-#             print(robot.enviarMensajeVoC(entrada))
-#         robot.avanzarBaldosa()
-#         image_processor.procesar(resultado)
-#         if entrada is not None:
-#             print(robot.enviarMensajeVoC(entrada))
-#     else:
-#         robot.girarMediaVuelta()
-#         robot.avanzarBaldosa()
-#         image_processor.procesar(resultado)
-#         if entrada is not None:
-#             print(robot.enviarMensajeVoC(entrada))
+        resultadoIzq = robot.convertir_camara(robot.camI.getImage(), altoIzq, anchoIzq)
+        resultadoDer = robot.convertir_camara(robot.camD.getImage(), altoDer, anchoDer)
+        entradaIzq = image_processor.procesar(resultadoIzq)
+        entradaDer = image_processor.procesar(resultadoDer)
+        if entradaIzq is not None:
+            robot.enviarMensajeVoC(entradaIzq)
+        if entradaDer is not None:
+            robot.enviarMensajeVoC(entradaDer)
