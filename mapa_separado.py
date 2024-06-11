@@ -58,3 +58,8 @@ class Mapa:
         grilla.append(fila)
         tupla_grilla = tuple(grilla)
         return tupla_grilla
+    
+
+
+
+

@@ -207,27 +207,12 @@ class Robot:
         grilla.append(fila)
         tupla_grilla = tuple(grilla)
         return tupla_grilla
-
-    # def coordenada_baldosa_delantera(self, posicion_inicial):
-    #     baldosa_actual = self.positionToGrid(posicion_inicial)
-    #     list(baldosa_actual)
-    #     baldosa_delantera = []
-    #     baldosa_delantera.append(baldosa_actual[0])
-    #     baldosa_delantera.append(baldosa_actual[1] - 1)
-    #     return baldosa_delantera
     
-    def coordenada_baldosa_izquierda(self, posicion_inicial):
-        baldosa_actual = self.positionToGrid(posicion_inicial)
-        list(baldosa_actual)
-        baldosa_izquierda = []
-        baldosa_izquierda.append(baldosa_actual[0] + 1)
-        baldosa_izquierda.append(baldosa_actual[1])
-        return baldosa_izquierda
-    
-    def coordendada_baldosa_derecha(self, posicion_inicial):
-        baldosa_actual = self.positionToGrid(posicion_inicial)
-        list(baldosa_actual)
-        baldosa_derecha = []
-        baldosa_derecha.append(baldosa_actual[0] - 1)
-        baldosa_derecha.append(baldosa_actual[1] - 1)
-        return baldosa_derecha 
+    def positionToGridBaldosasEspecificas(self, tile, posicion_inicial):
+        grilla = []
+        columna = round((tile.x - posicion_inicial['x']) / 0.12)
+        grilla.append(columna)
+        fila = round((tile.y - posicion_inicial['y']) / 0.12) 
+        grilla.append(fila)
+        tupla_grilla = tuple(grilla)
+        return tupla_grilla
