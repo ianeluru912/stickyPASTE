@@ -177,20 +177,18 @@ class Robot:
             if condicion:
                 return color
         return  None
+
     def evaluar_baldosa_delantera(self):
-        coordenada_y = self.position.y
-        baldosa_delantera_a_evaluar = coordenada_y - 0.12
-        return baldosa_delantera_a_evaluar
+        coordenada_y = self.position.y - 0.12
+        return {'x': self.position.x, 'y': coordenada_y}
 
     def evaluar_baldosa_derecha(self):
-        coordenada_x = self.position.x
-        baldosa_derecha_a_evaluar = coordenada_x + 0.12
-        return baldosa_derecha_a_evaluar
+        coordenada_x = self.position.x + 0.12
+        return {'x': coordenada_x, 'y': self.position.y}
 
     def evaluar_baldosa_izquierda(self):
-        coordenada_x = self.position.x
-        baldosa_izquierda_a_evaluar = coordenada_x - 0.12
-        return baldosa_izquierda_a_evaluar
+        coordenada_x = self.position.x - 0.12
+        return {'x': coordenada_x, 'y': self.position.y}
 
     def isVisited(self, baldosas_recorridas, posicion_inicial):
         gridIndex = self.positionToGrid(posicion_inicial)
@@ -210,9 +208,9 @@ class Robot:
     
     def positionToGridBaldosasEspecificas(self, tile, posicion_inicial):
         grilla = []
-        columna = round((tile.x - posicion_inicial['x']) / 0.12)
+        columna = round((tile['x'] - posicion_inicial['x']) / 0.12)
         grilla.append(columna)
-        fila = round((tile.y - posicion_inicial['y']) / 0.12) 
+        fila = round((tile['y'] - posicion_inicial['y']) / 0.12)
         grilla.append(fila)
         tupla_grilla = tuple(grilla)
         return tupla_grilla
