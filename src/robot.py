@@ -178,6 +178,10 @@ class Robot:
                 return color
         return  None
 
+    def evaluar_baldosa_trasera(self):
+        coordenada_y = self.position.y + 0.12
+        return {'x': self.position.x, 'y': coordenada_y}    
+
     def evaluar_baldosa_delantera(self):
         coordenada_y = self.position.y - 0.12
         return {'x': self.position.x, 'y': coordenada_y}
@@ -214,3 +218,34 @@ class Robot:
         grilla.append(fila)
         tupla_grilla = tuple(grilla)
         return tupla_grilla
+    
+    # def recorrer_bifurcaciones(self, posicion_inicial, bifurcaciones, direccion, baldosa_trasera):
+    #     if self.positionToGrid(posicion_inicial) == self.positionToGridBaldosasEspecificas(baldosa_trasera, posicion_inicial): # la "tile" en este caso va a ser la baldosa anterior a la birfurcacion
+    #         if self.positionToGrid == bifurcaciones[0] and direccion == 'adelante':
+    #             del(bifurcaciones[0])
+    #             self.avanzarBaldosa()
+    #             return bifurcaciones
+    #         elif self.positionToGrid() == bifurcaciones[0] and direccion == 'derecha':
+    #             del(bifurcaciones[0])
+    #             self.girarDerecha90()
+    #             self.avanzarBaldosa()
+    #             return bifurcaciones
+    #     if self.positionToGrid(posicion_inicial) in bifurcaciones:
+    #         bifurcaciones.remove(self.positionToGrid(posicion_inicial))
+    #         return bifurcaciones
+
+    def recorrer_bifurcaciones(self, posicion_inicial, bifurcaciones, direccion, baldosa_trasera):
+        # Implementación del método recorrer_bifurcaciones
+        if direccion == 'derecha':
+            self.girarDerecha90()
+            self.avanzarBaldosa()
+        elif direccion == 'izquierda':
+            self.girarIzquierda90()
+            self.avanzarBaldosa()
+        
+        # Realizar la acción necesaria en la bifurcación
+        bifurcaciones.append(self.position)
+
+        # Volver a la baldosa trasera si es necesario
+        self.girarMediaVuelta()
+        self.avanzarBaldosa()
