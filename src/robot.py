@@ -219,33 +219,25 @@ class Robot:
         tupla_grilla = tuple(grilla)
         return tupla_grilla
     
-    # def recorrer_bifurcaciones(self, posicion_inicial, bifurcaciones, direccion, baldosa_trasera):
-    #     if self.positionToGrid(posicion_inicial) == self.positionToGridBaldosasEspecificas(baldosa_trasera, posicion_inicial): # la "tile" en este caso va a ser la baldosa anterior a la birfurcacion
-    #         if self.positionToGrid == bifurcaciones[0] and direccion == 'adelante':
-    #             del(bifurcaciones[0])
-    #             self.avanzarBaldosa()
-    #             return bifurcaciones
-    #         elif self.positionToGrid() == bifurcaciones[0] and direccion == 'derecha':
-    #             del(bifurcaciones[0])
-    #             self.girarDerecha90()
-    #             self.avanzarBaldosa()
-    #             return bifurcaciones
-    #     if self.positionToGrid(posicion_inicial) in bifurcaciones:
-    #         bifurcaciones.remove(self.positionToGrid(posicion_inicial))
-    #         return bifurcaciones
+    def recorrer_bifurcaciones(self, posicion_inicial, bifurcaciones, direcciones, baldosa_trasera):
+        # if self.positionToGrid(posicion_inicial) == self.positionToGridBaldosasEspecificas(baldosa_trasera, posicion_inicial):
+        #     print('baldosa previa a bifurcacion')
+            if self.positionToGrid(posicion_inicial) == bifurcaciones[0]:
+                direccion = direcciones[0]
+                del bifurcaciones[0]
+                del direcciones[0]
+                if direccion == 'adelante':
+                    self.avanzarBaldosa()
+                elif direccion == 'derecha':
+                    self.girarDerecha90()
+                    self.avanzarBaldosa()
+                elif direccion == 'izquierda':
+                    self.girarIzquierda90()
+                    self.avanzarBaldosa()
+                return bifurcaciones, direcciones
+            if self.positionToGrid(posicion_inicial) in bifurcaciones:
+                bifurcaciones.remove(self.positionToGrid(posicion_inicial))
+                return bifurcaciones, direcciones
+            return bifurcaciones, direcciones
 
-    def recorrer_bifurcaciones(self, posicion_inicial, bifurcaciones, direccion, baldosa_trasera):
-        # Implementación del método recorrer_bifurcaciones
-        if direccion == 'derecha':
-            self.girarDerecha90()
-            self.avanzarBaldosa()
-        elif direccion == 'izquierda':
-            self.girarIzquierda90()
-            self.avanzarBaldosa()
-        
-        # Realizar la acción necesaria en la bifurcación
-        bifurcaciones.append(self.position)
-
-        # Volver a la baldosa trasera si es necesario
-        self.girarMediaVuelta()
-        self.avanzarBaldosa()
+    
