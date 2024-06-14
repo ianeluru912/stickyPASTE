@@ -192,18 +192,18 @@ class Robot:
         baldosa_izquierda_a_evaluar = coordenada_x - 0.12
         return baldosa_izquierda_a_evaluar
 
-    def isVisited(self, baldosas_recorridas, posicion_inicial):
-        gridIndex = self.positionToGrid(posicion_inicial)
+    def isVisited(self, baldosas_recorridas, posicion_inicial, pos):
+        gridIndex = self.positionToGrid(posicion_inicial, pos)
         if not gridIndex in baldosas_recorridas:
             baldosas_recorridas.append(gridIndex)
             return baldosas_recorridas
         return True
 
-    def positionToGrid(self, posicion_inicial):
+    def positionToGrid(self, posicion_inicial, pos):
         grilla = []
-        columna = round((self.position.x - posicion_inicial['x']) / 0.12)
+        columna = round((pos.x - posicion_inicial['x']) / 0.12)
         grilla.append(columna)
-        fila = round((self.position.y - posicion_inicial['y']) / 0.12) 
+        fila = round((pos.y - posicion_inicial['y']) / 0.12) 
         grilla.append(fila)
         tupla_grilla = tuple(grilla)
         return tupla_grilla
@@ -216,16 +216,16 @@ class Robot:
     #     baldosa_delantera.append(baldosa_actual[1] - 1)
     #     return baldosa_delantera
     
-    def coordenada_baldosa_izquierda(self, posicion_inicial):
-        baldosa_actual = self.positionToGrid(posicion_inicial)
+    def coordenada_baldosa_izquierda(self, posicion_inicial, pos):
+        baldosa_actual = self.positionToGrid(posicion_inicial, pos)
         list(baldosa_actual)
         baldosa_izquierda = []
         baldosa_izquierda.append(baldosa_actual[0] + 1)
         baldosa_izquierda.append(baldosa_actual[1])
         return baldosa_izquierda
     
-    def coordendada_baldosa_derecha(self, posicion_inicial):
-        baldosa_actual = self.positionToGrid(posicion_inicial)
+    def coordendada_baldosa_derecha(self, posicion_inicial, pos):
+        baldosa_actual = self.positionToGrid(posicion_inicial, pos)
         list(baldosa_actual)
         baldosa_derecha = []
         baldosa_derecha.append(baldosa_actual[0] - 1)
