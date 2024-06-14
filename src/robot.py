@@ -219,25 +219,23 @@ class Robot:
         tupla_grilla = tuple(grilla)
         return tupla_grilla
     
-    def recorrer_bifurcaciones(self, posicion_inicial, bifurcaciones, direcciones, baldosa_trasera):
-        # if self.positionToGrid(posicion_inicial) == self.positionToGridBaldosasEspecificas(baldosa_trasera, posicion_inicial):
-        #     print('baldosa previa a bifurcacion')
-            if self.positionToGrid(posicion_inicial) == bifurcaciones[0]:
-                direccion = direcciones[0]
-                del bifurcaciones[0]
-                del direcciones[0]
-                if direccion == 'adelante':
-                    self.avanzarBaldosa()
-                elif direccion == 'derecha':
-                    self.girarDerecha90()
-                    self.avanzarBaldosa()
-                elif direccion == 'izquierda':
-                    self.girarIzquierda90()
-                    self.avanzarBaldosa()
-                return bifurcaciones, direcciones
-            if self.positionToGrid(posicion_inicial) in bifurcaciones:
-                bifurcaciones.remove(self.positionToGrid(posicion_inicial))
-                return bifurcaciones, direcciones
+    def recorrer_bifurcaciones(self, posicion_inicial, bifurcaciones, direcciones):
+        if self.positionToGrid(posicion_inicial) == bifurcaciones[0]:
+            direccion = direcciones[0]
+            del bifurcaciones[0]
+            del direcciones[0]
+            if direccion == 'adelante':
+                self.avanzarBaldosa()
+            elif direccion == 'derecha':
+                self.girarDerecha90()
+                self.avanzarBaldosa()
+            elif direccion == 'izquierda':
+                self.girarIzquierda90()
+                self.avanzarBaldosa()
             return bifurcaciones, direcciones
+        if self.positionToGrid(posicion_inicial) in bifurcaciones:
+            bifurcaciones.remove(self.positionToGrid(posicion_inicial))
+            return bifurcaciones, direcciones
+        return bifurcaciones, direcciones
 
     
