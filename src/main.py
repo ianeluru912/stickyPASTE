@@ -45,7 +45,7 @@ while robot.step() != -1:
             print('hay dos caminos posibles')
             print('candidato izquierda', candidato_izquierda,'candidato derecha', candidato_derecha)
         else:
-            robot.girarDerecha90()
+            robot.girarIzquierda90()
             robot.avanzarBaldosa()
         print('orientacion', robot.obtener_orientacion(robot.rotation))
         print(baldosas_recorridas)
