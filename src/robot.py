@@ -220,12 +220,12 @@ class Robot:
     def obtener_orientacion(self, radianes):
         angulo = self.normalizar_radianes(radianes)
         if angulo >= 0.785 and angulo <= 2.355:
-            return 'E'
-        elif angulo >= -2.355 and angulo <= -0.785:
             return 'W'
+        elif angulo >= -2.355 and angulo <= -0.785:
+            return 'E'
         elif angulo >= -0.785 and angulo <= 0.785:
             return 'N'
-        elif angulo <= -2.355 and angulo <= 2.355:
+        else:
             return 'S'
     
     def coordenada_baldosa_derecha(self, posicion_inicial, pos, radianes):
@@ -238,13 +238,13 @@ class Robot:
             baldosa_derecha.append(baldosa_actual[1])
         elif orientacion == 'W':
             baldosa_derecha.append(baldosa_actual[0])
-            baldosa_derecha.append(baldosa_actual[1] + 1)
+            baldosa_derecha.append(baldosa_actual[1] - 1)
         elif orientacion == 'S':
             baldosa_derecha.append(baldosa_actual[0] - 1)
             baldosa_derecha.append(baldosa_actual[1])
         elif orientacion == 'E':
             baldosa_derecha.append(baldosa_actual[0])
-            baldosa_derecha.append(baldosa_actual[1] - 1)
+            baldosa_derecha.append(baldosa_actual[1] + 1)
         return tuple(baldosa_derecha)
         
     def coordenada_baldosa_delantera(self, posicion_inicial, pos, radianes):
@@ -258,11 +258,11 @@ class Robot:
         elif orientacion == 'S':
             baldosa_delantera.append(baldosa_actual[0])
             baldosa_delantera.append(baldosa_actual[1] + 1)
-        elif orientacion == 'E':
-            baldosa_delantera.append(baldosa_actual[0] + 1)
-            baldosa_delantera.append(baldosa_actual[1])
         elif orientacion == 'W':
             baldosa_delantera.append(baldosa_actual[0] - 1)
+            baldosa_delantera.append(baldosa_actual[1])
+        elif orientacion == 'E':
+            baldosa_delantera.append(baldosa_actual[0] + 1)
             baldosa_delantera.append(baldosa_actual[1])
         return tuple(baldosa_delantera)
 
@@ -276,11 +276,11 @@ class Robot:
             baldosa_izquierda.append(baldosa_actual[1])
         elif orientacion == 'W':
             baldosa_izquierda.append(baldosa_actual[0])
-            baldosa_izquierda.append(baldosa_actual[1] - 1)
+            baldosa_izquierda.append(baldosa_actual[1] + 1)
         elif orientacion == 'S':
             baldosa_izquierda.append(baldosa_actual[0] + 1)
             baldosa_izquierda.append(baldosa_actual[1])
         elif orientacion == 'E':
             baldosa_izquierda.append(baldosa_actual[0])
-            baldosa_izquierda.append(baldosa_actual[1] + 1)    
+            baldosa_izquierda.append(baldosa_actual[1] - 1)    
         return tuple(baldosa_izquierda)
