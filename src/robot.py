@@ -284,3 +284,5 @@ class Robot:
             baldosa_izquierda.append(baldosa_actual[0])
             baldosa_izquierda.append(baldosa_actual[1] - 1)    
         return tuple(baldosa_izquierda)
+
+    
