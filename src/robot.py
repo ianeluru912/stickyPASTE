@@ -2,6 +2,7 @@ from controller import Robot as WebotsRobot
 from map import Map, Tile
 from image import ImageProcessor
 from point import Point
+from piso import Piso
 import math
 import utils
 import struct
@@ -144,7 +145,14 @@ class Robot:
             else:
                 return False
 
-
+    def bh_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.blackHole():
+            return True
+        else:
+            return False
+        
     def hayAlgoAdelante(self):
         frontDist = self.rangeImage[256]
         return frontDist < 0.08
@@ -336,11 +344,14 @@ class Robot:
             east_tile = self.map.addTile(col + 1, row)
             east_tile.west = tile
             tile.east = east_tile
-
         if self.isOpenSouth():
             south_tile = self.map.addTile(col, row + 1)
             south_tile.north = tile
             tile.south = south_tile
+        if self.bh_ahead():
+            self.obtener_orientacion(self.rotation)
+            
+            tile.isBlackHole = True
 
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
@@ -379,7 +390,7 @@ class Robot:
 
         while self.obtener_orientacion(self.rotation) != self.getDirectionBetween(current_tile, tile):
             self.girarIzquierda90()
-
         self.avanzarBaldosa()
+
 
     

@@ -1,4 +1,4 @@
-class N:
+class Piso:
     def __init__(self, r, g, b):
         self.red = r
         self.green = g
@@ -15,6 +15,4 @@ class N:
         return abs(self.red) < 15 \
             and abs(self.green) < 15 \
             and abs(self.blue) < 15
-    def is_BH(self):
-        return self.blackHole()
     
