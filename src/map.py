@@ -30,6 +30,7 @@ class Tile:
         self.west = None
         self.east = None
         self.south = None
+        self.isBlackHole = False
 
     def isConnectedTo(self, tile):
         if self.north == tile: 

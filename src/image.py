@@ -46,8 +46,9 @@ class ImageProcessor:
                     self.salida = 'S'
                 elif pixeles_negros_abajo >= 15 and pixeles_negros_arriba <= 5:
                     self.salida = 'U'
-                return self.salida
-        return self.salida
+                elif pixeles_negros_abajo >= 1 and pixeles_negros_arriba >= 1:
+                    return self.salida
+            return self.salida
 
     def reconocer_limpiar_cartel(self):
         if self.img is None or self.img.size == 0:
@@ -79,7 +80,14 @@ class ImageProcessor:
             rect = imagen_rot[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
             return rect, True
         return None
-
+    def hay_posible_agujero(self, img):
+        gris = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        height, width = gris.shape
+        primer_tercio = gris[:, :width // 3]
+        cantidad_negros = np.sum(primer_tercio == 0)
+        umbral = (height * (width // 3)) * 0.1 
+        
+        return cantidad_negros > umbral
     def devolver_letra_carteles(self):
         self.salida = None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -119,17 +127,19 @@ class ImageProcessor:
                         rojo += 1
                     elif b < 10 and g > 190 and r > 195:
                         amarillo += 1
-            if (rojo + blanco) > (negro + amarillo) and rojo > blanco and blanco >= negro:
+            if rojo > 0 and rojo > blanco and rojo > negro and rojo > amarillo and blanco == 0 and negro == 0 and amarillo == 0:
+                print(rojo, blanco, negro, amarillo)
                 self.salida = 'F'
             elif (blanco + negro) > (amarillo + rojo) and blanco > negro:
+                print(rojo, blanco, negro, amarillo)
                 self.salida = 'P'
             elif (blanco + negro) > (amarillo + rojo):
+                print(rojo, blanco, negro, amarillo)
                 self.salida = 'C'
-            elif (rojo + amarillo) > (negro + blanco):
+            elif rojo > 0 and amarillo > 0 and rojo > blanco and rojo > negro and rojo > amarillo and amarillo > blanco and amarillo > negro:
+                print(rojo, blanco, negro, amarillo)
                 self.salida = 'O'
             return self.salida
-        return self.salida
-
     def procesar(self, converted_img):
         # if converted_img is None or converted_img.size == 0:
         #     return None

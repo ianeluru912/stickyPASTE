@@ -126,11 +126,24 @@ class Robot:
 
     def hayAlgoIzquierda(self):
         leftDist = self.rangeImage[128]
-        return leftDist < 0.08
+        if leftDist < 0.08:
+            return True
+        else:
+            if self.imageProcessor.hay_posible_agujero(self.camI.getImage()):
+                return True
+            else:
+                return False
 
     def hayAlgoDerecha(self):
         rightDist = self.rangeImage[128*3]
-        return rightDist < 0.08
+        if rightDist < 0.08:
+            return True
+        else:
+            if self.imageProcessor.hay_posible_agujero(self.camD.getImage()):
+                return True
+            else:
+                return False
+
 
     def hayAlgoAdelante(self):
         frontDist = self.rangeImage[256]
