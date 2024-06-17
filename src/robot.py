@@ -1,4 +1,5 @@
 from controller import Robot as WebotsRobot
+from map import Map, Tile
 from image import ImageProcessor
 from point import Point
 import math
@@ -39,16 +40,18 @@ class Robot:
         self.camD.enable(TIME_STEP)
 
         self.imageProcessor = ImageProcessor()
-
+       
         self.position = None
         self.rotation = 0
         self.rangeImage = None
+        self.posicion_inicial = None
 
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
         self.step()
 
-        self.posicion_inicial = None
+        self.posicion_inicial = self.position
+        self.map = Map(self.posicion_inicial)
 
     def step(self):
         result = self.robot.step(TIME_STEP)
@@ -162,6 +165,7 @@ class Robot:
     def convertir_camara(self, img, alto, ancho):  
             img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
             return img_a_convertir
+    
     def detectar_color(r, g, b):
         colores = {
             "verde": (abs(r - 48) < 15 and abs(g - 255) < 15 and abs(b - 48) < 15),
@@ -177,20 +181,6 @@ class Robot:
             if condicion:
                 return color
         return  None
-    def evaluar_baldosa_delantera(self):
-        coordenada_y = self.position.y
-        baldosa_delantera_a_evaluar = coordenada_y - 0.12
-        return baldosa_delantera_a_evaluar
-
-    def evaluar_baldosa_derecha(self):
-        coordenada_x = self.position.x
-        baldosa_derecha_a_evaluar = coordenada_x + 0.12
-        return baldosa_derecha_a_evaluar
-
-    def evaluar_baldosa_izquierda(self):
-        coordenada_x = self.position.x
-        baldosa_izquierda_a_evaluar = coordenada_x - 0.12
-        return baldosa_izquierda_a_evaluar
 
     def isVisited(self, baldosas_recorridas, posicion_inicial, pos):
         gridIndex = self.positionToGrid(posicion_inicial, pos)
@@ -199,14 +189,6 @@ class Robot:
             return baldosas_recorridas
         return True
 
-    def positionToGrid(self, posicion_inicial, pos):
-        grilla = []
-        columna = round((pos.x - posicion_inicial['x']) / 0.12)
-        grilla.append(columna)
-        fila = round((pos.y - posicion_inicial['y']) / 0.12)
-        grilla.append(fila)
-        tupla_grilla = tuple(grilla)
-        return tupla_grilla
 
     def normalizar_radianes(self, radianes): # radianes seria la rotacion actual del robot
         if radianes > math.pi:
@@ -284,5 +266,107 @@ class Robot:
             baldosa_izquierda.append(baldosa_actual[0])
             baldosa_izquierda.append(baldosa_actual[1] - 1)    
         return tuple(baldosa_izquierda)
+    
+    def isOpenNorth(self):
+        orient = self.obtener_orientacion(self.rotation)
+        lidar_idx = {'N': 256,
+                     'W': 384,
+                     'S': 0,
+                     'E': 128}
+        
+        dist = self.rangeImage[lidar_idx[orient]]
+        return dist >= 0.08
+
+    def isOpenSouth(self):
+        orient = self.obtener_orientacion(self.rotation)
+        lidar_idx = {'S': 256,
+                     'E': 384,
+                     'N': 0,
+                     'W': 128}
+        
+        dist = self.rangeImage[lidar_idx[orient]]
+        return dist >= 0.08
+        
+    def isOpenWest(self):
+        orient = self.obtener_orientacion(self.rotation)
+        lidar_idx = {'S': 384,
+                     'E': 0,
+                     'N': 128,
+                     'W': 256}
+        
+        dist = self.rangeImage[lidar_idx[orient]]
+        return dist >= 0.08
+        
+    def isOpenEast(self):
+        orient = self.obtener_orientacion(self.rotation)
+        lidar_idx = {'S': 128,
+                     'E': 256,
+                     'N': 384,
+                     'W': 0}
+        
+        dist = self.rangeImage[lidar_idx[orient]]
+        return dist >= 0.08
+        
+    def updateMap(self):
+        col, row = self.map.positionToGrid(self.position)
+        tile = self.map.addTile(col, row)
+        tile.visits += 1
+        if self.isOpenNorth():
+            north_tile = self.map.addTile(col, row - 1)
+            north_tile.south = tile
+            tile.north = north_tile
+        if self.isOpenWest():
+            west_tile = self.map.addTile(col - 1, row)
+            west_tile.east = tile
+            tile.west = west_tile
+        if self.isOpenEast():
+            east_tile = self.map.addTile(col + 1, row)
+            east_tile.west = tile
+            tile.east = east_tile
+
+        if self.isOpenSouth():
+            south_tile = self.map.addTile(col, row + 1)
+            south_tile.north = tile
+            tile.south = south_tile
+
+    def checkNeighbours(self):
+        orient = self.obtener_orientacion(self.rotation)
+        col, row = self.map.positionToGrid(self.position)
+        current_tile = self.map.getTileAt(col, row)
+
+        tile_order = {"N": ((-1, 0), (0, -1), (1, 0), (0, 1)),
+                      "E": ((0, -1), (1, 0), (0, 1), (-1, 0)),
+                      "S": ((1, 0), (0, 1), (-1, 0), (0, -1)),
+                      "W": ((0, 1), (-1, 0), (0, -1), (1, 0))}
+        tiles = []
+        for c, r in tile_order[orient]:
+            tile = self.map.addTile(col + c, row + r)
+            if tile.isConnectedTo(current_tile):
+                tiles.append(tile)
+
+        return tiles
+    
+    def getDirectionBetween(self, src, dst):
+        sc = src.col
+        sr = src.row
+        dc = dst.col
+        dr = dst.row
+        if dc - sc == 0: # Misma columna
+            if dr - sr > 0: return "S"
+            if dr - sr < 0: return "N"
+        elif dr - sr == 0: # Misma fila
+            if dc - sc > 0: return "E"
+            if dc - sc < 0: return "W"
+        return None
+    
+    
+    def moveTo(self, tile):
+        col, row = self.map.positionToGrid(self.position)
+        current_tile = self.map.getTileAt(col, row)
+
+        while self.obtener_orientacion(self.rotation) != self.getDirectionBetween(current_tile, tile):
+            self.girarIzquierda90()
+
+        self.avanzarBaldosa()
 
     
