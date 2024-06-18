@@ -1,5 +1,5 @@
 from robot import Robot
-
+from point import Point
 robot = Robot()
 
 while robot.step() != -1:

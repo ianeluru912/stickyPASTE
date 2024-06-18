@@ -40,7 +40,9 @@ class Robot:
         self.camD.enable(TIME_STEP)
 
         self.imageProcessor = ImageProcessor()
-       
+    
+        self.point = Point(0, 0)
+
         self.position = None
         self.rotation = 0
         self.rangeImage = None
@@ -209,6 +211,26 @@ class Robot:
             return 'N'
         else:
             return 'S'
+        
+    def coordenada_baldosa_proxima(self):
+        orientacion = self.obtener_orientacion(self.rotation)
+        if orientacion == 'N':
+            baldosa_proxima_delantera = (self.position.x, self.position.y - 0.12)
+            baldosa_proxima_izquierda = (self.position.x - 0.12, self.position.y)
+            baldosa_proxima_derecha = (self.position.x + 0.12, self.position.y)
+        elif orientacion == 'S':
+            baldosa_proxima_delantera = (self.position.x, self.position.y + 0.12)
+            baldosa_proxima_izquierda = (self.position.x + 0.12, self.position.y)
+            baldosa_proxima_derecha = (self.position.x - 0.12, self.position.y)
+        elif orientacion == 'W':
+            baldosa_proxima_delantera = (self.position.x - 0.12, self.position.y)
+            baldosa_proxima_izquierda = (self.position.x, self.position.y + 0.12)
+            baldosa_proxima_derecha = (self.position.x, self.position.y - 0.12)
+        else:
+            baldosa_proxima_delantera = (self.position.x + 0.12, self.position.y)
+            baldosa_proxima_izquierda = (self.position.x, self.position.y - 0.12)
+            baldosa_proxima_derecha = (self.position.x, self.position.y + 0.12)
+        return baldosa_proxima_delantera, baldosa_proxima_izquierda, baldosa_proxima_derecha
     
     def coordenada_baldosa_derecha(self, posicion_inicial, pos, radianes):
         baldosa_actual = self.positionToGrid(posicion_inicial, pos)
@@ -359,14 +381,16 @@ class Robot:
             if dc - sc < 0: return "W"
         return None
     
-    
     def moveTo(self, tile):
         col, row = self.map.positionToGrid(self.position)
         current_tile = self.map.getTileAt(col, row)
+        angulo_a_girar = self.point.angle_to() # pasar como argumento las coordenadas de la baldosa a la que quiero llegar
 
         while self.obtener_orientacion(self.rotation) != self.getDirectionBetween(current_tile, tile):
+        # Corregir código para no girar de más
             self.girarIzquierda90()
 
+        # self.girar(self.point.angle_to(self.point.distance_vector()))
         self.avanzarBaldosa()
 
     

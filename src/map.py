@@ -1,7 +1,13 @@
+from point import Point
 class Map:
     def __init__(self, origin) -> None:
         self.origin = origin
         self.tiles = {}
+
+    def gridToPosition(self, col, row):
+        x = self.origin.x + col * Tile.WIDTH
+        y = self.origin.y + row * Tile.HEIGHT
+        return Point(x, y)
 
     def positionToGrid(self, pos):
         columna = round((pos.x - self.origin.x) / Tile.WIDTH)
