@@ -14,7 +14,7 @@ while robot.step() != -1:
     tile = tiles[0]
 
     # 3. Mover robot a baldosa elegida
-    robot.moveTo(tile)
+    robot.moveToTile(tile)
     
     # 4. Repetir
 

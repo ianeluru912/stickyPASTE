@@ -405,15 +405,15 @@ class Robot:
             if dc - sc < 0: return "W"
         return None
     
-    def moveTo(self, tile):
-        col, row = self.map.positionToGrid(self.position)
-        current_tile = self.map.getTileAt(col, row)
-        angulo_a_girar = self.point.angle_to() # pasar como argumento las coordenadas de la baldosa a la que quiero llegar
+    def moveToTile(self, tile):
+        target_pos = self.map.gridToPosition(tile.col, tile.row)
+        self.moveToPoint(target_pos)
 
-        while self.obtener_orientacion(self.rotation) != self.getDirectionBetween(current_tile, tile):
-        # Corregir código para no girar de más
-            self.girarIzquierda90()
-        self.avanzarBaldosa()
-
-
+    def moveToPoint(self, target_pos):
+        target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
+        target_ang = target_vector.angle()
+        delta_ang = self.normalizar_radianes(target_ang - self.rotation)
+        
+        self.girar(delta_ang)
+        self.avanzar(target_vector.length())
     
