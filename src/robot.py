@@ -127,26 +127,6 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-    def hayAlgoIzquierda(self):
-        leftDist = self.rangeImage[128]
-        if leftDist < 0.08:
-            return True
-        else:
-            if self.imageProcessor.hay_posible_agujero(self.camI.getImage()):
-                return True
-            else:
-                return False
-
-    def hayAlgoDerecha(self):
-        rightDist = self.rangeImage[128*3]
-        if rightDist < 0.08:
-            return True
-        else:
-            if self.imageProcessor.hay_posible_agujero(self.camD.getImage()):
-                return True
-            else:
-                return False
-
     def bh_ahead(self):
         b, g, r, _ = self.colorSensor.getImage()
         m = Piso(r, g, b)
@@ -154,22 +134,6 @@ class Robot:
             return True
         else:
             return False
-        
-    def hayAlgoAdelante(self):
-        frontDist = self.rangeImage[256]
-        return frontDist < 0.08
-
-    def girarIzquierda90(self):
-        self.girar(math.tau/4)
-
-    def girarDerecha90(self):
-        self.girar(-math.tau/4)
-
-    def girarMediaVuelta(self):
-        self.girar(math.tau/2)
-
-    def avanzarBaldosa(self):
-        self.avanzar(0.12)
 
     def parar(self):
         self.wheelL.setVelocity(0)
@@ -205,14 +169,6 @@ class Robot:
                 return color
         return  None
 
-    def isVisited(self, baldosas_recorridas, posicion_inicial, pos):
-        gridIndex = self.positionToGrid(posicion_inicial, pos)
-        if not gridIndex in baldosas_recorridas:
-            baldosas_recorridas.append(gridIndex)
-            return baldosas_recorridas
-        return True
-
-
     def normalizar_radianes(self, radianes): # radianes seria la rotacion actual del robot
         if radianes > math.pi:
             radianes -= math.pi*2
@@ -233,83 +189,6 @@ class Robot:
         else:
             return 'S'
         
-    def coordenada_baldosa_proxima(self):
-        orientacion = self.obtener_orientacion(self.rotation)
-        if orientacion == 'N':
-            baldosa_proxima_delantera = (self.position.x, self.position.y - 0.12)
-            baldosa_proxima_izquierda = (self.position.x - 0.12, self.position.y)
-            baldosa_proxima_derecha = (self.position.x + 0.12, self.position.y)
-        elif orientacion == 'S':
-            baldosa_proxima_delantera = (self.position.x, self.position.y + 0.12)
-            baldosa_proxima_izquierda = (self.position.x + 0.12, self.position.y)
-            baldosa_proxima_derecha = (self.position.x - 0.12, self.position.y)
-        elif orientacion == 'W':
-            baldosa_proxima_delantera = (self.position.x - 0.12, self.position.y)
-            baldosa_proxima_izquierda = (self.position.x, self.position.y + 0.12)
-            baldosa_proxima_derecha = (self.position.x, self.position.y - 0.12)
-        else:
-            baldosa_proxima_delantera = (self.position.x + 0.12, self.position.y)
-            baldosa_proxima_izquierda = (self.position.x, self.position.y - 0.12)
-            baldosa_proxima_derecha = (self.position.x, self.position.y + 0.12)
-        return baldosa_proxima_delantera, baldosa_proxima_izquierda, baldosa_proxima_derecha
-    
-    def coordenada_baldosa_derecha(self, posicion_inicial, pos, radianes):
-        baldosa_actual = self.positionToGrid(posicion_inicial, pos)
-        baldosa_actual = list(baldosa_actual)
-        orientacion = self.obtener_orientacion(radianes)
-        baldosa_derecha = []
-        if orientacion == 'N':
-            baldosa_derecha.append(baldosa_actual[0] + 1)
-            baldosa_derecha.append(baldosa_actual[1])
-        elif orientacion == 'W':
-            baldosa_derecha.append(baldosa_actual[0])
-            baldosa_derecha.append(baldosa_actual[1] - 1)
-        elif orientacion == 'S':
-            baldosa_derecha.append(baldosa_actual[0] - 1)
-            baldosa_derecha.append(baldosa_actual[1])
-        elif orientacion == 'E':
-            baldosa_derecha.append(baldosa_actual[0])
-            baldosa_derecha.append(baldosa_actual[1] + 1)
-        return tuple(baldosa_derecha)
-        
-    def coordenada_baldosa_delantera(self, posicion_inicial, pos, radianes):
-        baldosa_actual = self.positionToGrid(posicion_inicial, pos)
-        list(baldosa_actual)
-        orientacion = self.obtener_orientacion(radianes)
-        baldosa_delantera = []
-        if orientacion == 'N':
-            baldosa_delantera.append(baldosa_actual[0])
-            baldosa_delantera.append(baldosa_actual[1] - 1)
-        elif orientacion == 'S':
-            baldosa_delantera.append(baldosa_actual[0])
-            baldosa_delantera.append(baldosa_actual[1] + 1)
-        elif orientacion == 'W':
-            baldosa_delantera.append(baldosa_actual[0] - 1)
-            baldosa_delantera.append(baldosa_actual[1])
-        elif orientacion == 'E':
-            baldosa_delantera.append(baldosa_actual[0] + 1)
-            baldosa_delantera.append(baldosa_actual[1])
-        return tuple(baldosa_delantera)
-
-    def coordenada_baldosa_izquierda(self, posicion_inicial, pos, radianes):
-        baldosa_actual = self.positionToGrid(posicion_inicial, pos)
-        baldosa_actual = list(baldosa_actual)
-        orientacion = self.obtener_orientacion(radianes)
-        baldosa_izquierda = []
-        if orientacion == 'N':
-            baldosa_izquierda.append(baldosa_actual[0] - 1)
-            baldosa_izquierda.append(baldosa_actual[1])
-        elif orientacion == 'W':
-            baldosa_izquierda.append(baldosa_actual[0])
-            baldosa_izquierda.append(baldosa_actual[1] + 1)
-        elif orientacion == 'S':
-            baldosa_izquierda.append(baldosa_actual[0] + 1)
-            baldosa_izquierda.append(baldosa_actual[1])
-        elif orientacion == 'E':
-            baldosa_izquierda.append(baldosa_actual[0])
-            baldosa_izquierda.append(baldosa_actual[1] - 1)    
-        return tuple(baldosa_izquierda)
-    
     def isOpenNorth(self):
         orient = self.obtener_orientacion(self.rotation)
         lidar_idx = {'N': 256,
@@ -405,15 +284,17 @@ class Robot:
             if dc - sc < 0: return "W"
         return None
     
-    def moveTo(self, tile):
-        col, row = self.map.positionToGrid(self.position)
-        current_tile = self.map.getTileAt(col, row)
-        angulo_a_girar = self.point.angle_to() # pasar como argumento las coordenadas de la baldosa a la que quiero llegar
+    def moveToTile(self, tile):
+        target_pos = self.map.gridToPosition(tile.col, tile.row)
+        self.moveToPoint(target_pos)
 
-        while self.obtener_orientacion(self.rotation) != self.getDirectionBetween(current_tile, tile):
-        # Corregir código para no girar de más
-            self.girarIzquierda90()
-        self.avanzarBaldosa()
-
+    def moveToPoint(self, target_pos):
+        target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
+        target_ang = target_vector.angle()
+        delta_ang = self.normalizar_radianes(target_ang - self.rotation)
+        
+        self.girar(delta_ang)
+        self.avanzar(target_vector.length())
+    
 
     

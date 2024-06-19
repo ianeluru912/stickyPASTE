@@ -5,7 +5,8 @@ robot = Robot()
 while robot.step() != -1:
     # 0. Actualizar mapa
     robot.updateMap()
-    
+    robot.map.writeMap("map.txt", robot)
+
     # 1. Dame baldosas vecinas candidatas a donde puedo moverme
     tiles = robot.checkNeighbours()
     
@@ -14,8 +15,7 @@ while robot.step() != -1:
     tile = tiles[0]
 
     # 3. Mover robot a baldosa elegida
-    robot.moveTo(tile)
+    robot.moveToTile(tile)
     
     # 4. Repetir
-
 
