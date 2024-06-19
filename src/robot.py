@@ -296,5 +296,3 @@ class Robot:
         self.girar(delta_ang)
         self.avanzar(target_vector.length())
     
-
-    
