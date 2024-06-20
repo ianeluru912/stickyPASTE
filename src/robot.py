@@ -41,12 +41,13 @@ class Robot:
         self.camD.enable(TIME_STEP)
 
         self.imageProcessor = ImageProcessor()
-       
         self.position = None
         self.rotation = 0
         self.rangeImage = None
         self.posicion_inicial = None
 
+        # self.holeIZ = self.imageProcessor.see_hole()
+        # self.holeDER = self.imageProcessor.see_hole()
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
         self.step()
@@ -130,20 +131,20 @@ class Robot:
         if leftDist < 0.08:
             return True
         else:
-            if self.imageProcessor.hay_posible_agujero(self.camI.getImage()):
-                return True
-            else:
-                return False
+             if self.holeIZ == True:
+                 return True
+             else:
+                 return False
 
     def hayAlgoDerecha(self):
         rightDist = self.rangeImage[128*3]
         if rightDist < 0.08:
             return True
         else:
-            if self.imageProcessor.hay_posible_agujero(self.camD.getImage()):
-                return True
-            else:
-                return False
+             if self.holeDER == True:
+                 return True
+             else:
+                 return False
 
     def bh_ahead(self):
         b, g, r, _ = self.colorSensor.getImage()
@@ -152,6 +153,8 @@ class Robot:
             return True
         else:
             return False
+        
+
         
     def hayAlgoAdelante(self):
         frontDist = self.rangeImage[256]
@@ -349,9 +352,47 @@ class Robot:
             south_tile.north = tile
             tile.south = south_tile
         if self.bh_ahead():
-            self.obtener_orientacion(self.rotation)
-            
-            tile.isBlackHole = True
+            orient = self.obtener_orientacion(self.rotation)
+            if orient == "N":
+                tile = self.map.getTileAt(col, row - 1)
+                tile.isBlackHole = True
+            elif orient == "S":
+                tile = self.map.getTileAt(col, row + 1)
+                tile.isBlackHole = True
+            elif orient == "E":
+                tile = self.map.getTileAt(col + 1, row)
+                tile.isBlackHole = True
+            elif orient == "W":
+                tile = self.map.getTileAt(col - 1, row)
+                tile.isBlackHole = True
+        if self.bh_izq():
+            orient = self.obtener_orientacion(self.rotation)
+            if orient == "N":
+                tile = self.map.getTileAt(col, row - 1)
+                tile.isBlackHole = True
+            elif orient == "S":
+                tile = self.map.getTileAt(col, row + 1)
+                tile.isBlackHole = True
+            elif orient == "E":
+                tile = self.map.getTileAt(col + 1, row)
+                tile.isBlackHole = True
+            elif orient == "W":
+                tile = self.map.getTileAt(col - 1, row)
+                tile.isBlackHole = True
+        if self.bh_der():
+            orient = self.obtener_orientacion(self.rotation)
+            if orient == "N":
+                tile = self.map.getTileAt(col, row - 1)
+                tile.isBlackHole = True
+            elif orient == "S":
+                tile = self.map.getTileAt(col, row + 1)
+                tile.isBlackHole = True
+            elif orient == "E":
+                tile = self.map.getTileAt(col + 1, row)
+                tile.isBlackHole = True
+            elif orient == "W":
+                tile = self.map.getTileAt(col - 1, row)
+                tile.isBlackHole = True
 
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
@@ -365,7 +406,7 @@ class Robot:
         tiles = []
         for c, r in tile_order[orient]:
             tile = self.map.addTile(col + c, row + r)
-            if tile.isConnectedTo(current_tile):
+            if tile.isConnectedTo(current_tile) and not tile.isBlackHole:
                 tiles.append(tile)
 
         return tiles

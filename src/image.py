@@ -80,14 +80,6 @@ class ImageProcessor:
             rect = imagen_rot[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
             return rect, True
         return None
-    def hay_posible_agujero(self, img):
-        gris = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        height, width = gris.shape
-        primer_tercio = gris[:, :width // 3]
-        cantidad_negros = np.sum(primer_tercio == 0)
-        umbral = (height * (width // 3)) * 0.1 
-        
-        return cantidad_negros > umbral
     def devolver_letra_carteles(self):
         self.salida = None
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
@@ -156,12 +148,13 @@ class ImageProcessor:
                 print('cartel', salida)
                 return salida
         return salida
-    def see_hole(self, image): 
-        mitad = image[43:,:] 
-        tamanio = mitad.shape[0]*mitad.shape[1]
+    def see_hole(self, img):
+        gris = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        mitad = gris[43:, :]
+        tamanio = mitad.shape[0] * mitad.shape[1]
         pixeles_negros = np.count_nonzero(mitad < 31)
         porcentaje_negros = pixeles_negros / tamanio
         black_Hole = False
-        if porcentaje_negros <= 3 and porcentaje_negros >= 1 or pixeles_negros <= 5100 and pixeles_negros > 100:
+        if porcentaje_negros >=0.85 and porcentaje_negros <= 0.97:
             black_Hole = True
         return black_Hole
