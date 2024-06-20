@@ -191,6 +191,12 @@ class Robot:
         
     def isOpenNorth(self):
         orient = self.obtener_orientacion(self.rotation)
+        if orient == 'N' and self.bh_ahead() == True:
+            return False
+        elif orient == 'E' and self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64)) == True:
+            return False
+        elif orient == 'W' and self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64)) == True:
+            return False
         lidar_idx = {'N': 256,
                      'W': 384,
                      'S': 0,
@@ -201,6 +207,12 @@ class Robot:
 
     def isOpenSouth(self):
         orient = self.obtener_orientacion(self.rotation)
+        if orient == 'S' and self.bh_ahead() == True:
+            return False
+        elif orient == 'E' and self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64)) == True:
+            return False
+        elif orient == 'W' and self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64)) == True:
+            return False
         lidar_idx = {'S': 256,
                      'E': 384,
                      'N': 0,
@@ -211,6 +223,12 @@ class Robot:
         
     def isOpenWest(self):
         orient = self.obtener_orientacion(self.rotation)
+        if orient == 'W' and self.bh_ahead() == True:
+            return False
+        elif orient == 'N' and self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64)) == True:
+            return False
+        elif orient == 'S' and self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64)) == True:
+            return False
         lidar_idx = {'S': 384,
                      'E': 0,
                      'N': 128,
@@ -221,6 +239,12 @@ class Robot:
         
     def isOpenEast(self):
         orient = self.obtener_orientacion(self.rotation)
+        if orient == 'E' and self.bh_ahead() == True:
+            return False
+        elif orient == 'N' and self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64)) == True:
+            return False
+        elif orient == 'S' and self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64)) == True:
+            return False
         lidar_idx = {'S': 128,
                      'E': 256,
                      'N': 384,
@@ -251,7 +275,6 @@ class Robot:
             tile.south = south_tile
         if self.bh_ahead():
             self.obtener_orientacion(self.rotation)
-            
             tile.isBlackHole = True
 
     def checkNeighbours(self):
@@ -292,7 +315,7 @@ class Robot:
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
-        
         self.girar(delta_ang)
-        self.avanzar(target_vector.length())
+        if not self.bh_ahead():
+            self.avanzar(target_vector.length())
     

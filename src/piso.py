@@ -12,7 +12,7 @@ class Piso:
             and abs(self.green - 119) < 15 \
             and abs(self.blue - 60) < 15
     def blackHole(self):
-        return abs(self.red) < 15 \
-            and abs(self.green) < 15 \
-            and abs(self.blue) < 15
+        return abs(self.red) < 30 \
+            and abs(self.green) < 30 \
+            and abs(self.blue) < 30
     
