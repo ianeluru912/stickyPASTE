@@ -134,6 +134,14 @@ class Robot:
             return True
         else:
             return False
+        
+    def bh_izq(self):
+        # TODO(Martu): Sólo consultar cámara si el lidar indica que NO hay pared
+        return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+
+    def bh_der(self):
+        # TODO(Martu): Sólo consultar cámara si el lidar indica que NO hay pared
+        return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
 
     def parar(self):
         self.wheelL.setVelocity(0)
@@ -191,12 +199,6 @@ class Robot:
         
     def isOpenNorth(self):
         orient = self.obtener_orientacion(self.rotation)
-        if orient == 'N' and self.bh_ahead() == True:
-            return False
-        elif orient == 'E' and self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64)) == True:
-            return False
-        elif orient == 'W' and self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64)) == True:
-            return False
         lidar_idx = {'N': 256,
                      'W': 384,
                      'S': 0,
@@ -207,12 +209,6 @@ class Robot:
 
     def isOpenSouth(self):
         orient = self.obtener_orientacion(self.rotation)
-        if orient == 'S' and self.bh_ahead() == True:
-            return False
-        elif orient == 'E' and self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64)) == True:
-            return False
-        elif orient == 'W' and self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64)) == True:
-            return False
         lidar_idx = {'S': 256,
                      'E': 384,
                      'N': 0,
@@ -223,12 +219,6 @@ class Robot:
         
     def isOpenWest(self):
         orient = self.obtener_orientacion(self.rotation)
-        if orient == 'W' and self.bh_ahead() == True:
-            return False
-        elif orient == 'N' and self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64)) == True:
-            return False
-        elif orient == 'S' and self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64)) == True:
-            return False
         lidar_idx = {'S': 384,
                      'E': 0,
                      'N': 128,
@@ -239,12 +229,6 @@ class Robot:
         
     def isOpenEast(self):
         orient = self.obtener_orientacion(self.rotation)
-        if orient == 'E' and self.bh_ahead() == True:
-            return False
-        elif orient == 'N' and self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64)) == True:
-            return False
-        elif orient == 'S' and self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64)) == True:
-            return False
         lidar_idx = {'S': 128,
                      'E': 256,
                      'N': 384,
@@ -252,7 +236,26 @@ class Robot:
         
         dist = self.rangeImage[lidar_idx[orient]]
         return dist >= 0.08
+    
+    def get_tile_ahead(self):
+        # Buscar tile de adelante teniendo en cuenta la orientación del robot
+        col, row = self.map.positionToGrid(self.position)
+        orient = self.obtener_orientacion(self.rotation)
+        if orient == "N":
+            return self.map.getTileAt(col, row - 1)
+        elif orient == "S":
+            return self.map.getTileAt(col, row + 1)
+        elif orient == "E":            
+            return self.map.getTileAt(col + 1, row)
+        elif orient == "W":            
+            return self.map.getTileAt(col - 1, row)
         
+    def get_tile_izq(self):
+        # TODO(Martu): Buscar tile de la izq teniendo en cuenta la orientación del robot
+        
+    def get_tile_der(self):
+        # TODO(Martu): Buscar tile de la der teniendo en cuenta la orientación del robot
+
     def updateMap(self):
         col, row = self.map.positionToGrid(self.position)
         tile = self.map.addTile(col, row)
@@ -273,10 +276,18 @@ class Robot:
             south_tile = self.map.addTile(col, row + 1)
             south_tile.north = tile
             tile.south = south_tile
-        if self.bh_ahead():
-            self.obtener_orientacion(self.rotation)
-            tile.isBlackHole = True
 
+        if self.bh_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isBlackHole = True
+        if self.bh_izq():
+            tile_izq = self.get_tile_izq()
+            tile_izq.isBlackHole = True
+        if self.bh_der():
+            tile_der = self.get_tile_der()
+            tile_der.isBlackHole = True
+
+        
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
         col, row = self.map.positionToGrid(self.position)
@@ -289,7 +300,7 @@ class Robot:
         tiles = []
         for c, r in tile_order[orient]:
             tile = self.map.addTile(col + c, row + r)
-            if tile.isConnectedTo(current_tile):
+            if tile.isConnectedTo(current_tile) and not tile.isBlackHole:
                 tiles.append(tile)
 
         return tiles
@@ -316,6 +327,5 @@ class Robot:
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
-        if not self.bh_ahead():
-            self.avanzar(target_vector.length())
+        self.avanzar(target_vector.length())
     
