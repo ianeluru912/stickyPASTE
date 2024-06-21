@@ -161,6 +161,14 @@ class Robot:
             img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
             return img_a_convertir
     
+    def enviar_mensaje_imgs(self):
+        entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
+        if entrada_I is not None:
+            self.enviarMensajeVoC(entrada_I)
+        entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
+        if entrada_D is not None:
+            self.enviarMensajeVoC(entrada_D)
+    
     def detectar_color(r, g, b):
         colores = {
             "verde": (abs(r - 48) < 15 and abs(g - 255) < 15 and abs(b - 48) < 15),
@@ -317,7 +325,7 @@ class Robot:
             if dc - sc > 0: return "E"
             if dc - sc < 0: return "W"
         return None
-    
+
     def moveToTile(self, tile):
         target_pos = self.map.gridToPosition(tile.col, tile.row)
         self.moveToPoint(target_pos)
@@ -326,6 +334,12 @@ class Robot:
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
-        self.girar(delta_ang)
+        if abs(delta_ang) > math.pi/2 + 0.4:
+            self.girar(delta_ang/2)
+            self.enviar_mensaje_imgs()
+            self.girar(delta_ang/2)
+        else:
+            self.girar(delta_ang)
+            self.enviar_mensaje_imgs()
         self.avanzar(target_vector.length())
-    
+        self.enviar_mensaje_imgs()

@@ -28,7 +28,6 @@ class Map:
     def writeMap(self, file_path, robot):
         col, row = self.positionToGrid(robot.position)
         orientation = robot.obtener_orientacion(robot.rotation)
-
         # Primero buscamos los extremos del mapa, que nos servira para iterar
         # en la grilla en el orden correcto.
         min_col, min_row, max_col, max_row = 0, 0, 0, 0
@@ -39,7 +38,6 @@ class Map:
             if r < min_row: min_row = r
             if c > max_col: max_col = c
             if r > max_row: max_row = r
-
         # Luego revisamos una por una cada baldosa y calculamos los caracteres
         # a imprimir de acuerdo a sus caracteristicas (si es la baldosa de
         # inicio, si tiene vecinos cuales, si fue visitada, etc.)
@@ -71,7 +69,6 @@ class Map:
                     if t.west != None: chars[1][0] = " "
                 char_group.append(chars)
             char_groups.append(char_group)
-        
         # Finalmente, abrimos el archivo y escribimos los caracteres que
         # representan a cada baldosa
         with open(file_path, "w") as f:
