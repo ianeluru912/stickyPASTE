@@ -58,6 +58,8 @@ class Map:
                         chars[1][1] = "@"
                     elif not t.isConnected():
                         chars[1][1] = "X"
+                    elif t.isBlackHole:
+                        chars[1][1] = "B"
                     elif t.visits == 0:
                         chars[1][1] = "?"
                     else:
