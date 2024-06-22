@@ -136,12 +136,42 @@ class Robot:
             return False
         
     def bh_izq(self):
-        if self.isOpenWest():
-            return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+        orientation = self.obtener_orientacion(self.rotation)
+        if orientation == 'N':
+            if self.isOpenWest():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+            return False
+        elif orientation == 'E':
+            if self.isOpenNorth():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+            return False
+        elif orientation == 'S':
+            if self.isOpenEast():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+            return False
+        elif orientation == 'W':
+            if self.isOpenSouth():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+            return False   
 
     def bh_der(self):
-        if self.isOpenEast():
-            return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+        orientation = self.obtener_orientacion(self.rotation)
+        if orientation == 'N':
+            if self.isOpenEast():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+            return False
+        elif orientation == 'E':
+            if self.isOpenSouth():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+            return False
+        elif orientation == 'S':
+            if self.isOpenWest():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+            return False
+        elif orientation == 'W':
+            if self.isOpenNorth():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+            return False
 
     def parar(self):
         self.wheelL.setVelocity(0)
