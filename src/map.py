@@ -91,7 +91,12 @@ class Tile:
         self.east = None
         self.south = None
         self.isBlackHole = False
-
+        self.isSwamp = False
+        self.isCheckpoint = False
+        self.isPurple = False
+        self.isRed = False
+        self.isGreen = False
+        self.isBlue = False
     def isConnectedTo(self, tile):
         if self.north == tile: 
             return True
