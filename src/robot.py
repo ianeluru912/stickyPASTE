@@ -277,33 +277,15 @@ class Robot:
 
     def isOpenSouth(self):
         orient = self.obtener_orientacion(self.rotation)
-        lidar_idx = {'S': 256,
-                     'E': 384,
-                     'N': 0,
-                     'W': 128}
-        
-        dist = self.rangeImage[lidar_idx[orient]]
-        return dist >= 0.08
+        return self.lidar.isOpenSouth(orient)
         
     def isOpenWest(self):
         orient = self.obtener_orientacion(self.rotation)
-        lidar_idx = {'S': 384,
-                     'E': 0,
-                     'N': 128,
-                     'W': 256}
-        
-        dist = self.rangeImage[lidar_idx[orient]]
-        return dist >= 0.08
+        return self.lidar.isOpenWest(orient)
         
     def isOpenEast(self):
         orient = self.obtener_orientacion(self.rotation)
-        lidar_idx = {'S': 128,
-                     'E': 256,
-                     'N': 384,
-                     'W': 0}
-        
-        dist = self.rangeImage[lidar_idx[orient]]
-        return dist >= 0.08
+        return self.lidar.isOpenEast(orient)
     
     def get_tile_ahead(self):
         col, row = self.map.positionToGrid(self.position)
@@ -388,14 +370,10 @@ class Robot:
             tile_ahead = self.get_tile_ahead()
             tile_ahead.isCheckpoint= True
             
-
-
-        
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
         col, row = self.map.positionToGrid(self.position)
         current_tile = self.map.getTileAt(col, row)
-
         tile_order = {"N": ((-1, 0), (0, -1), (1, 0), (0, 1)),
                       "E": ((0, -1), (1, 0), (0, 1), (-1, 0)),
                       "S": ((1, 0), (0, 1), (-1, 0), (0, -1)),
@@ -405,7 +383,6 @@ class Robot:
             tile = self.map.addTile(col + c, row + r)
             if tile.isConnectedTo(current_tile) and not tile.isBlackHole:
                 tiles.append(tile)
-
         return tiles
     
     def getDirectionBetween(self, src, dst):
