@@ -24,7 +24,7 @@ class Piso:
     def azul(self):
         return abs(self.red - 47) < 15 \
             and abs(self.green - 47) < 15 \
-            and abs(self.blue - 234) < 15
+            and abs(self.blue - 240) < 15
 
     def violeta(self):
         return abs(self.red - 109) < 15 \
