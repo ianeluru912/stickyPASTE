@@ -1,10 +1,16 @@
 import math
-
 class Point:
+    
     def __init__(self, x, y):
         self.x = x
         self.y = y
-
+        
+    def length(self):
+        return math.sqrt(self.x*self.x + self.y*self.y)
+    
+    def angle(self):
+        return math.atan2(-self.x, -self.y)
+    
     def distance_to(self, point):
         dx = self.x-point.x
         dy = self.y-point.y
@@ -12,3 +18,4 @@ class Point:
     
     def __str__(self) -> str:
         return f"({self.x:.3f}, {self.y:.3f})"
+    

@@ -41,6 +41,9 @@ class Robot:
         self.camD.enable(TIME_STEP)
 
         self.imageProcessor = ImageProcessor()
+    
+        self.point = Point(0, 0)
+
         self.position = None
         self.rotation = 0
         self.rangeImage = None
@@ -126,26 +129,6 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-    def hayAlgoIzquierda(self):
-        leftDist = self.rangeImage[128]
-        if leftDist < 0.08:
-            return True
-        else:
-             if self.holeIZ == True:
-                 return True
-             else:
-                 return False
-
-    def hayAlgoDerecha(self):
-        rightDist = self.rangeImage[128*3]
-        if rightDist < 0.08:
-            return True
-        else:
-             if self.holeDER == True:
-                 return True
-             else:
-                 return False
-
     def bh_ahead(self):
         b, g, r, _ = self.colorSensor.getImage()
         m = Piso(r, g, b)
@@ -163,21 +146,43 @@ class Robot:
             return False
 
         
-    def hayAlgoAdelante(self):
-        frontDist = self.rangeImage[256]
-        return frontDist < 0.08
+    def bh_izq(self):
+        orientation = self.obtener_orientacion(self.rotation)
+        if orientation == 'N':
+            if self.isOpenWest():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+            return False
+        elif orientation == 'E':
+            if self.isOpenNorth():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+            return False
+        elif orientation == 'S':
+            if self.isOpenEast():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+            return False
+        elif orientation == 'W':
+            if self.isOpenSouth():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+            return False   
 
-    def girarIzquierda90(self):
-        self.girar(math.tau/4)
-
-    def girarDerecha90(self):
-        self.girar(-math.tau/4)
-
-    def girarMediaVuelta(self):
-        self.girar(math.tau/2)
-
-    def avanzarBaldosa(self):
-        self.avanzar(0.12)
+    def bh_der(self):
+        orientation = self.obtener_orientacion(self.rotation)
+        if orientation == 'N':
+            if self.isOpenEast():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+            return False
+        elif orientation == 'E':
+            if self.isOpenSouth():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+            return False
+        elif orientation == 'S':
+            if self.isOpenWest():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+            return False
+        elif orientation == 'W':
+            if self.isOpenNorth():
+                return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+            return False
 
     def parar(self):
         self.wheelL.setVelocity(0)
@@ -196,14 +201,30 @@ class Robot:
     def convertir_camara(self, img, alto, ancho):  
             img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
             return img_a_convertir
-
-    def isVisited(self, baldosas_recorridas, posicion_inicial, pos):
-        gridIndex = self.positionToGrid(posicion_inicial, pos)
-        if not gridIndex in baldosas_recorridas:
-            baldosas_recorridas.append(gridIndex)
-            return baldosas_recorridas
-        return True
-
+    
+    def enviar_mensaje_imgs(self):
+        entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
+        if entrada_I is not None:
+            self.enviarMensajeVoC(entrada_I)
+        entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
+        if entrada_D is not None:
+            self.enviarMensajeVoC(entrada_D)
+    
+    def detectar_color(r, g, b):
+        colores = {
+            "verde": (abs(r - 48) < 15 and abs(g - 255) < 15 and abs(b - 48) < 15),
+            "rojo": (abs(r - 255) < 15 and abs(g - 91) < 15 and abs(b - 91) < 15),
+            "azul": (abs(r - 91) < 15 and abs(g - 91) < 15 and abs(b - 255) < 15),
+            "violeta": (abs(r - 193) < 15 and abs(g - 93) < 15 and abs(b - 251) < 15),
+            "del_suelo": (abs(r - 252) < 2 and abs(g - 252) < 2 and abs(b - 252) < 2),
+            "checkpoint": (abs(r - 255) < 2 and abs(g - 255) < 2 and abs(b - 255) < 2),
+            "huecos": (abs(r - 60) < 15 and abs(g - 60) < 15 and abs(b - 60) < 15),
+            "pantanos": (abs(r - 255) < 15 and abs(g - 222) < 15 and abs(b - 142) < 15)
+        }
+        for color, condicion in colores.items():
+            if condicion:
+                return color
+        return  None
 
     def normalizar_radianes(self, radianes): # radianes seria la rotacion actual del robot
         if radianes > math.pi:
@@ -224,64 +245,7 @@ class Robot:
             return 'N'
         else:
             return 'S'
-    
-    def coordenada_baldosa_derecha(self, posicion_inicial, pos, radianes):
-        baldosa_actual = self.positionToGrid(posicion_inicial, pos)
-        baldosa_actual = list(baldosa_actual)
-        orientacion = self.obtener_orientacion(radianes)
-        baldosa_derecha = []
-        if orientacion == 'N':
-            baldosa_derecha.append(baldosa_actual[0] + 1)
-            baldosa_derecha.append(baldosa_actual[1])
-        elif orientacion == 'W':
-            baldosa_derecha.append(baldosa_actual[0])
-            baldosa_derecha.append(baldosa_actual[1] - 1)
-        elif orientacion == 'S':
-            baldosa_derecha.append(baldosa_actual[0] - 1)
-            baldosa_derecha.append(baldosa_actual[1])
-        elif orientacion == 'E':
-            baldosa_derecha.append(baldosa_actual[0])
-            baldosa_derecha.append(baldosa_actual[1] + 1)
-        return tuple(baldosa_derecha)
         
-    def coordenada_baldosa_delantera(self, posicion_inicial, pos, radianes):
-        baldosa_actual = self.positionToGrid(posicion_inicial, pos)
-        list(baldosa_actual)
-        orientacion = self.obtener_orientacion(radianes)
-        baldosa_delantera = []
-        if orientacion == 'N':
-            baldosa_delantera.append(baldosa_actual[0])
-            baldosa_delantera.append(baldosa_actual[1] - 1)
-        elif orientacion == 'S':
-            baldosa_delantera.append(baldosa_actual[0])
-            baldosa_delantera.append(baldosa_actual[1] + 1)
-        elif orientacion == 'W':
-            baldosa_delantera.append(baldosa_actual[0] - 1)
-            baldosa_delantera.append(baldosa_actual[1])
-        elif orientacion == 'E':
-            baldosa_delantera.append(baldosa_actual[0] + 1)
-            baldosa_delantera.append(baldosa_actual[1])
-        return tuple(baldosa_delantera)
-
-    def coordenada_baldosa_izquierda(self, posicion_inicial, pos, radianes):
-        baldosa_actual = self.positionToGrid(posicion_inicial, pos)
-        baldosa_actual = list(baldosa_actual)
-        orientacion = self.obtener_orientacion(radianes)
-        baldosa_izquierda = []
-        if orientacion == 'N':
-            baldosa_izquierda.append(baldosa_actual[0] - 1)
-            baldosa_izquierda.append(baldosa_actual[1])
-        elif orientacion == 'W':
-            baldosa_izquierda.append(baldosa_actual[0])
-            baldosa_izquierda.append(baldosa_actual[1] + 1)
-        elif orientacion == 'S':
-            baldosa_izquierda.append(baldosa_actual[0] + 1)
-            baldosa_izquierda.append(baldosa_actual[1])
-        elif orientacion == 'E':
-            baldosa_izquierda.append(baldosa_actual[0])
-            baldosa_izquierda.append(baldosa_actual[1] - 1)    
-        return tuple(baldosa_izquierda)
-    
     def isOpenNorth(self):
         orient = self.obtener_orientacion(self.rotation)
         lidar_idx = {'N': 256,
@@ -321,7 +285,42 @@ class Robot:
         
         dist = self.rangeImage[lidar_idx[orient]]
         return dist >= 0.08
+    
+    def get_tile_ahead(self):
+        col, row = self.map.positionToGrid(self.position)
+        orient = self.obtener_orientacion(self.rotation)
+        if orient == "N":
+            return self.map.getTileAt(col, row - 1)
+        elif orient == "S":
+            return self.map.getTileAt(col, row + 1)
+        elif orient == "E":            
+            return self.map.getTileAt(col + 1, row)
+        elif orient == "W":            
+            return self.map.getTileAt(col - 1, row)
         
+    def get_tile_izq(self):
+        col, row = self.map.positionToGrid(self.position)
+        orient = self.obtener_orientacion(self.rotation)
+        if orient == "N":
+            return self.map.getTileAt(col - 1, row)
+        elif orient == "S":
+            return self.map.getTileAt(col + 1, row)
+        elif orient == "E":            
+            return self.map.getTileAt(col, row - 1)
+        elif orient == "W":
+            return self.map.getTileAt(col, row + 1)
+    def get_tile_der(self):
+        col, row = self.map.positionToGrid(self.position)
+        orient = self.obtener_orientacion(self.rotation)
+        if orient == "N":
+            return self.map.getTileAt(col + 1, row)
+        elif orient == "S":
+            return self.map.getTileAt(col - 1, row)
+        elif orient == "E":
+            return self.map.getTileAt(col, row + 1)
+        elif orient == "W":
+            return self.map.getTileAt(col, row - 1)
+
     def updateMap(self):
         col, row = self.map.positionToGrid(self.position)
         tile = self.map.addTile(col, row)
@@ -343,62 +342,16 @@ class Robot:
             south_tile.north = tile
             tile.south = south_tile
         if self.bh_ahead():
-            orient = self.obtener_orientacion(self.rotation)
-            if orient == "N":
-                tile = self.map.getTileAt(col, row - 1)
-                tile.isBlackHole = True
-            elif orient == "S":
-                tile = self.map.getTileAt(col, row + 1)
-                tile.isBlackHole = True
-            elif orient == "E":
-                tile = self.map.getTileAt(col + 1, row)
-                tile.isBlackHole = True
-            elif orient == "W":
-                tile = self.map.getTileAt(col - 1, row)
-                tile.isBlackHole = True
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isBlackHole = True
         if self.bh_izq():
-            orient = self.obtener_orientacion(self.rotation)
-            if orient == "N":
-                tile = self.map.getTileAt(col, row - 1)
-                tile.isBlackHole = True
-            elif orient == "S":
-                tile = self.map.getTileAt(col, row + 1)
-                tile.isBlackHole = True
-            elif orient == "E":
-                tile = self.map.getTileAt(col + 1, row)
-                tile.isBlackHole = True
-            elif orient == "W":
-                tile = self.map.getTileAt(col - 1, row)
-                tile.isBlackHole = True
+            tile_izq = self.get_tile_izq()
+            tile_izq.isBlackHole = True
         if self.bh_der():
-            orient = self.obtener_orientacion(self.rotation)
-            if orient == "N":
-                tile = self.map.getTileAt(col, row - 1)
-                tile.isBlackHole = True
-            elif orient == "S":
-                tile = self.map.getTileAt(col, row + 1)
-                tile.isBlackHole = True
-            elif orient == "E":
-                tile = self.map.getTileAt(col + 1, row)
-                tile.isBlackHole = True
-            elif orient == "W":
-                tile = self.map.getTileAt(col - 1, row)
-                tile.isBlackHole = True
-            if self.pantano_ahead():
-                orient = self.obtener_orientacion(self.rotation)
-            if orient == "N":
-                tile = self.map.getTileAt(col, row - 1)
-                tile.isSwamp = True
-            elif orient == "S":
-                tile = self.map.getTileAt(col, row + 1)
-                tile.isSwamp = True
-            elif orient == "E":
-                tile = self.map.getTileAt(col + 1, row)
-                tile.isSwamp = True
-            elif orient == "W":
-                tile = self.map.getTileAt(col - 1, row)
-                tile.isSwamp = True
+            tile_der = self.get_tile_der()
+            tile_der.isBlackHole = True
 
+        
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
         col, row = self.map.positionToGrid(self.position)
@@ -411,7 +364,7 @@ class Robot:
         tiles = []
         for c, r in tile_order[orient]:
             tile = self.map.addTile(col + c, row + r)
-            if tile.isConnectedTo(current_tile) and not tile.isBlackHole and not tile.isSwamp:
+            if tile.isConnectedTo(current_tile) and not tile.isBlackHole:
                 tiles.append(tile)
 
         return tiles
@@ -428,15 +381,21 @@ class Robot:
             if dc - sc > 0: return "E"
             if dc - sc < 0: return "W"
         return None
-    
-    
-    def moveTo(self, tile):
-        col, row = self.map.positionToGrid(self.position)
-        current_tile = self.map.getTileAt(col, row)
 
-        while self.obtener_orientacion(self.rotation) != self.getDirectionBetween(current_tile, tile):
-            self.girarIzquierda90()
-        self.avanzarBaldosa()
+    def moveToTile(self, tile):
+        target_pos = self.map.gridToPosition(tile.col, tile.row)
+        self.moveToPoint(target_pos)
 
-
-    
+    def moveToPoint(self, target_pos):
+        target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
+        target_ang = target_vector.angle()
+        delta_ang = self.normalizar_radianes(target_ang - self.rotation)
+        if abs(delta_ang) > math.pi/2 + 0.4:
+            self.girar(delta_ang/2)
+            self.enviar_mensaje_imgs()
+            self.girar(delta_ang/2)
+        else:
+            self.girar(delta_ang)
+            self.enviar_mensaje_imgs()
+        self.avanzar(target_vector.length())
+        self.enviar_mensaje_imgs()
