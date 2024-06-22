@@ -144,8 +144,49 @@ class Robot:
             return True
         else:
             return False
-
-        
+    def suelo_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.del_suelo():
+            return True
+        else:
+            return False
+    def azul_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.azul():
+            return True
+        else:
+            return False
+    def verde_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.verde():
+            return True
+        else:
+            return False
+    def violeta_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.violeta():
+            return True
+        else:
+            return False
+    def rojo_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.rojo():
+            return True
+        else:
+            return False
+    def checkpoint_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.checkpoint():
+            return True
+        else:
+            return False
+    
     def bh_izq(self):
         orientation = self.obtener_orientacion(self.rotation)
         if orientation == 'N':
@@ -209,22 +250,6 @@ class Robot:
         entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
         if entrada_D is not None:
             self.enviarMensajeVoC(entrada_D)
-    
-    def detectar_color(r, g, b):
-        colores = {
-            "verde": (abs(r - 48) < 15 and abs(g - 255) < 15 and abs(b - 48) < 15),
-            "rojo": (abs(r - 255) < 15 and abs(g - 91) < 15 and abs(b - 91) < 15),
-            "azul": (abs(r - 91) < 15 and abs(g - 91) < 15 and abs(b - 255) < 15),
-            "violeta": (abs(r - 193) < 15 and abs(g - 93) < 15 and abs(b - 251) < 15),
-            "del_suelo": (abs(r - 252) < 2 and abs(g - 252) < 2 and abs(b - 252) < 2),
-            "checkpoint": (abs(r - 255) < 2 and abs(g - 255) < 2 and abs(b - 255) < 2),
-            "huecos": (abs(r - 60) < 15 and abs(g - 60) < 15 and abs(b - 60) < 15),
-            "pantanos": (abs(r - 255) < 15 and abs(g - 222) < 15 and abs(b - 142) < 15)
-        }
-        for color, condicion in colores.items():
-            if condicion:
-                return color
-        return  None
 
     def normalizar_radianes(self, radianes): # radianes seria la rotacion actual del robot
         if radianes > math.pi:
@@ -350,6 +375,26 @@ class Robot:
         if self.bh_der():
             tile_der = self.get_tile_der()
             tile_der.isBlackHole = True
+        if self.pantano_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isSwamp = True
+        if self.azul_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isBlue = True
+        if self.verde_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isGreen = True
+        if self.violeta_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isPurple = True
+        if self.rojo_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isRed = True
+        if self.checkpoint_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isCheckpoint= True
+            
+
 
         
     def checkNeighbours(self):
