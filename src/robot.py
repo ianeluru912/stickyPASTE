@@ -136,12 +136,12 @@ class Robot:
             return False
         
     def bh_izq(self):
-        # TODO(Martu): Sólo consultar cámara si el lidar indica que NO hay pared
-        return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
+        if self.isOpenWest():
+            return self.imageProcessor.see_hole(self.convertir_camara(self.camI.getImage(), 64, 64))
 
     def bh_der(self):
-        # TODO(Martu): Sólo consultar cámara si el lidar indica que NO hay pared
-        return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
+        if self.isOpenEast():
+            return self.imageProcessor.see_hole(self.convertir_camara(self.camD.getImage(), 64, 64))
 
     def parar(self):
         self.wheelL.setVelocity(0)
@@ -246,7 +246,6 @@ class Robot:
         return dist >= 0.08
     
     def get_tile_ahead(self):
-        # Buscar tile de adelante teniendo en cuenta la orientación del robot
         col, row = self.map.positionToGrid(self.position)
         orient = self.obtener_orientacion(self.rotation)
         if orient == "N":
@@ -259,10 +258,27 @@ class Robot:
             return self.map.getTileAt(col - 1, row)
         
     def get_tile_izq(self):
-        # TODO(Martu): Buscar tile de la izq teniendo en cuenta la orientación del robot
-        
+        col, row = self.map.positionToGrid(self.position)
+        orient = self.obtener_orientacion(self.rotation)
+        if orient == "N":
+            return self.map.getTileAt(col - 1, row)
+        elif orient == "S":
+            return self.map.getTileAt(col + 1, row)
+        elif orient == "E":            
+            return self.map.getTileAt(col, row - 1)
+        elif orient == "W":
+            return self.map.getTileAt(col, row + 1)
     def get_tile_der(self):
-        # TODO(Martu): Buscar tile de la der teniendo en cuenta la orientación del robot
+        col, row = self.map.positionToGrid(self.position)
+        orient = self.obtener_orientacion(self.rotation)
+        if orient == "N":
+            return self.map.getTileAt(col + 1, row)
+        elif orient == "S":
+            return self.map.getTileAt(col - 1, row)
+        elif orient == "E":
+            return self.map.getTileAt(col, row + 1)
+        elif orient == "W":
+            return self.map.getTileAt(col, row - 1)
 
     def updateMap(self):
         col, row = self.map.positionToGrid(self.position)
@@ -284,7 +300,6 @@ class Robot:
             south_tile = self.map.addTile(col, row + 1)
             south_tile.north = tile
             tile.south = south_tile
-
         if self.bh_ahead():
             tile_ahead = self.get_tile_ahead()
             tile_ahead.isBlackHole = True
