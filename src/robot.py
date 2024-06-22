@@ -3,6 +3,7 @@ from map import Map, Tile
 from image import ImageProcessor
 from point import Point
 from piso import Piso
+from lidar import Lidar
 import math
 import utils
 import struct
@@ -22,8 +23,7 @@ class Robot:
         self.wheelR = self.robot.getDevice("wheel2 motor")
         self.wheelR.setPosition(float("inf"))
 
-        self.lidar = self.robot.getDevice("lidar")
-        self.lidar.enable(TIME_STEP)
+        self.lidar = Lidar(self.robot.getDevice("lidar"), TIME_STEP)
 
         self.inertialUnit = self.robot.getDevice("inertial_unit")
         self.inertialUnit.enable(TIME_STEP)
@@ -72,7 +72,7 @@ class Robot:
     def updateVars(self):
         self.updatePosition()
         self.updateRotation()
-        self.updateRangeImage()
+        self.updateLidar()
 
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -82,8 +82,8 @@ class Robot:
         _, _, yaw = self.inertialUnit.getRollPitchYaw()
         self.rotation = self.normalizar_radianes(yaw % math.tau)
 
-    def updateRangeImage(self):
-        self.rangeImage = self.lidar.getRangeImage()[1024:1536]
+    def updateLidar(self):
+        self.lidar.update()
 
     def girar(self, rad):
         lastRot = self.rotation
@@ -273,13 +273,7 @@ class Robot:
         
     def isOpenNorth(self):
         orient = self.obtener_orientacion(self.rotation)
-        lidar_idx = {'N': 256,
-                     'W': 384,
-                     'S': 0,
-                     'E': 128}
-        
-        dist = self.rangeImage[lidar_idx[orient]]
-        return dist >= 0.08
+        return self.lidar.isOpenNorth(orient)        
 
     def isOpenSouth(self):
         orient = self.obtener_orientacion(self.rotation)
