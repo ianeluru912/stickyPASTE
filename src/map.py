@@ -58,6 +58,8 @@ class Map:
                         chars[1][1] = "X"
                     elif t.isBlackHole:
                         chars[1][1] = "B"
+                    elif t.isBlue:
+                        chars[1][1] = "A"
                     elif t.visits == 0:
                         chars[1][1] = "?"
                     else:
