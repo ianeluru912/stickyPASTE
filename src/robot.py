@@ -65,7 +65,7 @@ class Robot:
 
     def delay(self, ms):
         initTime = self.robot.getTime()
-        while self.step() != -1:
+        while self.robot.step(TIME_STEP) != -1:
             if (self.robot.getTime() - initTime) * 1000.0 >= ms:
                 break
 
@@ -73,6 +73,32 @@ class Robot:
         self.updatePosition()
         self.updateRotation()
         self.updateLidar()
+        self.updateCamerasDetection()
+
+    def updateCamerasDetection(self):
+        return self.enviar_mensaje_imgs()
+
+    def enviarMensaje(self, pos1, pos2, letra):
+        let = bytes(letra, 'utf-8')  
+        mensaje = struct.pack("i i c", pos1, pos2, let) 
+        self.emitter.send(mensaje)
+
+    def enviarMensajeVoC(self, entrada):
+        self.parar()
+        self.delay(1200)
+        self.enviarMensaje(int(self.position.x * 100), int(self.position.y * 100), entrada)
+
+    def convertir_camara(self, img, alto, ancho):  
+            img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
+            return img_a_convertir
+    
+    def enviar_mensaje_imgs(self):
+        entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
+        if entrada_I is not None:
+            self.enviarMensajeVoC(entrada_I)
+        entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
+        if entrada_D is not None:
+            self.enviarMensajeVoC(entrada_D)
 
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -229,28 +255,6 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-    def enviarMensaje(self, pos1, pos2, letra):
-        let = bytes(letra, 'utf-8')  
-        mensaje = struct.pack("i i c", pos1, pos2, let) 
-        self.emitter.send(mensaje)
-
-    def enviarMensajeVoC(self, entrada):
-        self.parar()
-        self.delay(1200)
-        self.enviarMensaje(int(self.position.x * 100), int(self.position.y * 100), entrada)
-
-    def convertir_camara(self, img, alto, ancho):  
-            img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
-            return img_a_convertir
-    
-    def enviar_mensaje_imgs(self):
-        entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
-        if entrada_I is not None:
-            self.enviarMensajeVoC(entrada_I)
-        entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
-        if entrada_D is not None:
-            self.enviarMensajeVoC(entrada_D)
-
     def normalizar_radianes(self, radianes): # radianes seria la rotacion actual del robot
         if radianes > math.pi:
             radianes -= math.pi*2
@@ -406,12 +410,5 @@ class Robot:
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
-        if abs(delta_ang) > math.pi/2 + 0.4:
-            self.girar(delta_ang/2)
-            self.enviar_mensaje_imgs()
-            self.girar(delta_ang/2)
-        else:
-            self.girar(delta_ang)
-            self.enviar_mensaje_imgs()
+        self.girar(delta_ang)
         self.avanzar(target_vector.length())
-        self.enviar_mensaje_imgs()

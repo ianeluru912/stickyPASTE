@@ -1,6 +1,5 @@
 
 class Lidar:
-
     def __init__(self, lidar, time_step):
         self.lidar = lidar
         self.lidar.enable(time_step)
