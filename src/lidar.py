@@ -43,3 +43,12 @@ class Lidar:
         
         dist = self.rangeImage[lidar_idx[orient]]
         return dist >= 0.08
+    
+    
+    def hayAlgoIzquierda(self):
+        leftDist = self.rangeImage[128]
+        return leftDist < 0.08
+
+    def hayAlgoDerecha(self):
+        rightDist = self.rangeImage[128*3]
+        return rightDist < 0.08
