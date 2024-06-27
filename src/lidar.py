@@ -165,3 +165,11 @@ class Lidar:
     def rotToLidar(self, rot):
         #Cuánto girar los rayos para tomar referencia norte
         return int((256/PI)*rot)%512
+    
+    def hayAlgoIzquierda(self):
+        leftDist = self.rangeImage[128]
+        return leftDist < 0.08
+
+    def hayAlgoDerecha(self):
+        rightDist = self.rangeImage[128*3]
+        return rightDist < 0.08

@@ -85,20 +85,24 @@ class Robot:
 
     def enviarMensajeVoC(self, entrada):
         self.parar()
-        self.delay(1200)
+        self.delay(1500)
         self.enviarMensaje(int(self.position.x * 100), int(self.position.y * 100), entrada)
+        self.delay(100)
 
     def convertir_camara(self, img, alto, ancho):  
             img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
             return img_a_convertir
     
     def enviar_mensaje_imgs(self):
-        entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
-        if entrada_I is not None:
-            self.enviarMensajeVoC(entrada_I)
-        entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
-        if entrada_D is not None:
-            self.enviarMensajeVoC(entrada_D)
+        if self.lidar.hayAlgoIzquierda():
+            entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
+            if entrada_I is not None:
+                self.enviarMensajeVoC(entrada_I)
+        
+        if self.lidar.hayAlgoDerecha():
+            entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
+            if entrada_D is not None:
+                self.enviarMensajeVoC(entrada_D)
 
     def updatePosition(self):
         x, _, y = self.gps.getValues()

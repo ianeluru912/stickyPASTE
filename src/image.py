@@ -5,6 +5,11 @@ class ImageProcessor:
     def __init__(self):
         self.img = None
         self.salida = None
+
+    def debugShow(self, image):
+        cv2.imshow("V", image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
     def es_victima(self):
         if self.img is None or self.img.size == 0:
             return None
@@ -30,9 +35,30 @@ class ImageProcessor:
             angulo = approx[2]
             if angulo % 90 == 0: #si
                 x = int(approx[0][0])
-                y = int(approx[0][1])
+                y = int(approx[0][1])                
+                if x < 26 or x > 38: return None
+                if y < 26 or y > 38: return None
                 mitad_ancho = int(approx[1][0] / 2)
                 mitad_alto = int(approx[1][1] / 2)
+                ###############################################
+                rect = thresh[y - mitad_alto:y + mitad_alto, x - mitad_ancho:x + mitad_ancho]
+                tamanio = rect.shape[0] * rect.shape[1]
+                if tamanio == 0: return None
+                
+                pixeles_negros = np.count_nonzero(rect == 0)
+                if pixeles_negros == 0: 
+                    print("CHAU porque no hay pixeles negros")
+                    return None
+                
+                porcentaje_negros = pixeles_negros / tamanio
+                if porcentaje_negros < 0.1:
+                    print("CHAU porque hay muy pocos negros")
+                    return None
+                
+                if abs(rect.shape[0] - rect.shape[1]) > 2:
+                    print("CHAU porque no es un cuadrado")
+                    return None
+                ###############################################
                 cuadritoArriba = thresh[y - mitad_alto:y - int(mitad_alto / 3), x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
                 cuadritoAbajo = thresh[y + int(mitad_alto / 3):y + mitad_alto, x - int(mitad_ancho / 3):x + int(mitad_ancho / 3)]
                 top_central = y - int(mitad_alto / 3)
@@ -100,11 +126,25 @@ class ImageProcessor:
             approx = cv2.minAreaRect(contornos[0])
             x = int(approx[0][0])
             y = int(approx[0][1])
+            
+            if x < 26 or x > 38: return None
+            if y < 26 or y > 38: return None
+
             mitadAncho = int(approx[1][0] / 2)
             mitadAlto = int(approx[1][1] / 2)
+            
             if y - mitadAlto < 0 or y + mitadAlto > imagen_rot.shape[0] or x - mitadAncho < 0 or x + mitadAncho > imagen_rot.shape[1]:
                 return None
             rect = imagen_rot[y - mitadAlto:y + mitadAlto, x - mitadAncho:x + mitadAncho]
+            ###############################################
+            
+            tamanio = rect.shape[0] * rect.shape[1]
+            if tamanio == 0: return None
+                       
+            if abs(rect.shape[0] - rect.shape[1]) > 2:
+                print("CHAU porque no es un cuadrado")
+                return None
+            ###############################################
             amarillo, rojo, negro, blanco = 0, 0, 0, 0
             for x in range(rect.shape[0]):
                 for y in range(rect.shape[1]):
