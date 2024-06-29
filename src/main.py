@@ -2,12 +2,19 @@ from robot import Robot
 from point import Point
 import cv2
 from math import pi as PI
+
+from visualization import MapVisualizer
+
 robot = Robot()
+
+mapvis = MapVisualizer()
 
 while robot.step() != -1:
     # 0. Actualizar mapa
     robot.updateMap()
     robot.map.writeMap("map.txt", robot)
+    mapvis.send_map(robot.map)
+    
 
     # 1. Dame baldosas vecinas candidatas a donde puedo moverme
     tiles = robot.checkNeighbours()
