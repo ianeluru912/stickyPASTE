@@ -88,6 +88,29 @@ class Lidar:
             # walls.append(rangeLocal[self.rays_1[i][0]])
         return walls
     
+    def updateWalls1(self, rotation, map, tile):
+        walls = self.get_walls_1(rotation)
+        
+        # Current tile!
+        tile.north[0] = walls[0]
+        tile.north[1] = walls[1]
+        tile.north[2] = walls[2]
+        
+        tile.east[0] = walls[3]
+        tile.east[1] = walls[4]
+        tile.east[2] = walls[5]
+        
+        tile.south[0] = walls[6]
+        tile.south[1] = walls[7]
+        tile.south[2] = walls[8]
+        
+        tile.west[0] = walls[9]
+        tile.west[1] = walls[10]
+        tile.west[2] = walls[11]
+        
+        # TODO(Zoe): Actualizar las tiles vecinas con la info de las paredes
+        # que se comparten con la tile actual
+    
     def get_walls_2(self, rotation):
         shift = self.rotToLidar(rotation)
         # gira los rayos para que estén en orientación Norte

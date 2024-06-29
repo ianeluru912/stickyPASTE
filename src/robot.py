@@ -332,24 +332,11 @@ class Robot:
 
     def updateMap(self):
         col, row = self.map.positionToGrid(self.position)
-        tile = self.map.addTile(col, row)
+        tile = self.map.getTileAt(col, row)
         tile.visits += 1
-        if self.isOpenNorth():
-            north_tile = self.map.addTile(col, row - 1)
-            north_tile.south = tile
-            tile.north = north_tile
-        if self.isOpenWest():
-            west_tile = self.map.addTile(col - 1, row)
-            west_tile.east = tile
-            tile.west = west_tile
-        if self.isOpenEast():
-            east_tile = self.map.addTile(col + 1, row)
-            east_tile.west = tile
-            tile.east = east_tile
-        if self.isOpenSouth():
-            south_tile = self.map.addTile(col, row + 1)
-            south_tile.north = tile
-            tile.south = south_tile
+
+        self.lidar.updateWalls1(self.rotation, self.map, tile)
+
         if self.bh_ahead():
             tile_ahead = self.get_tile_ahead()
             tile_ahead.isBlackHole = True
@@ -388,24 +375,11 @@ class Robot:
                       "W": ((0, 1), (-1, 0), (0, -1), (1, 0))}
         tiles = []
         for c, r in tile_order[orient]:
-            tile = self.map.addTile(col + c, row + r)
-            if tile.isConnectedTo(current_tile) and not tile.isBlackHole:
+            tile = self.map.getTileAt(col + c, row + r)
+            if current_tile.isConnectedTo(tile) and not tile.isBlackHole:
                 tiles.append(tile)
         return tiles
     
-    def getDirectionBetween(self, src, dst):
-        sc = src.col
-        sr = src.row
-        dc = dst.col
-        dr = dst.row
-        if dc - sc == 0: # Misma columna
-            if dr - sr > 0: return "S"
-            if dr - sr < 0: return "N"
-        elif dr - sr == 0: # Misma fila
-            if dc - sc > 0: return "E"
-            if dc - sc < 0: return "W"
-        return None
-
     def moveToTile(self, tile):
         target_pos = self.map.gridToPosition(tile.col, tile.row)
         self.moveToPoint(target_pos)

@@ -13,8 +13,7 @@ while robot.step() != -1:
     # 0. Actualizar mapa
     robot.updateMap()
     robot.map.writeMap("map.txt", robot)
-    mapvis.send_map(robot.map)
-    
+    mapvis.send_map(robot.map)    
 
     # 1. Dame baldosas vecinas candidatas a donde puedo moverme
     tiles = robot.checkNeighbours()
@@ -28,6 +27,7 @@ while robot.step() != -1:
     print(robot.bh_ahead())
     print(robot.imageProcessor.see_hole(robot.convertir_camara(robot.camD.getImage(), 64, 64)))
     # 4. Repetir
+    
 # print(robot.position)
 # destino=Point(robot.position.x,robot.position.y+0.06)
 # robot.moveToPoint(destino)

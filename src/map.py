@@ -15,15 +15,12 @@ class Map:
         fila = round((pos.y - self.origin.y) / Tile.HEIGHT)
         return (columna, fila)
 
-    def addTile(self, col, row):
-        tile = self.getTileAt(col, row)
+    def getTileAt(self, col, row):
+        tile = self.tiles.get((col, row))
         if tile == None:
             tile = Tile(col, row)
             self.tiles[(col, row)] = tile
         return tile
-
-    def getTileAt(self, col, row):
-        return self.tiles.get((col, row))
             
     def writeMap(self, file_path, robot):
         col, row = self.positionToGrid(robot.position)
@@ -88,10 +85,12 @@ class Tile:
         self.col = col
         self.row = row
         self.visits = 0
-        self.north = None
-        self.west = None
-        self.east = None
-        self.south = None
+        
+        self.north = [-1, -1, -1]
+        self.west = [-1, -1, -1]
+        self.east = [-1, -1, -1]
+        self.south = [-1, -1, -1]
+
         self.isBlackHole = False
         self.isSwamp = False
         self.isCheckpoint = False
@@ -99,15 +98,31 @@ class Tile:
         self.isRed = False
         self.isGreen = False
         self.isBlue = False
+
+    
+    def getDirectionTo(self, tile):
+        sc = self.col
+        sr = self.row
+        dc = tile.col
+        dr = tile.row
+        if dc - sc == 0: # Misma columna
+            if dr - sr > 0: return "S"
+            if dr - sr < 0: return "N"
+        elif dr - sr == 0: # Misma fila
+            if dc - sc > 0: return "E"
+            if dc - sc < 0: return "W"
+        return None
+    
     def isConnectedTo(self, tile):
-        if self.north == tile: 
-            return True
-        elif self.west == tile:
-            return True
-        elif self.east == tile:
-            return True
-        elif self.south == tile:
-            return True
+        direction = self.getDirectionTo(tile)
+        if direction == "N":
+            return self.north == [0, 0, 0]
+        elif direction == "S":
+            return self.south == [0, 0, 0]
+        elif direction == "E":
+            return self.east == [0, 0, 0]
+        elif direction == "W":
+            return self.west == [0, 0, 0]
         return False
     
     def isConnected(self):
