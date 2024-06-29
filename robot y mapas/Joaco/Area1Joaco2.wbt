@@ -1439,7 +1439,7 @@
         }
         
         Victim {
-            translation -0.063 0 -0.0049999999999999906
+            translation -0.092 0 -0.0049999999999999906
             rotation 0 1 0 0
             name "Victim3"
             type "unharmed"
@@ -1469,7 +1469,7 @@
         }
         
         HazardMap {
-            translation -0.2344 0 0.033
+            translation -0.2344 0 0.027999999999999997
             rotation 0 1 0 -1.57
             name "Hazard2"
             type "C"
@@ -1477,7 +1477,7 @@
         }
         
         HazardMap {
-            translation -0.075 0 -0.3544
+            translation -0.028999999999999998 0 -0.3544
             rotation 0 1 0 3.14
             name "Hazard3"
             type "F"
