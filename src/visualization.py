@@ -4,8 +4,6 @@ import threading
 import traceback
 import json
 
-# HACK(Richo)
-from map import Tile
 
 def to_json_dict(obj):
     if obj is None: return obj
@@ -13,16 +11,6 @@ def to_json_dict(obj):
     if isinstance(obj, int): return obj
     if isinstance(obj, bool): return obj
     if isinstance(obj, float): return obj
-
-    # HACK(Richo): We can't serialize loops so until we have a better representation
-    # of walls I decided to simply mark the connections with true/false
-    if isinstance(obj, Tile):
-        result = obj.__dict__.copy()
-        result["north"] = obj.north is not None            
-        result["east"] = obj.east is not None
-        result["south"] = obj.south is not None
-        result["west"] = obj.west is not None
-        return to_json_dict(result)
 
     if isinstance(obj, list):
         result = []
