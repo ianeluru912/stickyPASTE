@@ -14,7 +14,7 @@ MAX_VEL = 3.14  # Reduzco la velocidad para minimizar desvío
 
 class Robot:
     def __init__(self):
-
+        self.piso = Piso(0, 0, 0)
         self.robot = WebotsRobot()
         self.emitter = self.robot.getDevice("emitter")
         self.wheelL = self.robot.getDevice("wheel1 motor")
@@ -57,7 +57,7 @@ class Robot:
 
         self.posicion_inicial = self.position
         self.map = Map(self.posicion_inicial)
-
+        self.current_area = 1
     def step(self):
         result = self.robot.step(TIME_STEP)
         self.updateVars()
@@ -383,7 +383,11 @@ class Robot:
     def moveToTile(self, tile):
         target_pos = self.map.gridToPosition(tile.col, tile.row)
         self.moveToPoint(target_pos)
-
+        if tile.isBlue:
+            self.current_area = 2
+            print(f"Robot en area {self.current_area}")
+        tile.set_area(self.current_area)
+        print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
     def moveToPoint(self, target_pos):
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
