@@ -44,10 +44,11 @@ while robot.step() != -1:
 # destino=Point(robot.position.x,robot.position.y-0.12)
 # robot.moveToPoint(destino)
 # print(robot.position)
-# print(robot.lidar.ver_walls(robot.rotation))
-# print(robot.lidar.get_walls_3(robot.rotation))
-# print('---')
-
+    # print(robot.lidar.ver_walls(robot.rotation))
+    # print(robot.lidar.get_walls_4(robot.rotation))
+    # print('---')
+    # print(robot.lidar.ver_walls(robot.rotation))
+    # print('---')
 
 # destino=Point(robot.position.x+0.36,robot.position.y)
 # robot.moveToPoint(destino)
