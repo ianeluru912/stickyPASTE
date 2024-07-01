@@ -270,3 +270,11 @@ class Lidar:
     def hayAlgoDerecha(self):
         rightDist = self.rangeImage[128*3]
         return rightDist < 0.08
+    
+    def is_obstacle_preventing_passage(self):
+        rays = self.rangeImage[192:320]
+        available_rays = filter(lambda x: x > 0.08, rays)
+        not_available_rays = filter(lambda x: x < 0.08, rays)
+        if list(len(not_available_rays)) >= 97:
+            return True
+        return available_rays
