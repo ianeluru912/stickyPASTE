@@ -98,7 +98,7 @@ class Tile:
         self.isRed = False
         self.isGreen = False
         self.isBlue = False
-        self.area = 1
+        self.area = None
     
     def getDirectionTo(self, tile):
         sc = self.col
