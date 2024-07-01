@@ -216,6 +216,20 @@ class Robot:
             return True
         else:
             return False
+    def orange_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.orange():
+            return True
+        else:
+            return False
+    def yellow_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.amarillo():
+            return True
+        else:
+            return False
     
     def bh_izq(self):
         orientation = self.obtener_orientacion(self.rotation)
@@ -364,6 +378,12 @@ class Robot:
         if self.checkpoint_ahead():
             tile_ahead = self.get_tile_ahead()
             tile_ahead.isCheckpoint= True
+        if self.orange_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isOrange = True
+        if self.yellow_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isYellow = True
             
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
@@ -383,11 +403,38 @@ class Robot:
     def moveToTile(self, tile):
         target_pos = self.map.gridToPosition(tile.col, tile.row)
         self.moveToPoint(target_pos)
-        if tile.isBlue:
-            self.current_area = 2
-            print(f"Robot en area {self.current_area}")
-        tile.set_area(self.current_area)
-        print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
+        if tile.get_area() is None:
+            tile.set_area(self.current_area)
+            print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
+        else:
+            self.current_area = tile.get_area()
+            print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
+        color = tile.get_color()
+        if color:
+            self.update_area_by_color(color)
+            tile.set_area(self.current_area)
+        print(f"Tile en ({tile.col}, {tile.row}) tiene area {tile.area}")
+
+    def update_area_by_color(self, color):
+        possibleAreas = {
+            (1, 'Blue'): 2, #area 1, azul? area 2
+            (1, 'Yellow'): 3,
+            (1, 'Green'): 4,
+            (2, 'Blue'): 1, #area 2, azul? area 1
+            (2, 'Purple'): 3, #""
+            (2, 'Orange'): 4,
+            (3, 'Yellow'): 1,
+            (3, 'Purple'): 2,
+            (3, 'Red'): 4,
+            (4, 'Green'): 1,
+            (4, 'Orange'): 2,
+            (4, 'Red'): 3
+        }
+
+        changeOfArea = (self.current_area, color)
+        if changeOfArea in possibleAreas:
+            self.current_area = possibleAreas[changeOfArea]
+            print(f"Area actualizada a {self.current_area} por color {color}")
     def moveToPoint(self, target_pos):
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
