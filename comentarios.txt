@@ -1,6 +1,0 @@
-Bueno, hice pruebas y cuestion: 
-1. hay que ponerle que detecte el piso  y los agujeros
-2. en  un mapa sin nada, no debe printear nada, y solo en caso de encontrar carteles.
-3. deberiamos ver como hacerlo mas rapido, y que sepa que las paredes no son completamente rectas a veces.
-4. la navegacion falla, hay que mejorarla
-5. despues em dice a mi el desorden RICHO jajajaj

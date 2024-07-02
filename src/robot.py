@@ -14,7 +14,7 @@ MAX_VEL = 3.14  # Reduzco la velocidad para minimizar desvío
 
 class Robot:
     def __init__(self):
-
+        self.piso = Piso(0, 0, 0)
         self.robot = WebotsRobot()
         self.emitter = self.robot.getDevice("emitter")
         self.wheelL = self.robot.getDevice("wheel1 motor")
@@ -57,7 +57,7 @@ class Robot:
 
         self.posicion_inicial = self.position
         self.map = Map(self.posicion_inicial)
-
+        self.current_area = 1
     def step(self):
         result = self.robot.step(TIME_STEP)
         self.updateVars()
@@ -227,6 +227,20 @@ class Robot:
             return True
         else:
             return False
+    def orange_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.orange():
+            return True
+        else:
+            return False
+    def yellow_ahead(self):
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if m.amarillo():
+            return True
+        else:
+            return False
     
     def bh_izq(self):
         orientation = self.obtener_orientacion(self.rotation)
@@ -378,6 +392,12 @@ class Robot:
         if self.lidar.is_obstacle_preventing_passage(): # Al sacar esto, el robot deja de moverse, hay que mantenerlo :)
             tile_ahead = self.get_tile_ahead()
             tile_ahead.hasObstacle = True
+        if self.orange_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isOrange = True
+        if self.yellow_ahead():
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.isYellow = True
             
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
@@ -397,7 +417,38 @@ class Robot:
     def moveToTile(self, tile):
         target_pos = self.map.gridToPosition(tile.col, tile.row)
         self.moveToPoint(target_pos)
+        if tile.get_area() is None:
+            tile.set_area(self.current_area)
+            print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
+        else:
+            self.current_area = tile.get_area()
+            print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
+        color = tile.get_color()
+        if color:
+            self.update_area_by_color(color)
+            tile.set_area(self.current_area)
+        print(f"Tile en ({tile.col}, {tile.row}) tiene area {tile.area}")
 
+    def update_area_by_color(self, color):
+        possibleAreas = {
+            (1, 'Blue'): 2, #area 1, azul? area 2
+            (1, 'Yellow'): 3,
+            (1, 'Green'): 4,
+            (2, 'Blue'): 1, #area 2, azul? area 1
+            (2, 'Purple'): 3, #""
+            (2, 'Orange'): 4,
+            (3, 'Yellow'): 1,
+            (3, 'Purple'): 2,
+            (3, 'Red'): 4,
+            (4, 'Green'): 1,
+            (4, 'Orange'): 2,
+            (4, 'Red'): 3
+        }
+
+        changeOfArea = (self.current_area, color)
+        if changeOfArea in possibleAreas:
+            self.current_area = possibleAreas[changeOfArea]
+            print(f"Area actualizada a {self.current_area} por color {color}")
     def moveToPoint(self, target_pos):
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
