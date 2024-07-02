@@ -154,15 +154,17 @@ class Robot:
 
             if self.lidar.is_obstacle_preventing_passage() == True:
                 print('hay algo delante')
-                col, row = self.map.positionToGrid(self.position)
-                tile = self.map.getTileAt(col, row)
+                tile = self.get_tile_ahead()
                 tile.hasObstacle = True
                 if tile.hasObstacle: 
                     self.wheelL.setVelocity(-vel*MAX_VEL)
                     self.wheelR.setVelocity(-vel*MAX_VEL)
-                    # self.updateMap()
-                    # self.checkNeighbours()
-                    break
+                self.updateMap()
+                posible_next_tile = self.checkNeighbours()
+                next_tile = posible_next_tile[0]
+                self.moveToTile(next_tile)
+                self.updateMap()
+                break
 
             if diff < 0.001:
                 break
@@ -389,9 +391,6 @@ class Robot:
         if self.checkpoint_ahead():
             tile_ahead = self.get_tile_ahead()
             tile_ahead.isCheckpoint= True
-        if self.lidar.is_obstacle_preventing_passage(): # Al sacar esto, el robot deja de moverse, hay que mantenerlo :)
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.hasObstacle = True
         if self.orange_ahead():
             tile_ahead = self.get_tile_ahead()
             tile_ahead.isOrange = True

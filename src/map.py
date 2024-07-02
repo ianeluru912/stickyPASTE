@@ -59,6 +59,8 @@ class Map:
                         chars[1][1] = "A"
                     elif t.visits == 0:
                         chars[1][1] = "?"
+                    # elif t.hasObstacle:
+                    #     chars[1][1] = "O"
                     else:
                         chars[1][1] = " "
                     
