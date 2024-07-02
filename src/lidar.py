@@ -115,6 +115,28 @@ class Lidar:
         tile.west[1] = walls[10]
         tile.west[2] = walls[11]
         
+        north_tile = map.getTileAt(tile.col, tile.row - 1)
+        east_tile = map.getTileAt(tile.col + 1, tile.row)
+        west_tile = map.getTileAt(tile.col - 1, tile.row)
+        south_tile = map.getTileAt(tile.col, tile.row + 1)
+
+        if tile.north[0] == 1:
+            north_tile.south[2] = 1
+        if tile.north[2] == 1:
+            north_tile.south[0] = 1
+        if tile.east[0] == 1:
+            east_tile.west[2] = 1
+        if tile.east[2] == 1:
+            east_tile.west[0] = 1
+        if tile.west[0] == 1:
+            west_tile.east[2] = 1
+        if tile.west[2] == 1:
+            west_tile.east[0] = 1
+        if tile.south[0] == 1:
+            south_tile.north[2] = 1
+        if tile.south[2] == 1:
+            south_tile.north[0] = 1
+
         # TODO(Zoe): Actualizar las tiles vecinas con la info de las paredes
         # que se comparten con la tile actual
     
