@@ -143,6 +143,8 @@ class Robot:
 
     def avanzar(self, distance):
         initPos = self.position
+        hasObstacle = False
+
         while self.step() != -1:
             diff = abs(distance) - initPos.distance_to(self.position)
             vel = min(max(diff/0.01, 0.1), 1)
@@ -152,18 +154,9 @@ class Robot:
             self.wheelL.setVelocity(vel*MAX_VEL)
             self.wheelR.setVelocity(vel*MAX_VEL)
 
-            if self.lidar.is_obstacle_preventing_passage() == True:
+            if distance > 0 and self.lidar.is_obstacle_preventing_passage():
                 print('hay algo delante')
-                tile = self.get_tile_ahead()
-                tile.hasObstacle = True
-                if tile.hasObstacle: 
-                    self.wheelL.setVelocity(-vel*MAX_VEL)
-                    self.wheelR.setVelocity(-vel*MAX_VEL)
-                self.updateMap()
-                posible_next_tile = self.checkNeighbours()
-                next_tile = posible_next_tile[0]
-                self.moveToTile(next_tile)
-                self.updateMap()
+                hasObstacle = True
                 break
 
             if diff < 0.001:
@@ -171,6 +164,28 @@ class Robot:
 
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
+
+        if hasObstacle:
+            # 1) Obtener el tile en el que está el obstáculo
+            col, row = self.map.positionToGrid(initPos)
+            orient = self.obtener_orientacion(self.rotation)
+            if orient == "N":
+                row -= 1
+            elif orient == "S":
+                row += 1
+            elif orient == "E":
+                col += 1
+            elif orient == "W":
+                col -= 1
+            tile = self.map.getTileAt(col, row)
+
+            # 2) Marcar ese tile como hasObstacle = True
+            tile.hasObstacle = True
+
+            # 3) Retroceder la misma distancia que avancé
+            dist = initPos.distance_to(self.position)
+            self.avanzar(-dist)
+
 
     def bh_ahead(self):
         b, g, r, _ = self.colorSensor.getImage()
