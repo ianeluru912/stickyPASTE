@@ -1,4 +1,4 @@
-from controller import Robot as WebotsRobot
+from controller import Robot as WebotsRobot # type: ignore
 from map import Map, Tile
 from image import ImageProcessor
 from point import Point
