@@ -45,6 +45,7 @@ class Robot:
         self.point = Point(0, 0)
 
         self.position = None
+        self.lastPosition=None
         self.rotation = 0
         self.rangeImage = None
         self.posicion_inicial = None
@@ -58,6 +59,8 @@ class Robot:
         self.posicion_inicial = self.position
         self.map = Map(self.posicion_inicial)
         self.current_area = 1
+        self.doingLOP = False
+
     def step(self):
         result = self.robot.step(TIME_STEP)
         self.updateVars()
@@ -106,7 +109,20 @@ class Robot:
 
     def updatePosition(self):
         x, _, y = self.gps.getValues()
+        # print(self.lastPosition, self.position)
+        
         self.position = Point(x, y)
+        if self.lastPosition is None:
+            self.lastPosition = self.position
+        elif self.lastPosition.distance_to(self.position) > 0.03:
+            print("LOP")
+            self.doingLOP = True
+            actualCol, actualRow=self.map.positionToGrid(self.position)
+            actualTile=self.map.getTileAt(actualCol, actualRow)
+            self.current_area=actualTile.get_area()
+            self.lastPosition = self.position
+        else:
+            self.lastPosition = self.position
 
     def updateRotation(self):
         _, _, yaw = self.inertialUnit.getRollPitchYaw()
@@ -416,17 +432,21 @@ class Robot:
     def moveToTile(self, tile):
         target_pos = self.map.gridToPosition(tile.col, tile.row)
         self.moveToPoint(target_pos)
-        if tile.get_area() is None:
-            tile.set_area(self.current_area)
-            print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
+        if not self.doingLOP:
+            if tile.get_area() is None:
+                tile.set_area(self.current_area)
+                print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
+            else:
+                self.current_area = tile.get_area()
+                print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
+            color = tile.get_color()
+            if color:
+                self.update_area_by_color(color)
+                tile.set_area(self.current_area)
+            print(f"Tile en ({tile.col}, {tile.row}) tiene area {tile.area}")
+            print(f"Yo robot estoy en área {self.current_area})")
         else:
-            self.current_area = tile.get_area()
-            print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
-        color = tile.get_color()
-        if color:
-            self.update_area_by_color(color)
-            tile.set_area(self.current_area)
-        print(f"Tile en ({tile.col}, {tile.row}) tiene area {tile.area}")
+            self.doingLOP = False
 
     def update_area_by_color(self, color):
         possibleAreas = {

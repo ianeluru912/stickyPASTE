@@ -8,8 +8,11 @@ from visualization import MapVisualizer
 robot = Robot()
 
 mapvis = MapVisualizer()
-
+robot.step()
+inicio=robot.map.getTileAt(0, 0)
+inicio.set_area(1)
 while robot.step() != -1:
+    print("Loop")
     # 0. Actualizar mapa
     robot.updateMap()
     robot.map.writeMap("map.txt", robot)
