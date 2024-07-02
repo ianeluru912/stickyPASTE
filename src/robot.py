@@ -4,6 +4,7 @@ from image import ImageProcessor
 from point import Point
 from piso import Piso
 from lidar import Lidar
+from rectangle import Rectangle
 import math
 import utils
 import struct
@@ -469,3 +470,11 @@ class Robot:
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
         self.avanzar(target_vector.length())
+
+    def getRectangle(self):
+        diameter = 0.07
+        left = self.position.x - diameter/2
+        right = self.position.x + diameter/2
+        top = self.position.y - diameter/2
+        bottom = self.position.y + diameter/2
+        return Rectangle(top, left, bottom, right)

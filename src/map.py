@@ -1,4 +1,5 @@
 from point import Point
+from rectangle import Rectangle
 
 class Map:
     def __init__(self, origin) -> None:
@@ -21,6 +22,18 @@ class Map:
             tile = Tile(col, row)
             self.tiles[(col, row)] = tile
         return tile
+    
+    def getTileRectangle(self, col, row):
+        position = self.gridToPosition(col, row)
+        left = position.x - Tile.WIDTH/2
+        right = position.x + Tile.WIDTH/2
+        top = position.y - Tile.HEIGHT/2
+        bottom = position.y + Tile.HEIGHT/2
+        return Rectangle(top, left, bottom, right)
+    
+    def getTilesIntersecting(self, rectangle):
+        # TODO(zoe): Filtrar que tiles estan tocando al rectangulo
+        pass
             
     def writeMap(self, file_path, robot):
         col, row = self.positionToGrid(robot.position)
