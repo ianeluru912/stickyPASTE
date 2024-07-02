@@ -24,8 +24,8 @@ while robot.step() != -1:
 
     # 3. Mover robot a baldosa elegida
     robot.moveToTile(tile)
-    print(robot.bh_ahead())
-    print(robot.imageProcessor.see_hole(robot.convertir_camara(robot.camD.getImage(), 64, 64)))
+    # print(robot.bh_ahead())
+    # print(robot.imageProcessor.see_hole(robot.convertir_camara(robot.camD.getImage(), 64, 64)))
     # 4. Repetir
     
 # print(robot.position)

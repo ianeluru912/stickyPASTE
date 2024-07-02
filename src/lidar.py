@@ -272,9 +272,9 @@ class Lidar:
         return rightDist < 0.08
     
     def is_obstacle_preventing_passage(self):
-        rays = self.rangeImage[192:320]
-        available_rays = filter(lambda x: x > 0.08, rays)
-        not_available_rays = filter(lambda x: x < 0.08, rays)
-        if list(len(not_available_rays)) >= 97:
+        rays = self.rangeImage[224:288]
+        not_available_rays = filter(lambda x: x < 0.05, rays)
+        if len(list(not_available_rays)) >= 1:
+            print('obstacle is not allowing passage')
             return True
-        return available_rays
+        return False

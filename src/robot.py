@@ -143,15 +143,26 @@ class Robot:
 
     def avanzar(self, distance):
         initPos = self.position
-
         while self.step() != -1:
             diff = abs(distance) - initPos.distance_to(self.position)
-
             vel = min(max(diff/0.01, 0.1), 1)
+            
             if distance < 0: vel *= -1
 
             self.wheelL.setVelocity(vel*MAX_VEL)
             self.wheelR.setVelocity(vel*MAX_VEL)
+
+            if self.lidar.is_obstacle_preventing_passage() == True:
+                print('hay algo delante')
+                col, row = self.map.positionToGrid(self.position)
+                tile = self.map.getTileAt(col, row)
+                tile.hasObstacle = True
+                if tile.hasObstacle: 
+                    self.wheelL.setVelocity(-vel*MAX_VEL)
+                    self.wheelR.setVelocity(-vel*MAX_VEL)
+                    # self.updateMap()
+                    # self.checkNeighbours()
+                    break
 
             if diff < 0.001:
                 break
@@ -364,6 +375,9 @@ class Robot:
         if self.checkpoint_ahead():
             tile_ahead = self.get_tile_ahead()
             tile_ahead.isCheckpoint= True
+        if self.lidar.is_obstacle_preventing_passage(): # Al sacar esto, el robot deja de moverse, hay que mantenerlo :)
+            tile_ahead = self.get_tile_ahead()
+            tile_ahead.hasObstacle = True
             
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
@@ -376,10 +390,10 @@ class Robot:
         tiles = []
         for c, r in tile_order[orient]:
             tile = self.map.getTileAt(col + c, row + r)
-            if current_tile.isConnectedTo(tile) and not tile.isBlackHole:
+            if current_tile.isConnectedTo(tile) and not tile.isBlackHole and not tile.hasObstacle:
                 tiles.append(tile)
         return tiles
-    
+
     def moveToTile(self, tile):
         target_pos = self.map.gridToPosition(tile.col, tile.row)
         self.moveToPoint(target_pos)
