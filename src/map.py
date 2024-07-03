@@ -23,6 +23,10 @@ class Map:
             self.tiles[(col, row)] = tile
         return tile
     
+    def getTileAtPosition(self, point):
+        col, row = self.positionToGrid(point)
+        return self.getTileAt(col, row)
+    
     def getTileRectangle(self, col, row):
         position = self.gridToPosition(col, row)
         left = position.x - Tile.WIDTH/2
