@@ -185,3 +185,9 @@ class Tile:
             return 'Orange'
         else:
             return None
+    
+    def isValid(self):
+        walls=[self.north,self.west,self.east,self.south]
+        print(walls)
+        # if there is a 0 in the walls, then it is a valid tile
+        return 0 in walls

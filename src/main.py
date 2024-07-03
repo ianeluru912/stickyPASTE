@@ -23,6 +23,9 @@ while robot.step() != -1:
 
     # 3. Mover robot a baldosa elegida
     robot.moveToTile(tile)
+    # print all tiles that are valids
+    for t in robot.map.tiles:
+        print(t.col,t.row, t.is_valid())
     # print(robot.bh_ahead())
     # print(robot.imageProcessor.see_hole(robot.convertir_camara(robot.camD.getImage(), 64, 64)))
     # 4. Repetir
