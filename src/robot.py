@@ -108,6 +108,10 @@ class Robot:
             if entrada_D is not None:
                 self.enviarMensajeVoC(entrada_D)
 
+    def tileAtPosition(self, position):
+        col,row=self.map.positionToGrid(position)
+        return self.map.getTileAt(col, row)
+    
     def updatePosition(self):
         x, _, y = self.gps.getValues()
         # print(self.lastPosition, self.position)
@@ -115,11 +119,10 @@ class Robot:
         self.position = Point(x, y)
         if self.lastPosition is None:
             self.lastPosition = self.position
-        elif self.lastPosition.distance_to(self.position) > 0.03:
+        elif self.lastPosition.distance_to(self.position) > 0.06:
             print("LOP")
             self.doingLOP = True
-            actualCol, actualRow=self.map.positionToGrid(self.position)
-            actualTile=self.map.getTileAt(actualCol, actualRow)
+            actualTile=self.tileAtPosition(self.position)
             self.current_area=actualTile.get_area()
             self.lastPosition = self.position
         else:
@@ -396,6 +399,9 @@ class Robot:
 
         self.lidar.updateWalls1(self.rotation, self.map, tile)
 
+        self.clasificar_tile_ahead()
+
+    def clasificar_tile_ahead(self):
         if self.bh_ahead():
             tile_ahead = self.get_tile_ahead()
             tile_ahead.isBlackHole = True
@@ -484,12 +490,19 @@ class Robot:
         if changeOfArea in possibleAreas:
             self.current_area = possibleAreas[changeOfArea]
             print(f"Area actualizada a {self.current_area} por color {color}")
+    
+    
     def moveToPoint(self, target_pos):
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
-        self.avanzar(target_vector.length())
+        self.clasificar_tile_ahead()
+        tileDestino=self.get_tile_ahead()
+        if tileDestino.hasObstacle or tileDestino.isBlackHole:
+            print("Hay un obstaculo o agujero en el camino")
+        else:
+            self.avanzar(target_vector.length())
 
     def getRectangle(self):
         diameter = 0.07
