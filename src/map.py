@@ -32,8 +32,12 @@ class Map:
         return Rectangle(top, left, bottom, right)
     
     def getTilesIntersecting(self, rectangle):
-        # TODO(zoe): Filtrar que tiles estan tocando al rectangulo
-        pass
+        result = []
+        for tile in self.tiles.values():
+            tile_rect = self.getTileRectangle(tile.col, tile.row)
+            if tile_rect.intersects(rectangle):
+                result.append(tile)
+        return result
             
     def writeMap(self, file_path, robot):
         col, row = self.positionToGrid(robot.position)
