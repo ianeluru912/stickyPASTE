@@ -177,6 +177,45 @@ class Lidar:
             walls[1]=-1    
         return walls
 
+    def updateWalls2(self, rotation, map, tiles):
+        walls = self.get_walls_2(rotation)
+        north_tile = None
+        south_tile = None
+        if tiles[0].row < tiles[1].row:
+            north_tile = tiles[0]
+            south_tile = tiles[1]
+        else:
+            north_tile = tiles[1]
+            south_tile = tiles[0]
+
+        north_tile.north[0] = walls[0]
+        north_tile.north[1] = walls[1]
+        north_tile.north[2] = walls[2]
+
+        north_tile.east[0] = walls[3]
+        north_tile.east[1] = walls[4]
+        north_tile.east[2] = walls[5]
+
+        north_tile.south = [0, 0, 0]
+
+        north_tile.west[0] = walls[15]
+        north_tile.west[1] = walls[16]
+        north_tile.west[2] = walls[17]
+
+        south_tile.north = [0, 0, 0]
+
+        south_tile.east[0] = walls[6]
+        south_tile.east[1] = walls[7]
+        south_tile.east[2] = walls[8]
+
+        south_tile.south[0] = walls[9]
+        south_tile.south[1] = walls[10]
+        south_tile.south[2] = walls[11]
+
+        south_tile.west[0] = walls[12]
+        south_tile.west[1] = walls[13]
+        south_tile.west[2] = walls[14]
+        
     def get_walls_3(self, rotation):
         shift = self.rotToLidar(rotation)
         # gira los rayos para que estén en orientación Norte
@@ -213,6 +252,48 @@ class Lidar:
             walls[15]=-1
             walls[16]=-1
         return walls
+    
+    def updateWalls3(self, rotation, map, tiles):
+        print(f"WALLS {self.ver_walls(rotation)}")
+        
+        walls = self.get_walls_3(rotation)
+        
+        west_tile = None
+        east_tile = None
+        if tiles[0].col < tiles[1].col:
+            west_tile = tiles[0]
+            east_tile = tiles[1]
+        else:
+            west_tile = tiles[1]
+            east_tile = tiles[0]
+
+        west_tile.north[0] = walls[0]
+        west_tile.north[1] = walls[1]
+        west_tile.north[2] = walls[2]
+
+        west_tile.east = [0, 0, 0]
+
+        west_tile.south[0] = walls[12]
+        west_tile.south[1] = walls[13]
+        west_tile.south[2] = walls[14]
+
+        west_tile.west[0] = walls[15]
+        west_tile.west[1] = walls[16]
+        west_tile.west[2] = walls[17]
+
+        east_tile.north[0] = walls[3]
+        east_tile.north[1] = walls[4]
+        east_tile.north[2] = walls[5]
+        
+        east_tile.east[0] = walls[6]
+        east_tile.east[1] = walls[7]
+        east_tile.east[2] = walls[8]
+
+        east_tile.south[0] = walls[9]
+        east_tile.south[1] = walls[10]
+        east_tile.south[2] = walls[11]
+
+        east_tile.west = [0, 0, 0]
     
     def get_walls_4(self, rotation):
         print(dict(sorted(self.rays_4.items())))
@@ -285,6 +366,20 @@ class Lidar:
         if walls[26]==1:
             walls[27]=-1
         return walls
+    
+    def updateWalls4(self, rotation, map, tiles):
+        walls = self.get_walls_4(rotation)
+
+        # TODO(Richo): Esto no estoy seguro de que sea correcto...
+        tiles.sort(key=lambda t: t[0] + t[1])
+        nw_tile = tiles[0]
+        ne_tile = tiles[1]
+        sw_tile = tiles[2]
+        se_tile = tiles[3]
+
+        # TODO(Martu): Verificar que los tiles sean los correctos y terminar de 
+        # marcar las paredes
+
 
     def rotToLidar(self, rot):
         #Cuánto girar los rayos para tomar referencia norte
