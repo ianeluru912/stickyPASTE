@@ -253,9 +253,7 @@ class Lidar:
             walls[16]=-1
         return walls
     
-    def updateWalls3(self, rotation, map, tiles):
-        print(f"WALLS {self.ver_walls(rotation)}")
-        
+    def updateWalls3(self, rotation, map, tiles):        
         walls = self.get_walls_3(rotation)
         
         west_tile = None
