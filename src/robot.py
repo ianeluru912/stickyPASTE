@@ -120,10 +120,6 @@ class Robot:
             entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
             if entrada_D is not None:
                 self.enviarMensajeVoC(entrada_D)
-
-    def tileAtPosition(self, position):
-        col,row=self.map.positionToGrid(position)
-        return self.map.getTileAt(col, row)
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -526,7 +522,7 @@ class Robot:
         if changeOfArea in possibleAreas:
             self.current_area = possibleAreas[changeOfArea]
             # print(f"Area actualizada a {self.current_area} por color {color}")
-            
+
     def moveToPoint(self, target_pos):
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
