@@ -3,6 +3,7 @@ import json
 import threading
 import traceback
 import json
+from enum import Enum
 
 
 def to_json_dict(obj):
@@ -11,6 +12,7 @@ def to_json_dict(obj):
     if isinstance(obj, int): return obj
     if isinstance(obj, bool): return obj
     if isinstance(obj, float): return obj
+    if isinstance(obj, Enum): return obj.value
 
     if isinstance(obj, list):
         result = []
