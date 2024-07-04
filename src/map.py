@@ -1,5 +1,18 @@
 from point import Point
 from rectangle import Rectangle
+from enum import Enum
+
+class TileType(Enum):
+    BLACK_HOLE = '2'
+    SWAMP = '3'
+    CHECKPOINT = '4'
+    STARTING = '5'
+    BLUE = 'b'
+    YELLOW = 'y'
+    GREEN = 'g'
+    PURPLE = 'p'
+    ORANGE = 'o'
+    RED = 'r'
 
 class Map:
     def __init__(self, origin) -> None:
@@ -66,9 +79,9 @@ class Map:
                         chars[1][1] = "@"
                     elif not t.isConnected():
                         chars[1][1] = "X"
-                    elif t.isBlackHole:
+                    elif t.type==TileType.BLACK_HOLE:
                         chars[1][1] = "B"
-                    elif t.isBlue:
+                    elif t.type==TileType.BLUE:
                         chars[1][1] = "A"
                     elif t.visits == 0:
                         chars[1][1] = "?"
@@ -106,18 +119,8 @@ class Tile:
         self.east = [-1, -1, -1]
         self.south = [-1, -1, -1]
 
-        self.isBlackHole = False
-        self.isSwamp = False
-        self.isCheckpoint = False
-        self.isPurple = False
-        self.isRed = False
-        self.isGreen = False
-        self.isBlue = False
-
+        self.type=None
         self.hasObstacle = False
-
-        self.isOrange = False
-        self.isYellow = False
         self.area = None
     
     def getDirectionTo(self, tile):
@@ -162,24 +165,24 @@ class Tile:
     def get_area(self):
         return self.area
     
-    def get_color(self):
-        if self.isBlue:
-            return 'Blue'
-        elif self.isPurple:
-            return 'Purple'
-        elif self.isYellow:
-            return 'Yellow'
-        elif self.isGreen:
-            return 'Green'
-        elif self.isRed:
-            return 'Red'
-        elif self.isOrange:
-            return 'Orange'
-        else:
-            return None
+    # def get_color(self):
+    #     if self.isBlue:
+    #         return 'Blue'
+    #     elif self.isPurple:
+    #         return 'Purple'
+    #     elif self.isYellow:
+    #         return 'Yellow'
+    #     elif self.isGreen:
+    #         return 'Green'
+    #     elif self.isRed:
+    #         return 'Red'
+    #     elif self.isOrange:
+    #         return 'Orange'
+    #     else:
+    #         return None
     
     def isValid(self):
-        walls=[self.north,self.west,self.east,self.south]
-        print(walls)
+        #join self.north,self.west,self.east,self.south
+        walls=self.north+self.west+self.east+self.south
         # if there is a 0 in the walls, then it is a valid tile
         return 0 in walls

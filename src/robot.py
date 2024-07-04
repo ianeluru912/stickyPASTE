@@ -1,5 +1,5 @@
 from controller import Robot as WebotsRobot # type: ignore
-from map import Map, Tile
+from map import Map, Tile, TileType
 from image import ImageProcessor
 from point import Point
 from piso import Piso
@@ -207,77 +207,6 @@ class Robot:
             self.avanzar(-dist)
 
 
-    def bh_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.blackHole():
-            return True
-        else:
-            return False
-    
-    def pantano_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.pantano():
-            return True
-        else:
-            return False
-    def suelo_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.del_suelo():
-            return True
-        else:
-            return False
-    def azul_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.azul():
-            return True
-        else:
-            return False
-    def verde_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.verde():
-            return True
-        else:
-            return False
-    def violeta_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.violeta():
-            return True
-        else:
-            return False
-    def rojo_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.rojo():
-            return True
-        else:
-            return False
-    def checkpoint_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.checkpoint():
-            return True
-        else:
-            return False
-    def orange_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.orange():
-            return True
-        else:
-            return False
-    def yellow_ahead(self):
-        b, g, r, _ = self.colorSensor.getImage()
-        m = Piso(r, g, b)
-        if m.amarillo():
-            return True
-        else:
-            return False
     
     def bh_izq(self):
         orientation = self.obtener_orientacion(self.rotation)
@@ -380,6 +309,7 @@ class Robot:
             return self.map.getTileAt(col, row - 1)
         elif orient == "W":
             return self.map.getTileAt(col, row + 1)
+        
     def get_tile_der(self):
         col, row = self.map.positionToGrid(self.position)
         orient = self.obtener_orientacion(self.rotation)
@@ -396,45 +326,43 @@ class Robot:
         col, row = self.map.positionToGrid(self.position)
         tile = self.map.getTileAt(col, row)
         tile.visits += 1
-
         self.lidar.updateWalls1(self.rotation, self.map, tile)
+        self.classifyNeighbourTile()
 
-        self.clasificar_tile_ahead()
+    def classifyAhead(self, tile):
+        print(tile.type)
+        b, g, r, _ = self.colorSensor.getImage()
+        m = Piso(r, g, b)
+        if tile.type is None:
+            if m.blackHole():
+                tile.type = TileType.BLACK_HOLE         
+            elif m.pantano():
+                tile.type = TileType.SWAMP
+            elif m.blue():
+                tile.type = TileType.BLUE   
+            elif m.green():
+                tile.type = TileType.GREEN
+            elif m.purple():
+                tile.type = TileType.PURPLE
+            elif m.red():
+                tile.type = TileType.RED
+            elif m.orange():
+                tile.type = TileType.ORANGE
+            elif m.yellow():
+                tile.type = TileType.YELLOW
+            elif m.checkpoint():
+                tile.type = TileType.CHECKPOINT
 
-    def clasificar_tile_ahead(self):
-        if self.bh_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isBlackHole = True
+        
+    def classifyNeighbourTile(self):
+        tile_ahead=self.get_tile_ahead()
+        self.classifyAhead(tile_ahead)
         if self.bh_izq():
             tile_izq = self.get_tile_izq()
-            tile_izq.isBlackHole = True
+            tile_izq.type = TileType.BLACK_HOLE
         if self.bh_der():
             tile_der = self.get_tile_der()
-            tile_der.isBlackHole = True
-        if self.pantano_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isSwamp = True
-        if self.azul_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isBlue = True
-        if self.verde_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isGreen = True
-        if self.violeta_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isPurple = True
-        if self.rojo_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isRed = True
-        if self.checkpoint_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isCheckpoint= True
-        if self.orange_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isOrange = True
-        if self.yellow_ahead():
-            tile_ahead = self.get_tile_ahead()
-            tile_ahead.isYellow = True
+            tile_der.type = TileType.BLACK_HOLE
             
     def checkNeighbours(self):
         orient = self.obtener_orientacion(self.rotation)
@@ -447,7 +375,7 @@ class Robot:
         tiles = []
         for c, r in tile_order[orient]:
             tile = self.map.getTileAt(col + c, row + r)
-            if current_tile.isConnectedTo(tile) and not tile.isBlackHole and not tile.hasObstacle:
+            if current_tile.isConnectedTo(tile) and not tile.type== TileType.BLACK_HOLE and not tile.hasObstacle:
                 tiles.append(tile)
         return tiles
 
@@ -461,7 +389,7 @@ class Robot:
             else:
                 self.current_area = tile.get_area()
                 print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
-            color = tile.get_color()
+            color = tile.type
             if color:
                 self.update_area_by_color(color)
                 tile.set_area(self.current_area)
@@ -472,18 +400,18 @@ class Robot:
 
     def update_area_by_color(self, color):
         possibleAreas = {
-            (1, 'Blue'): 2, #area 1, azul? area 2
-            (1, 'Yellow'): 3,
-            (1, 'Green'): 4,
-            (2, 'Blue'): 1, #area 2, azul? area 1
-            (2, 'Purple'): 3, #""
-            (2, 'Orange'): 4,
-            (3, 'Yellow'): 1,
-            (3, 'Purple'): 2,
-            (3, 'Red'): 4,
-            (4, 'Green'): 1,
-            (4, 'Orange'): 2,
-            (4, 'Red'): 3
+            (1, TileType.BLUE): 2, #area 1, azul? area 2
+            (1, TileType.YELLOW): 3,
+            (1, TileType.GREEN): 4,
+            (2, TileType.BLUE): 1, #area 2, azul? area 1
+            (2, TileType.PURPLE): 3, #""
+            (2, TileType.ORANGE): 4,
+            (3, TileType.YELLOW): 1,
+            (3, TileType.PURPLE): 2,
+            (3, TileType.RED): 4,
+            (4, TileType.GREEN): 1,
+            (4, TileType.ORANGE): 2,
+            (4, TileType.RED): 3
         }
 
         changeOfArea = (self.current_area, color)
@@ -497,9 +425,9 @@ class Robot:
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
-        self.clasificar_tile_ahead()
+        self.classifyNeighbourTile()
         tileDestino=self.get_tile_ahead()
-        if tileDestino.hasObstacle or tileDestino.isBlackHole:
+        if tileDestino.hasObstacle or tileDestino.type == TileType.BLACK_HOLE:
             print("Hay un obstaculo o agujero en el camino")
         else:
             self.avanzar(target_vector.length())
