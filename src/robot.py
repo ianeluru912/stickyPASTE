@@ -233,6 +233,7 @@ class Robot:
         if hasObstacle:
             # 1) Obtener el tile en el que está el obstáculo
             col, row = self.map.positionToGrid(initPos)
+            # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa
             orient = self.obtener_orientacion(self.rotation)
             if orient == "N":
                 row -= 1
@@ -250,10 +251,9 @@ class Robot:
             # 3) Retroceder la misma distancia que avancé
             dist = initPos.distance_to(self.position)
             self.avanzar(-dist)
-
-
     
     def bh_izq(self):
+        # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa
         orientation = self.obtener_orientacion(self.rotation)
         if orientation == 'N':
             if self.isOpenWest():
@@ -273,6 +273,7 @@ class Robot:
             return False   
 
     def bh_der(self):
+        # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa
         orientation = self.obtener_orientacion(self.rotation)
         if orientation == 'N':
             if self.isOpenEast():
@@ -305,6 +306,7 @@ class Robot:
         return radianes
     
     def obtener_orientacion(self, radianes):
+        # TODO(Richo): Este código asume que no nos movemos en diagonal
         angulo = self.normalizar_radianes(radianes)
         if angulo >= 0.785 and angulo <= 2.355:
             return 'W'
@@ -427,22 +429,7 @@ class Robot:
         if self.bh_der():
             tile_der = self.get_tile_der()
             tile_der.type = TileType.BLACK_HOLE
-            
-    def checkNeighbours(self):
-        orient = self.obtener_orientacion(self.rotation)
-        col, row = self.map.positionToGrid(self.position)
-        current_tile = self.map.getTileAt(col, row)
-        tile_order = {"N": ((-1, 0), (0, -1), (1, 0), (0, 1)),
-                      "E": ((0, -1), (1, 0), (0, 1), (-1, 0)),
-                      "S": ((1, 0), (0, 1), (-1, 0), (0, -1)),
-                      "W": ((0, 1), (-1, 0), (0, -1), (1, 0))}
-        tiles = []
-        for c, r in tile_order[orient]:
-            tile = self.map.getTileAt(col + c, row + r)
-            if current_tile.isConnectedTo(tile) and not tile.type== TileType.BLACK_HOLE and not tile.hasObstacle:
-                tiles.append(tile)
-        return tiles
-
+           
     def update_area_by_color(self, color):
         possibleAreas = {
             (1, TileType.BLUE): 2, #area 1, azul? area 2
