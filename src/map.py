@@ -1,6 +1,7 @@
 from point import Point
 from rectangle import Rectangle
 from enum import Enum
+import numpy as np
 
 class TileType(Enum):
     BLACK_HOLE = '2'
@@ -113,6 +114,10 @@ class Map:
                         f.write("".join(chars[i]))
                     f.write("\n")
     
+    def getValidTiles(self):
+        salida=[tile for tile in self.tiles.values() if tile.isValid()]
+        return salida
+    
 class Tile:
     WIDTH = 0.12  
     HEIGHT = 0.12
@@ -131,6 +136,58 @@ class Tile:
         self.hasObstacle = False
         self.area = None
     
+    def __str__(self) -> str:
+        return f"Tile ({self.col}, {self.row}) tipo: {self.type} visitas: {self.visits}	area: {self.area}"
+    
+    def getRepresentation(self):
+        # create a numpy array 5x5
+        # Agregar en la tile las víctimas y carteles ACAACA
+        rep=np.full((5,5), None)
+        # Agregar las paredes
+        rep[0,0:5]=self.combinesWall(rep[0,0:5], self.getWallRepresentation(self.north))
+        rep[4,0:5]=self.combinesWall(rep[4,0:5], self.getWallRepresentation(self.south))
+        rep[0:5,0]=self.combinesWall(rep[0:5,0],self.getWallRepresentation(self.west))
+        rep[0:5,4]=self.combinesWall(rep[0:5,4],self.getWallRepresentation(self.east))
+
+        return rep
+
+    def maxWall(self, v1, v2):
+        if v1==1 or v2==1:
+            return 1
+        elif v1==0 or v2==0:
+            return 0
+        else:
+            return None
+
+    def combinesWall(self, w1, w2):
+        sol=[None, None, None, None, None]
+        for i in range(5):
+            sol[i]=self.maxWall(w1[i],w2[i])
+        return sol
+
+    def getWallRepresentation(self, wall):
+        left=wall[0]
+        right=wall[2]
+        if left==-1 and right==-1:
+            return [None, None, None, None, None]
+        elif left==-1 and right==0:
+            return [None, None, 0, 0, 0]
+        elif left==-1 and right==1:
+            return [None, None, 1, 1, 1]
+        elif left==0 and right==-1:
+            return [0, 0, 0, None, None]
+        elif left==0 and right==0:
+            return [0, 0, 0, 0, 0]
+        elif left==0 and right==1:
+            return [0, 0, 1, 1, 1]
+        elif left==1 and right==-1:
+            return [1, 1, 1, None, None]
+        elif left==1 and right==0:
+            return [1, 1, 1, 0, 0]
+        elif left==1 and right==1:
+            return [1, 1, 1, 1, 1]
+
+
     def getDirectionTo(self, tile):
         sc = self.col
         sr = self.row
