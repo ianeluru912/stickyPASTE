@@ -153,8 +153,6 @@ class Robot:
                     if color:
                         self.update_area_by_color(color)
                         currentTile.set_area(self.current_area)
-                else:
-                    self.doingLOP = False
 
             if self.lastPosition.distance_to(self.position) > 0.06:
                 # print("LOP")
@@ -163,6 +161,7 @@ class Robot:
                 self.lastPosition = self.position
             else:
                 self.lastPosition = self.position
+                self.doingLOP = False
 
     def updateRotation(self):
         _, _, yaw = self.inertialUnit.getRollPitchYaw()
