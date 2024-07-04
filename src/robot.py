@@ -232,7 +232,9 @@ class Robot:
         if hasObstacle:
             # 1) Obtener el tile en el que está el obstáculo
             col, row = self.map.positionToGrid(initPos)
-            # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa
+            # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa.
+            # Acá habría que calcular cuál es la posición destino para después pedirle al mapa qué
+            # tile corresponde con esa punto.
             orient = self.obtener_orientacion(self.rotation)
             if orient == "N":
                 row -= 1
@@ -456,7 +458,7 @@ class Robot:
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
         self.classifyNeighbourTile()
-        tileDestino=self.get_tile_ahead()
+        tileDestino=self.get_tile_ahead() # TODO: Esto me parece que debería ser el tile que esté en target_pos
         if tileDestino.hasObstacle or tileDestino.type == TileType.BLACK_HOLE:
             print("Hay un obstaculo o agujero en el camino")
         else:
