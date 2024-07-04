@@ -10,6 +10,8 @@ import utils
 import struct
 import numpy as np
 
+from visualization import MapVisualizer
+
 TIME_STEP = 16
 MAX_VEL = 3.14  # Reduzco la velocidad para minimizar desvío
 
@@ -55,12 +57,15 @@ class Robot:
         # self.holeDER = self.imageProcessor.see_hole()
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
+        self.map = None
         self.step()
 
         self.posicion_inicial = self.position
         self.map = Map(self.posicion_inicial)
         self.current_area = 1
         self.doingLOP = False
+
+        self.mapvis = MapVisualizer()
 
     def step(self):
         result = self.robot.step(TIME_STEP)
@@ -78,6 +83,14 @@ class Robot:
         self.updateRotation()
         self.updateLidar()
         self.updateCamerasDetection()
+        
+        if self.map != None:
+            x = self.position.x - self.posicion_inicial.x
+            y = self.position.y - self.posicion_inicial.y
+            x_valid = round(x * 100) % 6 <= 0
+            y_valid = round(y * 100) % 6 <= 0
+            if x_valid and y_valid:
+                self.updateMap()
 
     def updateCamerasDetection(self):
         return self.enviar_mensaje_imgs()
@@ -107,10 +120,6 @@ class Robot:
             entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
             if entrada_D is not None:
                 self.enviarMensajeVoC(entrada_D)
-
-    def tileAtPosition(self, position):
-        col,row=self.map.positionToGrid(position)
-        return self.map.getTileAt(col, row)
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
@@ -119,14 +128,19 @@ class Robot:
         self.position = Point(x, y)
         if self.lastPosition is None:
             self.lastPosition = self.position
-        elif self.lastPosition.distance_to(self.position) > 0.06:
-            print("LOP")
-            self.doingLOP = True
-            actualTile=self.tileAtPosition(self.position)
-            self.current_area=actualTile.get_area()
-            self.lastPosition = self.position
         else:
-            self.lastPosition = self.position
+            previousTile = self.map.getTileAtPosition(self.lastPosition)
+            currentTile = self.map.getTileAtPosition(self.position)
+            if currentTile != previousTile:
+                previousTile.visits += 1
+
+            if self.lastPosition.distance_to(self.position) > 0.06:
+                # print("LOP")
+                self.doingLOP = True
+                self.current_area = currentTile.get_area()
+                self.lastPosition = self.position
+            else:
+                self.lastPosition = self.position
 
     def updateRotation(self):
         _, _, yaw = self.inertialUnit.getRollPitchYaw()
@@ -175,7 +189,7 @@ class Robot:
             self.wheelR.setVelocity(vel*MAX_VEL)
 
             if distance > 0 and self.lidar.is_obstacle_preventing_passage():
-                print('hay algo delante')
+                # print('hay algo delante')
                 hasObstacle = True
                 break
 
@@ -323,9 +337,28 @@ class Robot:
             return self.map.getTileAt(col, row - 1)
 
     def updateMap(self):
-        col, row = self.map.positionToGrid(self.position)
-        tile = self.map.getTileAt(col, row)
-        tile.visits += 1
+        rect = self.getRectangle()
+        tiles_intersecting = self.map.getTilesIntersecting(rect)
+        if len(tiles_intersecting) == 1:
+            print("CASO 1")
+            self.updateMap1(tiles_intersecting[0])
+        elif len(tiles_intersecting) == 2:
+            direction = tiles_intersecting[0].getDirectionTo(tiles_intersecting[1])
+            if direction == "S" or direction == "N":
+                # Caso 2
+                print("CASO 2")
+                self.lidar.updateWalls2(self.rotation, self.map, tiles_intersecting)
+            else:
+                # Caso 3
+                print("CASO 3")
+                self.lidar.updateWalls3(self.rotation, self.map, tiles_intersecting)
+        elif len(tiles_intersecting) == 4:
+            print("CASO 4")
+            self.lidar.updateWalls4(self.rotation, self.map, tiles_intersecting)
+
+        self.mapvis.send_map(self.map)
+
+    def updateMap1(self, tile):
         self.lidar.updateWalls1(self.rotation, self.map, tile)
         self.classifyNeighbourTile()
 
@@ -385,7 +418,7 @@ class Robot:
         if not self.doingLOP:
             if tile.get_area() is None:
                 tile.set_area(self.current_area)
-                print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
+                # print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
             else:
                 self.current_area = tile.get_area()
                 print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
@@ -393,8 +426,8 @@ class Robot:
             if color:
                 self.update_area_by_color(color)
                 tile.set_area(self.current_area)
-            print(f"Tile en ({tile.col}, {tile.row}) tiene area {tile.area}")
-            print(f"Yo robot estoy en área {self.current_area})")
+            # print(f"Tile en ({tile.col}, {tile.row}) tiene area {tile.area}")
+            # print(f"Yo robot estoy en área {self.current_area})")
         else:
             self.doingLOP = False
 
@@ -417,9 +450,8 @@ class Robot:
         changeOfArea = (self.current_area, color)
         if changeOfArea in possibleAreas:
             self.current_area = possibleAreas[changeOfArea]
-            print(f"Area actualizada a {self.current_area} por color {color}")
-    
-    
+            # print(f"Area actualizada a {self.current_area} por color {color}")
+
     def moveToPoint(self, target_pos):
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
