@@ -5,6 +5,7 @@ from point import Point
 from piso import Piso
 from lidar import Lidar
 from rectangle import Rectangle
+from navigator import Navigator1, Navigator2
 import math
 import utils
 import struct
@@ -53,6 +54,8 @@ class Robot:
         self.rangeImage = None
         self.posicion_inicial = None
 
+        self.navigators = {1: Navigator1(), 2: Navigator2()}
+
         # self.holeIZ = self.imageProcessor.see_hole()
         # self.holeDER = self.imageProcessor.see_hole()
         self.wheelL.setVelocity(0)
@@ -66,6 +69,10 @@ class Robot:
         self.doingLOP = False
 
         self.mapvis = MapVisualizer()
+
+    def getNavigator(self):
+        return self.navigators[1] # TODO: Cambiar cuando anden los otros navigators 
+        return self.navigators[self.current_area]
 
     def step(self):
         result = self.robot.step(TIME_STEP)
@@ -131,8 +138,21 @@ class Robot:
         else:
             previousTile = self.map.getTileAtPosition(self.lastPosition)
             currentTile = self.map.getTileAtPosition(self.position)
-            if currentTile != previousTile:
+            if currentTile != previousTile: # Entramos a una nueva baldosa
                 previousTile.visits += 1
+
+                if not self.doingLOP:
+                    if currentTile.get_area() is None:
+                        currentTile.set_area(self.current_area)
+                        # print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
+                    else:
+                        self.current_area = currentTile.get_area()
+                        print(f"Robot ahora en area {self.current_area} en el tile ({currentTile.col}, {currentTile.row})")
+                    
+                    color = currentTile.type
+                    if color:
+                        self.update_area_by_color(color)
+                        currentTile.set_area(self.current_area)
 
             if self.lastPosition.distance_to(self.position) > 0.06:
                 # print("LOP")
@@ -141,6 +161,7 @@ class Robot:
                 self.lastPosition = self.position
             else:
                 self.lastPosition = self.position
+                self.doingLOP = False
 
     def updateRotation(self):
         _, _, yaw = self.inertialUnit.getRollPitchYaw()
@@ -211,6 +232,7 @@ class Robot:
         if hasObstacle:
             # 1) Obtener el tile en el que está el obstáculo
             col, row = self.map.positionToGrid(initPos)
+            # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa
             orient = self.obtener_orientacion(self.rotation)
             if orient == "N":
                 row -= 1
@@ -228,10 +250,9 @@ class Robot:
             # 3) Retroceder la misma distancia que avancé
             dist = initPos.distance_to(self.position)
             self.avanzar(-dist)
-
-
     
     def bh_izq(self):
+        # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa
         orientation = self.obtener_orientacion(self.rotation)
         if orientation == 'N':
             if self.isOpenWest():
@@ -251,6 +272,7 @@ class Robot:
             return False   
 
     def bh_der(self):
+        # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa
         orientation = self.obtener_orientacion(self.rotation)
         if orientation == 'N':
             if self.isOpenEast():
@@ -283,6 +305,7 @@ class Robot:
         return radianes
     
     def obtener_orientacion(self, radianes):
+        # TODO(Richo): Este código asume que no nos movemos en diagonal
         angulo = self.normalizar_radianes(radianes)
         if angulo >= 0.785 and angulo <= 2.355:
             return 'W'
@@ -405,41 +428,7 @@ class Robot:
         if self.bh_der():
             tile_der = self.get_tile_der()
             tile_der.type = TileType.BLACK_HOLE
-            
-    def checkNeighbours(self):
-        orient = self.obtener_orientacion(self.rotation)
-        col, row = self.map.positionToGrid(self.position)
-        current_tile = self.map.getTileAt(col, row)
-        tile_order = {"N": ((-1, 0), (0, -1), (1, 0), (0, 1)),
-                      "E": ((0, -1), (1, 0), (0, 1), (-1, 0)),
-                      "S": ((1, 0), (0, 1), (-1, 0), (0, -1)),
-                      "W": ((0, 1), (-1, 0), (0, -1), (1, 0))}
-        tiles = []
-        for c, r in tile_order[orient]:
-            tile = self.map.getTileAt(col + c, row + r)
-            if current_tile.isConnectedTo(tile) and not tile.type== TileType.BLACK_HOLE and not tile.hasObstacle:
-                tiles.append(tile)
-        return tiles
-
-    def moveToTile(self, tile):
-        target_pos = self.map.gridToPosition(tile.col, tile.row)
-        self.moveToPoint(target_pos)
-        if not self.doingLOP:
-            if tile.get_area() is None:
-                tile.set_area(self.current_area)
-                # print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
-            else:
-                self.current_area = tile.get_area()
-                # print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
-            color = tile.type
-            if color:
-                self.update_area_by_color(color)
-                tile.set_area(self.current_area)
-            # print(f"Tile en ({tile.col}, {tile.row}) tiene area {tile.area}")
-            # print(f"Yo robot estoy en área {self.current_area})")
-        else:
-            self.doingLOP = False
-
+           
     def update_area_by_color(self, color):
         possibleAreas = {
             (1, TileType.BLUE): 2, #area 1, azul? area 2
