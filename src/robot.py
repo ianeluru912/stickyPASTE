@@ -430,7 +430,7 @@ class Robot:
                 # print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
             else:
                 self.current_area = tile.get_area()
-                print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
+                # print(f"Robot ahora en area {self.current_area} en el tile ({tile.col}, {tile.row})")
             color = tile.type
             if color:
                 self.update_area_by_color(color)

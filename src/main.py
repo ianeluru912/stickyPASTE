@@ -24,7 +24,11 @@ while robot.step() != -1:
 
     # 3. Mover robot a baldosa elegida
     robot.moveToTile(tile)
-
+    # valid_tiles = robot.map.getValidTiles()
+    # for tile in valid_tiles:
+    #     print(tile)
+    #     print(tile.getRepresentation())
+    
     # print all tiles that are valids
     # for t in robot.map.tiles.values():
     #     print(t.col,t.row, t.isValid())
