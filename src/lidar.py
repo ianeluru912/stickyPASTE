@@ -351,8 +351,7 @@ class Lidar:
     def updateWalls4(self, rotation, map, tiles):
         walls = self.get_walls_4(rotation)
 
-        # TODO(Richo): Esto no estoy seguro de que sea correcto...
-        tiles.sort(key=lambda t: t[0] + t[1])
+        tiles.sort(key=lambda t: t.col + t.row)
         nw_tile = tiles[0]
         ne_tile = tiles[1]
         sw_tile = tiles[2]
