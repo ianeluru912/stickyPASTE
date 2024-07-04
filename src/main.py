@@ -26,8 +26,8 @@ while robot.step() != -1:
     robot.moveToTile(tile)
 
     # print all tiles that are valids
-    for t in robot.map.tiles.values():
-        print(t.col,t.row, t.isValid())
+    # for t in robot.map.tiles.values():
+    #     print(t.col,t.row, t.isValid())
 
     # print(robot.bh_ahead())
     # print(robot.imageProcessor.see_hole(robot.convertir_camara(robot.camD.getImage(), 64, 64)))
