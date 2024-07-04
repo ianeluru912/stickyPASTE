@@ -3,6 +3,7 @@ import json
 import threading
 import traceback
 import json
+from enum import Enum
 
 
 def to_json_dict(obj):
@@ -11,6 +12,7 @@ def to_json_dict(obj):
     if isinstance(obj, int): return obj
     if isinstance(obj, bool): return obj
     if isinstance(obj, float): return obj
+    if isinstance(obj, Enum): return obj.value
 
     if isinstance(obj, list):
         result = []
@@ -41,6 +43,8 @@ class MapVisualizer:
         self.connection = None
         self.start()
 
+        self.previousMessage = None
+
     def start(self):
         self.thread = threading.Thread(target=self.accept_connections, args=(), daemon=True)
         self.thread.start()
@@ -58,7 +62,10 @@ class MapVisualizer:
         if self.connection == None: return
         try:
             data = JSON.stringify(map).encode("utf8")
-            self.connection.sendall(data)
+            if data == self.previousMessage: return
+            self.previousMessage = data
+            count = len(data).to_bytes(4, "little")
+            self.connection.sendall(count + data)
         except Exception:
             print("Connection lost!")
             print(traceback.format_exc())

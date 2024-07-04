@@ -9,9 +9,9 @@ class Lidar:
             7:(466,0.055,0.075), 8:(466,0.093,0.113), 9:(486,0.11,0.13), 10:(0,0.052,0.072), 11:(26,0.11,0.13), 12:(46,0.093,0.113), 13:(46,0.055,0.075),\
             14:(84,0.054,0.074), 15:(172,0.054,0.074), 16:(210,0.055,0.075), 17:(210,0.093,0.113)}
     
-    rays_3 ={0: (174,0.09, 0.19), 1: (174,0.055, 0.075), 2: (212,0.055, 0.075), 3:(300,0.055, 0.075), 4:(338,0.055, 0.075), 5:(338,0.09, 0.19), 6:(358,0.012, 0.13),\
-            7:(384,0.05, 0.07), 8:(410,0.012, 0.13), 9:(430,0.09, 0.19), 10:(430,0.055, 0.075), 11:(468,0.055, 0.075), 12:(44,0.055, 0.075), 13:(82,0.055, 0.075),\
-            14:(82,0.09, 0.19), 15:(102,0.012, 0.13), 16:(128,0.05, 0.07), 17:(154,0.012, 0.13)}
+    rays_3 ={0: (174,0.09, 0.113), 1: (174,0.055, 0.075), 2: (212,0.055, 0.075), 3:(300,0.055, 0.075), 4:(338,0.055, 0.075), 5:(338,0.09, 0.113), 6:(358,0.012, 0.13),\
+            7:(384,0.05, 0.07), 8:(410,0.012, 0.13), 9:(430,0.09, 0.113), 10:(430,0.055, 0.075), 11:(468,0.055, 0.075), 12:(44,0.055, 0.075), 13:(82,0.055, 0.075),\
+            14:(82,0.09, 0.113), 15:(102,0.012, 0.13), 16:(128,0.05, 0.07), 17:(154,0.012, 0.13)}
     
     rays_4 = {0: (205, 0.04, 0.24), 1: (205, 0.09, 0.11), 2: (235, 0.01, 0.21), 3: (256, 0.049, 0.069), 4: (277, 0.01, 0.21), \
               5: (307, 0.09, 0.11), 6: (307, 0.04, 0.24), 7: (333, 0.133, 0.1533), 8: (333, 0.086, 0.106), 9: (363, 0.01, 0.21), \
@@ -115,30 +115,7 @@ class Lidar:
         tile.west[1] = walls[10]
         tile.west[2] = walls[11]
         
-        north_tile = map.getTileAt(tile.col, tile.row - 1)
-        east_tile = map.getTileAt(tile.col + 1, tile.row)
-        west_tile = map.getTileAt(tile.col - 1, tile.row)
-        south_tile = map.getTileAt(tile.col, tile.row + 1)
-
-        if tile.north[0] == 1:
-            north_tile.south[2] = 1
-        if tile.north[2] == 1:
-            north_tile.south[0] = 1
-        if tile.east[0] == 1:
-            east_tile.west[2] = 1
-        if tile.east[2] == 1:
-            east_tile.west[0] = 1
-        if tile.west[0] == 1:
-            west_tile.east[2] = 1
-        if tile.west[2] == 1:
-            west_tile.east[0] = 1
-        if tile.south[0] == 1:
-            south_tile.north[2] = 1
-        if tile.south[2] == 1:
-            south_tile.north[0] = 1
-
-        # TODO(Zoe): Actualizar las tiles vecinas con la info de las paredes
-        # que se comparten con la tile actual
+        self.fixNeighbours(map, tile)
     
     def get_walls_2(self, rotation):
         shift = self.rotToLidar(rotation)
@@ -177,6 +154,48 @@ class Lidar:
             walls[1]=-1    
         return walls
 
+    def updateWalls2(self, rotation, map, tiles):
+        walls = self.get_walls_2(rotation)
+        north_tile = None
+        south_tile = None
+        if tiles[0].row < tiles[1].row:
+            north_tile = tiles[0]
+            south_tile = tiles[1]
+        else:
+            north_tile = tiles[1]
+            south_tile = tiles[0]
+
+        north_tile.north[0] = walls[0]
+        north_tile.north[1] = walls[1]
+        north_tile.north[2] = walls[2]
+
+        north_tile.east[0] = walls[3]
+        north_tile.east[1] = walls[4]
+        north_tile.east[2] = walls[5]
+
+        north_tile.south = [0, 0, 0]
+
+        north_tile.west[0] = walls[15]
+        north_tile.west[1] = walls[16]
+        north_tile.west[2] = walls[17]
+
+        south_tile.north = [0, 0, 0]
+
+        south_tile.east[0] = walls[6]
+        south_tile.east[1] = walls[7]
+        south_tile.east[2] = walls[8]
+
+        south_tile.south[0] = walls[9]
+        south_tile.south[1] = walls[10]
+        south_tile.south[2] = walls[11]
+
+        south_tile.west[0] = walls[12]
+        south_tile.west[1] = walls[13]
+        south_tile.west[2] = walls[14]
+
+        self.fixNeighbours(map, north_tile)
+        self.fixNeighbours(map, south_tile)
+        
     def get_walls_3(self, rotation):
         shift = self.rotToLidar(rotation)
         # gira los rayos para que estén en orientación Norte
@@ -213,6 +232,49 @@ class Lidar:
             walls[15]=-1
             walls[16]=-1
         return walls
+    
+    def updateWalls3(self, rotation, map, tiles):        
+        walls = self.get_walls_3(rotation)
+        
+        west_tile = None
+        east_tile = None
+        if tiles[0].col < tiles[1].col:
+            west_tile = tiles[0]
+            east_tile = tiles[1]
+        else:
+            west_tile = tiles[1]
+            east_tile = tiles[0]
+
+        west_tile.north[0] = walls[0]
+        west_tile.north[1] = walls[1]
+        west_tile.north[2] = walls[2]
+
+        west_tile.east = [0, 0, 0]
+
+        west_tile.south[0] = walls[12]
+        west_tile.south[1] = walls[13]
+        west_tile.south[2] = walls[14]
+
+        west_tile.west[0] = walls[15]
+        west_tile.west[1] = walls[16]
+        west_tile.west[2] = walls[17]
+
+        east_tile.north[0] = walls[3]
+        east_tile.north[1] = walls[4]
+        east_tile.north[2] = walls[5]
+        
+        east_tile.east[0] = walls[6]
+        east_tile.east[1] = walls[7]
+        east_tile.east[2] = walls[8]
+
+        east_tile.south[0] = walls[9]
+        east_tile.south[1] = walls[10]
+        east_tile.south[2] = walls[11]
+
+        east_tile.west = [0, 0, 0]
+
+        self.fixNeighbours(map, west_tile)
+        self.fixNeighbours(map, east_tile)
     
     def get_walls_4(self, rotation):
         print(dict(sorted(self.rays_4.items())))
@@ -285,6 +347,42 @@ class Lidar:
         if walls[26]==1:
             walls[27]=-1
         return walls
+    
+    def updateWalls4(self, rotation, map, tiles):
+        walls = self.get_walls_4(rotation)
+
+        # TODO(Richo): Esto no estoy seguro de que sea correcto...
+        tiles.sort(key=lambda t: t[0] + t[1])
+        nw_tile = tiles[0]
+        ne_tile = tiles[1]
+        sw_tile = tiles[2]
+        se_tile = tiles[3]
+
+        # TODO(Martu): Verificar que los tiles sean los correctos y terminar de 
+        # marcar las paredes
+
+    def fixNeighbours(self, map, tile):
+        north_tile = map.getTileAt(tile.col, tile.row - 1)
+        east_tile = map.getTileAt(tile.col + 1, tile.row)
+        west_tile = map.getTileAt(tile.col - 1, tile.row)
+        south_tile = map.getTileAt(tile.col, tile.row + 1)
+
+        if tile.north[0] != -1:
+            north_tile.south[2] = tile.north[0]
+        if tile.north[2] != -1:
+            north_tile.south[0] = tile.north[2]
+        if tile.east[0] != -1:
+            east_tile.west[2] = tile.east[0]
+        if tile.east[2] != -1:
+            east_tile.west[0] = tile.east[2]
+        if tile.west[0] != -1:
+            west_tile.east[2] = tile.west[0]
+        if tile.west[2] != -1:
+            west_tile.east[0] = tile.west[2]
+        if tile.south[0] != -1:
+            south_tile.north[2] = tile.south[0]
+        if tile.south[2] != -1:
+            south_tile.north[0] = tile.south[2]
 
     def rotToLidar(self, rot):
         #Cuánto girar los rayos para tomar referencia norte
