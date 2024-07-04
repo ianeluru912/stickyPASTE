@@ -2,7 +2,7 @@ from robot import Robot
 from point import Point
 import cv2
 from math import pi as PI
-
+from map import TileType
 from visualization import MapVisualizer
 
 robot = Robot()
@@ -11,6 +11,7 @@ mapvis = MapVisualizer()
 robot.step()
 inicio=robot.map.getTileAt(0, 0)
 inicio.set_area(1)
+inicio.type=TileType.STARTING
 while robot.step() != -1:
     print("Loop")
     # 0. Actualizar mapa
