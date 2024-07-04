@@ -154,6 +154,10 @@ class Robot:
         deltaRot = 0
 
         while self.step() != -1:
+            if self.doingLOP:
+                self.wheelL.setVelocity(0)
+                self.wheelR.setVelocity(0)
+                break
             deltaRot += utils.angle_diff(self.rotation, lastRot)
             lastRot = self.rotation
 
@@ -176,10 +180,15 @@ class Robot:
         self.wheelR.setVelocity(0)
 
     def avanzar(self, distance):
+        
         initPos = self.position
         hasObstacle = False
 
         while self.step() != -1:
+            if self.doingLOP:
+                self.wheelL.setVelocity(0)
+                self.wheelR.setVelocity(0)
+                break
             diff = abs(distance) - initPos.distance_to(self.position)
             vel = min(max(diff/0.01, 0.1), 1)
             
@@ -340,20 +349,20 @@ class Robot:
         rect = self.getRectangle()
         tiles_intersecting = self.map.getTilesIntersecting(rect)
         if len(tiles_intersecting) == 1:
-            print("CASO 1")
+            # print("CASO 1")
             self.updateMap1(tiles_intersecting[0])
         elif len(tiles_intersecting) == 2:
             direction = tiles_intersecting[0].getDirectionTo(tiles_intersecting[1])
             if direction == "S" or direction == "N":
                 # Caso 2
-                print("CASO 2")
+                # print("CASO 2")
                 self.lidar.updateWalls2(self.rotation, self.map, tiles_intersecting)
             else:
                 # Caso 3
-                print("CASO 3")
+                # print("CASO 3")
                 self.lidar.updateWalls3(self.rotation, self.map, tiles_intersecting)
         elif len(tiles_intersecting) == 4:
-            print("CASO 4")
+            # print("CASO 4")
             self.lidar.updateWalls4(self.rotation, self.map, tiles_intersecting)
 
         self.mapvis.send_map(self.map)
@@ -363,7 +372,7 @@ class Robot:
         self.classifyNeighbourTile()
 
     def classifyAhead(self, tile):
-        print(tile.type)
+        # print(tile.type)
         b, g, r, _ = self.colorSensor.getImage()
         m = Piso(r, g, b)
         if tile.type is None:
