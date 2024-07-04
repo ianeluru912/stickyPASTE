@@ -14,7 +14,7 @@ import numpy as np
 from visualization import MapVisualizer
 
 TIME_STEP = 16
-MAX_VEL = 3.14  # Reduzco la velocidad para minimizar desvío
+MAX_VEL = 6.28
 
 class Robot:
     def __init__(self):
