@@ -132,6 +132,14 @@ class Tile:
         self.east = [-1, -1, -1]
         self.south = [-1, -1, -1]
 
+        self.tokensNorth = [0,0,0]
+        self.tokensWest = [0,0,0]
+        self.tokensEast = [0,0,0]
+        self.tokensSouth = [0,0,0]
+
+        self.tokensVerticalInternalWall=[0,0]
+        self.tokensHorizontalInternalWall=[0,0]
+
         self.type=None
         self.hasObstacle = False
         self.area = None
@@ -142,6 +150,8 @@ class Tile:
     def getRepresentation(self):
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles ACAACA
+        # Agregar paredes internas
+
         rep=np.full((5,5), None)
         # Agregar las paredes
         rep[0,0:5]=self.combinesWall(rep[0,0:5], self.getWallRepresentation(self.north))
