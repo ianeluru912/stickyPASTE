@@ -13,12 +13,12 @@ class Lidar:
             7:(384,0.05, 0.07), 8:(410,0.012, 0.13), 9:(430,0.09, 0.113), 10:(430,0.055, 0.075), 11:(468,0.055, 0.075), 12:(44,0.055, 0.075), 13:(82,0.055, 0.075),\
             14:(82,0.09, 0.113), 15:(102,0.012, 0.13), 16:(128,0.05, 0.07), 17:(154,0.012, 0.13)}
     
-    rays_4 = {0: (205, 0.04, 0.24), 1: (205, 0.09, 0.11), 2: (235, 0.01, 0.21), 3: (256, 0.049, 0.069), 4: (277, 0.01, 0.21), \
-              5: (307, 0.09, 0.11), 6: (307, 0.04, 0.24), 7: (333, 0.133, 0.1533), 8: (333, 0.086, 0.106), 9: (363, 0.01, 0.21), \
-              10: (384, 0.049, 0.069), 11: (405, 0.01, 0.21), 12: (435, 0.086, 0.106), 13: (435, 0.133, 0.1533), 14: (461, 0.04, 0.24),\
-              15: (461, 0.09, 0.11), 16: (491, 0.01, 0.21), 17: (0, 0.049, 0.06), 18: (21, 0.01, 0.21), 19: (51, 0.09, 0.11), \
-              20: (51, 0.04, 0.24), 21: (77, 0.133, 0.1533), 22: (77, 0.086, 0.106), 23: (107, 0.01, 0.21), 24: (128, 0, 0), \
-              25: (149, 0.01, 0.21), 26: (179, 0.086, 0.106), 27: (179, 0.133, 0.1533), 28: (235, 0.046, 0.066), 29: (277, 0.046, 0.066),\
+    rays_4 = {0: (205, 0.04, 0.16), 1: (205, 0.08, 0.12), 2: (235, 0.03, 0.13), 3: (256, 0.049, 0.069), 4: (277, 0.03, 0.13), \
+              5: (307, 0.08, 0.12), 6: (307, 0.04, 0.16), 7: (333, 0.04, 0.16), 8: (333, 0.086, 0.106), 9: (363, 0.03, 0.13), \
+              10: (384, 0.049, 0.069), 11: (405,0.03, 0.13), 12: (435, 0.086, 0.106), 13: (435, 0.04, 0.16), 14: (461, 0.04, 0.16),\
+              15: (461, 0.08, 0.12), 16: (491, 0.03, 0.13), 17: (0, 0.049, 0.06), 18: (21, 0.04, 0.16), 19: (51, 0.08, 0.12), \
+              20: (51, 0.04, 0.16), 21: (77, 0.04, 0.16), 22: (77, 0.086, 0.106), 23: (107,0.03, 0.13), 24: (128, 0.049, 0.069), \
+              25: (149, 0.03, 0.13), 26: (179, 0.086, 0.106), 27: (179, 0.04, 0.16), 28: (235, 0.046, 0.066), 29: (277, 0.046, 0.066),\
               30: (363, 0.043, 0.063), 31: (405, 0.043, 0.063), 32: (491, 0.046, 0.066), 33: (21, 0.046, 0.066), 34: (107, 0.043, 0.063),\
               35: (149, 0.043, 0.063)}
     
@@ -66,7 +66,7 @@ class Lidar:
         dist = self.rangeImage[lidar_idx[orient]]
         return dist >= 0.08
     
-    def ver_walls(self, rotation): # caso 3
+    def ver_walls(self, rotation): # caso 4
         shift = self.rotToLidar(rotation)
         # gira los rayos para que estén en orientación Norte
         rangeLocal = self.rangeImage[shift:] + self.rangeImage[:shift]
@@ -362,11 +362,11 @@ class Lidar:
 
         nw_tile.east[0] = walls[3]
         nw_tile.east[1] = walls[28]
-        nw_tile.east[2] = [0]
+        nw_tile.east[2] = 0
 
         nw_tile.south[0] = walls[24]
         nw_tile.south[1] = walls[35]
-        nw_tile.south[2] = [0]
+        nw_tile.south[2] = 0
 
         nw_tile.west[0] = walls[25]
         nw_tile.west[1] = walls[26]
@@ -380,21 +380,21 @@ class Lidar:
         ne_tile.east[1] = walls[8]
         ne_tile.east[2] = walls[9]
 
-        ne_tile.south[0] = walls[10]
+        ne_tile.south[0] = walls[10] #repite
         ne_tile.south[1] = walls[30]
-        ne_tile.south[2] = [0]
+        ne_tile.south[2] = 0
 
-        ne_tile.west[0] = walls[3]
+        ne_tile.west[0] = 0 
         ne_tile.west[1] = walls[29]
-        ne_tile.west[2] = [0]
+        ne_tile.west[2] = walls[3]#repite
 
         sw_tile.north[0] = walls[24]
         sw_tile.north[1] = walls[34]
-        sw_tile.north[2] = [0]
+        sw_tile.north[2] = 0
 
-        sw_tile.east[0] = walls[17]
+        sw_tile.east[0] = 0
         sw_tile.east[1] = walls[33]
-        sw_tile.east[2] = [0]
+        sw_tile.east[2] = walls[17]
 
         sw_tile.south[0] = walls[18]
         sw_tile.south[1] = walls[19]
@@ -404,9 +404,9 @@ class Lidar:
         sw_tile.west[1] = walls[22]
         sw_tile.west[2] = walls[23]
 
-        se_tile.north[0] = walls[10]
+        se_tile.north[0] = 0
         se_tile.north[1] = walls[31]
-        se_tile.north[2] = [0]
+        se_tile.north[2] = walls[10]
 
         se_tile.east[0] = walls[11]
         se_tile.east[1] = walls[12]
@@ -416,16 +416,15 @@ class Lidar:
         se_tile.south[1] = walls[15]
         se_tile.south[2] = walls[16]
 
-        se_tile.west[0] = walls[17]
+        se_tile.west[0] = walls[17] #repite
         se_tile.west[1] = walls[32]
-        se_tile.west[2] = [0]
+        se_tile.west[2] = 0
 
         self.fixNeighbours(map, nw_tile)
         self.fixNeighbours(map, ne_tile)
         self.fixNeighbours(map, sw_tile)
         self.fixNeighbours(map, se_tile)
-        # TODO(Martu): Verificar que los tiles sean los correctos y terminar de 
-        # marcar las paredes
+
 
     def fixNeighbours(self, map, tile):
         north_tile = map.getTileAt(tile.col, tile.row - 1)

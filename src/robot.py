@@ -388,6 +388,11 @@ class Robot:
                 self.lidar.updateWalls3(self.rotation, self.map, tiles_intersecting)
         elif len(tiles_intersecting) == 4:
             print("CASO 4")
+            print('---')
+            print('tiles intersectando:', tiles_intersecting)
+            print('---')
+            print(self.lidar.ver_walls(self.rotation))
+            print('---')
             self.lidar.updateWalls4(self.rotation, self.map, tiles_intersecting)
 
         self.mapvis.send_map(self.map)
