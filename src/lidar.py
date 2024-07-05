@@ -1,4 +1,5 @@
 from math import pi as PI
+
 class Lidar:
     shift ={'N': 0, 'E': 384, 'S': 256, 'W':128}
     rays_1 ={0:(214,0.053, 0.073),1:(256,0,0), 2:(299, 0.053, 0.073), 3:(342,0.053, 0.073),\
@@ -98,22 +99,21 @@ class Lidar:
     def updateWalls1(self, rotation, map, tile):
         walls = self.get_walls_1(rotation)
         
-        # Current tile!
-        tile.north[0] = walls[0]
-        tile.north[1] = walls[1]
-        tile.north[2] = walls[2]
+        self.setWall(tile.north, 0, walls[0])
+        self.setWall(tile.north, 1, walls[1])
+        self.setWall(tile.north, 2, walls[2])
         
-        tile.east[0] = walls[3]
-        tile.east[1] = walls[4]
-        tile.east[2] = walls[5]
+        self.setWall(tile.east, 0, walls[3])
+        self.setWall(tile.east, 1, walls[4])
+        self.setWall(tile.east, 2, walls[5])
         
-        tile.south[0] = walls[6]
-        tile.south[1] = walls[7]
-        tile.south[2] = walls[8]
+        self.setWall(tile.south, 0, walls[6])
+        self.setWall(tile.south, 1, walls[7])
+        self.setWall(tile.south, 2, walls[8])
         
-        tile.west[0] = walls[9]
-        tile.west[1] = walls[10]
-        tile.west[2] = walls[11]
+        self.setWall(tile.west, 0, walls[9])
+        self.setWall(tile.west, 1, walls[10])
+        self.setWall(tile.west, 2, walls[11])
         
         self.fixNeighbours(map, tile)
     
@@ -165,33 +165,33 @@ class Lidar:
             north_tile = tiles[1]
             south_tile = tiles[0]
 
-        north_tile.north[0] = walls[0]
-        north_tile.north[1] = walls[1]
-        north_tile.north[2] = walls[2]
+        self.setWall(north_tile.north, 0, walls[0])
+        self.setWall(north_tile.north, 1, walls[1])
+        self.setWall(north_tile.north, 2, walls[2])
 
-        north_tile.east[0] = walls[3]
-        north_tile.east[1] = walls[4]
-        north_tile.east[2] = walls[5]
+        self.setWall(north_tile.east, 0, walls[3])
+        self.setWall(north_tile.east, 1, walls[4])
+        self.setWall(north_tile.east, 2, walls[5])
 
         north_tile.south = [0, 0, 0]
 
-        north_tile.west[0] = walls[15]
-        north_tile.west[1] = walls[16]
-        north_tile.west[2] = walls[17]
+        self.setWall(north_tile.west, 0, walls[15])
+        self.setWall(north_tile.west, 1, walls[16])
+        self.setWall(north_tile.west, 2, walls[17])
 
         south_tile.north = [0, 0, 0]
 
-        south_tile.east[0] = walls[6]
-        south_tile.east[1] = walls[7]
-        south_tile.east[2] = walls[8]
+        self.setWall(south_tile.east, 0, walls[6])
+        self.setWall(south_tile.east, 1, walls[7])
+        self.setWall(south_tile.east, 2, walls[8])
 
-        south_tile.south[0] = walls[9]
-        south_tile.south[1] = walls[10]
-        south_tile.south[2] = walls[11]
+        self.setWall(south_tile.south, 0, walls[9])
+        self.setWall(south_tile.south, 1, walls[10])
+        self.setWall(south_tile.south, 2, walls[11])
 
-        south_tile.west[0] = walls[12]
-        south_tile.west[1] = walls[13]
-        south_tile.west[2] = walls[14]
+        self.setWall(south_tile.west, 0, walls[12])
+        self.setWall(south_tile.west, 1, walls[13])
+        self.setWall(south_tile.west, 2, walls[14])
 
         self.fixNeighbours(map, north_tile)
         self.fixNeighbours(map, south_tile)
@@ -245,31 +245,31 @@ class Lidar:
             west_tile = tiles[1]
             east_tile = tiles[0]
 
-        west_tile.north[0] = walls[0]
-        west_tile.north[1] = walls[1]
-        west_tile.north[2] = walls[2]
+        self.setWall(west_tile.north, 0, walls[0])
+        self.setWall(west_tile.north, 1, walls[1])
+        self.setWall(west_tile.north, 2, walls[2])
 
         west_tile.east = [0, 0, 0]
 
-        west_tile.south[0] = walls[12]
-        west_tile.south[1] = walls[13]
-        west_tile.south[2] = walls[14]
+        self.setWall(west_tile.south, 0, walls[12])
+        self.setWall(west_tile.south, 1, walls[13])
+        self.setWall(west_tile.south, 2, walls[14])
 
-        west_tile.west[0] = walls[15]
-        west_tile.west[1] = walls[16]
-        west_tile.west[2] = walls[17]
+        self.setWall(west_tile.west, 0, walls[15])
+        self.setWall(west_tile.west, 1, walls[16])
+        self.setWall(west_tile.west, 2, walls[17])
 
-        east_tile.north[0] = walls[3]
-        east_tile.north[1] = walls[4]
-        east_tile.north[2] = walls[5]
+        self.setWall(east_tile.north, 0, walls[3])
+        self.setWall(east_tile.north, 1, walls[4])
+        self.setWall(east_tile.north, 2, walls[5])
         
-        east_tile.east[0] = walls[6]
-        east_tile.east[1] = walls[7]
-        east_tile.east[2] = walls[8]
+        self.setWall(east_tile.east, 0, walls[6])
+        self.setWall(east_tile.east, 1, walls[7])
+        self.setWall(east_tile.east, 2, walls[8])
 
-        east_tile.south[0] = walls[9]
-        east_tile.south[1] = walls[10]
-        east_tile.south[2] = walls[11]
+        self.setWall(east_tile.south, 0, walls[9])
+        self.setWall(east_tile.south, 1, walls[10])
+        self.setWall(east_tile.south, 2, walls[11])
 
         east_tile.west = [0, 0, 0]
 
@@ -347,7 +347,7 @@ class Lidar:
         if walls[26]==1:
             walls[27]=-1
         return walls
-    
+        
     def updateWalls4(self, rotation, map, tiles):
         walls = self.get_walls_4(rotation)
         tiles.sort(key=lambda t: t.col + t.row)
@@ -356,75 +356,78 @@ class Lidar:
         sw_tile = tiles[2]
         se_tile = tiles[3]
 
-        nw_tile.north[0] = walls[0]
-        nw_tile.north[1] = walls[1]
-        nw_tile.north[2] = walls[2]
+        self.setWall(nw_tile.north, 0, walls[0])        
+        self.setWall(nw_tile.north, 1, walls[1])
+        self.setWall(nw_tile.north, 2, walls[2])
 
-        nw_tile.east[0] = walls[3]
-        nw_tile.east[1] = walls[28]
-        nw_tile.east[2] = 0
+        self.setWall(nw_tile.east, 0, walls[3])
+        self.setWall(nw_tile.east, 1, walls[28])
+        self.setWall(nw_tile.east, 2, 0)
 
-        nw_tile.south[0] = walls[24]
-        nw_tile.south[1] = walls[35]
-        nw_tile.south[2] = 0
+        self.setWall(nw_tile.south, 0, 0)
+        self.setWall(nw_tile.south, 1, walls[35])
+        self.setWall(nw_tile.south, 2, walls[24])
 
-        nw_tile.west[0] = walls[25]
-        nw_tile.west[1] = walls[26]
-        nw_tile.west[2] = walls[27]
+        self.setWall(nw_tile.west, 0, walls[25])
+        self.setWall(nw_tile.west, 1, walls[26])
+        self.setWall(nw_tile.west, 2, walls[27])
 
-        ne_tile.north[0] = walls[4]
-        ne_tile.north[1] = walls[5]
-        ne_tile.north[2] = walls[6]
+        self.setWall(ne_tile.north, 0, walls[4])
+        self.setWall(ne_tile.north, 1, walls[5])
+        self.setWall(ne_tile.north, 2, walls[6])
 
-        ne_tile.east[0] = walls[7]
-        ne_tile.east[1] = walls[8]
-        ne_tile.east[2] = walls[9]
+        self.setWall(ne_tile.east, 0, walls[7])
+        self.setWall(ne_tile.east, 1, walls[8])
+        self.setWall(ne_tile.east, 2, walls[9])
 
-        ne_tile.south[0] = walls[10] #repite
-        ne_tile.south[1] = walls[30]
-        ne_tile.south[2] = 0
+        self.setWall(ne_tile.south, 0, walls[10]) #repite
+        self.setWall(ne_tile.south, 1, walls[30])
+        self.setWall(ne_tile.south, 2, 0)
 
-        ne_tile.west[0] = 0 
-        ne_tile.west[1] = walls[29]
-        ne_tile.west[2] = walls[3]#repite
+        self.setWall(ne_tile.west, 0, 0) 
+        self.setWall(ne_tile.west, 1, walls[29])
+        self.setWall(ne_tile.west, 2, walls[3]) #repite
 
-        sw_tile.north[0] = walls[24]
-        sw_tile.north[1] = walls[34]
-        sw_tile.north[2] = 0
+        self.setWall(sw_tile.north, 0, walls[24])
+        self.setWall(sw_tile.north, 1, walls[34])
+        self.setWall(sw_tile.north, 2, 0)
 
-        sw_tile.east[0] = 0
-        sw_tile.east[1] = walls[33]
-        sw_tile.east[2] = walls[17]
+        self.setWall(sw_tile.east, 0, 0)
+        self.setWall(sw_tile.east, 1, walls[33])
+        self.setWall(sw_tile.east, 2, walls[17])
 
-        sw_tile.south[0] = walls[18]
-        sw_tile.south[1] = walls[19]
-        sw_tile.south[2] = walls[20]
+        self.setWall(sw_tile.south, 0, walls[18])
+        self.setWall(sw_tile.south, 1, walls[19])
+        self.setWall(sw_tile.south, 2, walls[20])
 
-        sw_tile.west[0] = walls[21]
-        sw_tile.west[1] = walls[22]
-        sw_tile.west[2] = walls[23]
+        self.setWall(sw_tile.west, 0, walls[21])
+        self.setWall(sw_tile.west, 1, walls[22])
+        self.setWall(sw_tile.west, 2, walls[23])
 
-        se_tile.north[0] = 0
-        se_tile.north[1] = walls[31]
-        se_tile.north[2] = walls[10]
+        self.setWall(se_tile.north, 0, 0)
+        self.setWall(se_tile.north, 1, walls[31])
+        self.setWall(se_tile.north, 2, walls[10])
 
-        se_tile.east[0] = walls[11]
-        se_tile.east[1] = walls[12]
-        se_tile.east[2] = walls[13]
+        self.setWall(se_tile.east, 0, walls[11])
+        self.setWall(se_tile.east, 1, walls[12])
+        self.setWall(se_tile.east, 2, walls[13])
 
-        se_tile.south[0] = walls[14]
-        se_tile.south[1] = walls[15]
-        se_tile.south[2] = walls[16]
+        self.setWall(se_tile.south, 0, walls[14])
+        self.setWall(se_tile.south, 1, walls[15])
+        self.setWall(se_tile.south, 2, walls[16])
 
-        se_tile.west[0] = walls[17] #repite
-        se_tile.west[1] = walls[32]
-        se_tile.west[2] = 0
+        self.setWall(se_tile.west, 0, walls[17]) #repite
+        self.setWall(se_tile.west, 1, walls[32])
+        self.setWall(se_tile.west, 2, 0)
 
         self.fixNeighbours(map, nw_tile)
         self.fixNeighbours(map, ne_tile)
         self.fixNeighbours(map, sw_tile)
         self.fixNeighbours(map, se_tile)
 
+    def setWall(self, tile_wall, idx, value):
+        if value < 0: return
+        tile_wall[idx] = value
 
     def fixNeighbours(self, map, tile):
         north_tile = map.getTileAt(tile.col, tile.row - 1)
