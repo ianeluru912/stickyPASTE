@@ -1,4 +1,4 @@
-from math import pi as PI
+import math
 
 class Lidar:
     shift ={'N': 0, 'E': 384, 'S': 256, 'W':128}
@@ -277,7 +277,7 @@ class Lidar:
         self.fixNeighbours(map, east_tile)
     
     def get_walls_4(self, rotation):
-        print(self.ver_walls(rotation))
+        # print(self.ver_walls(rotation))
         shift = self.rotToLidar(rotation)
         rangeLocal = self.rangeImage[shift:] + self.rangeImage[:shift]
         walls = {}
@@ -350,11 +350,17 @@ class Lidar:
         
     def updateWalls4(self, rotation, map, tiles):
         walls = self.get_walls_4(rotation)
-        tiles.sort(key=lambda t: t.col + t.row)
-        nw_tile = tiles[0]
-        ne_tile = tiles[1]
-        sw_tile = tiles[2]
-        se_tile = tiles[3]
+
+        min_col = math.inf
+        min_row = math.inf
+        for t in tiles:
+            if t.col < min_col: min_col = t.col
+            if t.row < min_row: min_row = t.row
+
+        nw_tile = map.getTileAt(min_col, min_row)
+        ne_tile = map.getTileAt(min_col + 1, min_row)
+        sw_tile = map.getTileAt(min_col, min_row + 1)
+        se_tile = map.getTileAt(min_col + 1, min_row + 1)
 
         self.setWall(nw_tile.north, 0, walls[0])        
         self.setWall(nw_tile.north, 1, walls[1])
@@ -454,7 +460,7 @@ class Lidar:
 
     def rotToLidar(self, rot):
         #Cuánto girar los rayos para tomar referencia norte
-        return int((256/PI)*rot)%512
+        return int((256/math.pi)*rot)%512
     
     def hayAlgoIzquierda(self):
         leftDist = self.rangeImage[128]
