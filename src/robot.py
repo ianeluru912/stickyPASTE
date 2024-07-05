@@ -147,7 +147,6 @@ class Robot:
                 else:
                     wall=tileToTag.tokensEast
                 yTtoTag=tileToTagPosition=self.map.gridToPosition(tileToTag.col, tileToTag.row).y 
-                print(yRobot, yTtoTag)
                 if yRobot< yTtoTag-0.02: #Considero que estoy en la parte superior de la baldosa
                     wall[0]=token
                 elif yRobot> yTtoTag+0.02:
