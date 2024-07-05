@@ -15,10 +15,10 @@ while robot.step() != -1:
     print("Loop")
     robot.updateMap() 
 
-    navigator = robot.getNavigator()
+    """navigator = robot.getNavigator()
     point = navigator.whereToGo(robot)
 
-    robot.moveToPoint(point)
+    robot.moveToPoint(point)"""
 
    # valid_tiles = robot.map.getValidTiles()
     # for tile in valid_tiles:

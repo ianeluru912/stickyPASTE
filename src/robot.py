@@ -387,7 +387,7 @@ class Robot:
                 # print("CASO 3")
                 self.lidar.updateWalls3(self.rotation, self.map, tiles_intersecting)
         elif len(tiles_intersecting) == 4:
-            # print("CASO 4")
+            print("CASO 4")
             self.lidar.updateWalls4(self.rotation, self.map, tiles_intersecting)
 
         self.mapvis.send_map(self.map)

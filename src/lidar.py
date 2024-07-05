@@ -350,13 +350,80 @@ class Lidar:
     
     def updateWalls4(self, rotation, map, tiles):
         walls = self.get_walls_4(rotation)
-
         tiles.sort(key=lambda t: t.col + t.row)
         nw_tile = tiles[0]
         ne_tile = tiles[1]
         sw_tile = tiles[2]
         se_tile = tiles[3]
 
+        nw_tile.north[0] = walls[0]
+        nw_tile.north[1] = walls[1]
+        nw_tile.north[2] = walls[2]
+
+        nw_tile.east[0] = walls[3]
+        nw_tile.east[1] = walls[28]
+        nw_tile.east[2] = [0]
+
+        nw_tile.south[0] = walls[24]
+        nw_tile.south[1] = walls[35]
+        nw_tile.south[2] = [0]
+
+        nw_tile.west[0] = walls[25]
+        nw_tile.west[1] = walls[26]
+        nw_tile.west[2] = walls[27]
+
+        ne_tile.north[0] = walls[4]
+        ne_tile.north[1] = walls[5]
+        ne_tile.north[2] = walls[6]
+
+        ne_tile.east[0] = walls[7]
+        ne_tile.east[1] = walls[8]
+        ne_tile.east[2] = walls[9]
+
+        ne_tile.south[0] = walls[10]
+        ne_tile.south[1] = walls[30]
+        ne_tile.south[2] = [0]
+
+        ne_tile.west[0] = walls[3]
+        ne_tile.west[1] = walls[29]
+        ne_tile.west[2] = [0]
+
+        sw_tile.north[0] = walls[24]
+        sw_tile.north[1] = walls[34]
+        sw_tile.north[2] = [0]
+
+        sw_tile.east[0] = walls[17]
+        sw_tile.east[1] = walls[33]
+        sw_tile.east[2] = [0]
+
+        sw_tile.south[0] = walls[18]
+        sw_tile.south[1] = walls[19]
+        sw_tile.south[2] = walls[20]
+
+        sw_tile.west[0] = walls[21]
+        sw_tile.west[1] = walls[22]
+        sw_tile.west[2] = walls[23]
+
+        se_tile.north[0] = walls[10]
+        se_tile.north[1] = walls[31]
+        se_tile.north[2] = [0]
+
+        se_tile.east[0] = walls[11]
+        se_tile.east[1] = walls[12]
+        se_tile.east[2] = walls[13]
+
+        se_tile.south[0] = walls[14]
+        se_tile.south[1] = walls[15]
+        se_tile.south[2] = walls[16]
+
+        se_tile.west[0] = walls[17]
+        se_tile.west[1] = walls[32]
+        se_tile.west[2] = [0]
+
+        self.fixNeighbours(map, nw_tile)
+        self.fixNeighbours(map, ne_tile)
+        self.fixNeighbours(map, sw_tile)
+        self.fixNeighbours(map, se_tile)
         # TODO(Martu): Verificar que los tiles sean los correctos y terminar de 
         # marcar las paredes
 
