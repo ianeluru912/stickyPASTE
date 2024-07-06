@@ -342,7 +342,7 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-    def normalizar_radianes(self, radianes): # radianes es la rotacion actual del robot
+    def normalizar_radianes(self, radianes): # radianes seria la rotacion actual del robot
         if radianes > math.pi:
             radianes -= math.pi*2
             return radianes
@@ -352,21 +352,14 @@ class Robot:
         return radianes
     
     def obtener_orientacion(self, radianes):
+        # TODO(Richo): Este código asume que no nos movemos en diagonal
         angulo = self.normalizar_radianes(radianes)
-        if angulo >= 1.1775 and angulo <= 1.9625:
+        if angulo >= 0.785 and angulo <= 2.355:
             return 'W'
-        elif angulo >= -1.9625 and angulo <= -1.1775:
+        elif angulo >= -2.355 and angulo <= -0.785:
             return 'E'
-        elif angulo >= -0.3925 and angulo <= 0.3925:
+        elif angulo >= -0.785 and angulo <= 0.785:
             return 'N'
-        # elif angulo >= 0.3925 and angulo <= 1.1775:
-        #     return 'NW'
-        # elif angulo >= -1.1775 and angulo <= -0.3925:
-        #     return 'NE'
-        # elif angulo >= 1.9625 and angulo <= 2.7475:
-        #     return 'SW'
-        # elif angulo >= -2.7475 and angulo <= -1.9625:
-        #     return 'SE'
         else:
             return 'S'
         
@@ -434,7 +427,7 @@ class Robot:
                 # Caso 2
                 # print("CASO 2")
                 self.lidar.updateWalls2(self.rotation, self.map, tiles_intersecting)
-            elif direction == "E" or direction == "W":
+            else:
                 # Caso 3
                 # print("CASO 3")
                 self.lidar.updateWalls3(self.rotation, self.map, tiles_intersecting)
@@ -510,8 +503,7 @@ class Robot:
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
         self.classifyNeighbourTile()
-        grillaTileDestino = self.map.positionToGrid(target_pos) 
-        tileDestino = self.map.getTileAt(grillaTileDestino[0], grillaTileDestino[1])
+        tileDestino=self.get_tile_ahead() # TODO: Esto me parece que debería ser el tile que esté en target_pos
         if tileDestino.hasObstacle or tileDestino.type == TileType.BLACK_HOLE:
             print("Hay un obstaculo o agujero en el camino")
         else:
