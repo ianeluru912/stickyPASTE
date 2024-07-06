@@ -29,7 +29,11 @@ def to_json_dict(obj):
                 result[str(key)] = to_json_dict(obj[key])
         return result
     
-    return to_json_dict(obj.__dict__)
+    d = {}
+    for k, v in obj.__dict__.items():
+        if not k.startswith("_"):
+            d[k] = v
+    return to_json_dict(d)
 
 class JSON:
     @classmethod
