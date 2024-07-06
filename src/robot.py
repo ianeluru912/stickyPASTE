@@ -170,7 +170,7 @@ class Robot:
         if self.lidar.hayAlgoDerecha():
             entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
             if entrada_D is not None:
-                self.mappingVictim("L", entrada_I)
+                self.mappingVictim("L", entrada_D)
                 self.enviarMensajeVoC(entrada_D)
     
     def updatePosition(self):
