@@ -121,44 +121,98 @@ class Robot:
         orientation=self.obtener_orientacion(self.rotation)
         xRobot = self.position.x
         yRobot = self.position.y
+        xRobotRel = abs(xRobot - self.posicion_inicial.x)
+        yRobotRel = abs(yRobot - self.posicion_inicial.y)
         if orientation == "N" or orientation == "S":
-            # si mi posición en x está en el medio de una baldosa, yo estoy viendo la víctima en una pared exterior
-            # si no, lo estoy viendo en una pared interna.
-            if abs(xRobot % 0.12) <0.1:
+            # si mi posición en x está en el borde entre baldosas, yo estoy viendo la víctima en una pared interna
+            # si no, lo estoy viendo en una pared externda
+            if abs(xRobotRel % 0.12) >0.03:
+                print("NS Estoy en el borde entre dos baldosas", xRobotRel, yRobotRel)
                 # Estoy caminando entre dos baldosas, es decir, estoy viendo algo en una pared interna vertical
-                # si detecté algo con la cámara izquierda, está en la pared interna vertical del tile de mi izquierda.
                 if side == "L":
-                    tileToTag=self.map.getTileAtPosition(Point(self.position.x-0.2, self.position.y))
-                else:
-                    tileToTag=self.map.getTileAtPosition(Point(self.position.x+0.2, self.position.y))   
+                    if orientation == "N":
+                        tileToTag=self.map.getTileAtPosition(Point(self.position.x-0.02, self.position.y))
+                    else: # estoy yendo para el sur
+                        tileToTag=self.map.getTileAtPosition(Point(self.position.x+0.02, self.position.y))
+                else: # estoy viendo con la cámara derecha
+                    if orientation == "N":
+                        tileToTag=self.map.getTileAtPosition(Point(self.position.x+0.02, self.position.y))   
+                    else: # estoy yendo para el sur
+                        tileToTag=self.map.getTileAtPosition(Point(self.position.x-0.02, self.position.y))
 
                 # para saber si es la pared interna vertical de arriba o de abajo, voy a fijarme si estoy más arriba o más
                 # abajo de la mitad de la baldosa
                 yTtoTag=self.map.gridToPosition(tileToTag.col, tileToTag.row).y
-                if yRobot>yTtoTag:
+                if yRobot<yTtoTag:
                     tileToTag.tokensVerticalInternalWall[0]=token
                 else:
                     tileToTag.tokensVerticalInternalWall[1]=token
             else:
                 # Estoy caminando en el medio de una baldosa
+                print("NS Estoy en el medio de una baldosa", xRobotRel, yRobotRel)
                 tileToTag=self.map.getTileAtPosition(self.position)
-                if side == "L":
-                    wall=tileToTag.tokensWest
+                if side == "L": # es la cámara izquierda
+                    if orientation == "N":                    
+                        wall=tileToTag.tokensWest
+                    else: # estoy yendo para el sur
+                        wall=tileToTag.tokensEast
                 else:
-                    wall=tileToTag.tokensEast
+                    if orientation == "N":
+                        wall=tileToTag.tokensEast
+                    else: # estoy yendo para el sur
+                        wall=tileToTag.tokensWest
                 yTtoTag=tileToTagPosition=self.map.gridToPosition(tileToTag.col, tileToTag.row).y 
                 if yRobot< yTtoTag-0.02: #Considero que estoy en la parte superior de la baldosa
                     wall[0]=token
-                elif yRobot> yTtoTag+0.02:
+                elif yRobot> yTtoTag+0.02: # PArte inferior
                     wall[2]=token
-                else:
+                else: # En el medio de la pared
                     wall[1]=token 
+        else: # orientación de E a W
+            # si mi posición en y está en el borde entre baldosas, yo estoy viendo la víctima en una pared interna
+            # si no, lo estoy viendo en una pared externa
+            if abs(yRobotRel % 0.12) >0.03: 
+                print("EO Estoy en el borde entre dos baldosas", yRobotRel, yRobot, abs(yRobotRel % 0.12))
+                # Estoy caminando entre dos baldosas, es decir, estoy viendo algo en una pared interna horizontal
+                if side == "L":
+                    if orientation == "E":
+                        tileToTag=self.map.getTileAtPosition(Point(self.position.x, self.position.y-0.02))
+                    else: # estoy yendo para el oeste
+                        tileToTag=self.map.getTileAtPosition(Point(self.position.x, self.position.y+0.02))
+                else: # estoy viendo con la cámara derecha
+                    if orientation == "E":
+                        tileToTag=self.map.getTileAtPosition(Point(self.position.x, self.position.y+0.02))   
+                    else: # estoy yendo para el sur
+                        tileToTag=self.map.getTileAtPosition(Point(self.position.x, self.position.y-0.02))
 
-
-                # si detecté algo con la cámara derecha, está en la pared interna vertical del tile de mi derecha.
-        else:
+                # para saber si es la pared interna horizontal de izq o derecha, voy a fijarme si estoy más izq
+                # o derecha de la mitad de la baldosa
+                xTtoTag=self.map.gridToPosition(tileToTag.col, tileToTag.row).x
+                if xRobot<xTtoTag:
+                    tileToTag.tokensHorizontalInternalWall[0]=token
+                else:
+                    tileToTag.tokensHorizontalInternalWall[1]=token
+            else:
                 # Estoy caminando en el medio de una baldosa
-            pass
+                print("EO Estoy en el medio de una baldosa", xRobotRel, yRobotRel)
+                tileToTag=self.map.getTileAtPosition(self.position)
+                if side == "L": # es la cámara izquierda
+                    if orientation == "E":                    
+                        wall=tileToTag.tokensNorth
+                    else: # estoy yendo para el oeste
+                        wall=tileToTag.tokensSouth
+                else:
+                    if orientation == "E":
+                        wall=tileToTag.tokensSouth
+                    else: # estoy yendo para el oeste
+                        wall=tileToTag.tokensNorth
+                xTtoTag=tileToTagPosition=self.map.gridToPosition(tileToTag.col, tileToTag.row).x 
+                if xRobot< xTtoTag-0.02: #Considero que estoy en la parte inferior de la baldosa
+                    wall[0]=token
+                elif xRobot> xTtoTag+0.02: # PArte superior
+                    wall[2]=token
+                else: # En el medio de la pared
+                    wall[1]=token 
 
     def enviar_mensaje_imgs(self):
         if self.lidar.hayAlgoIzquierda():
@@ -170,7 +224,7 @@ class Robot:
         if self.lidar.hayAlgoDerecha():
             entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
             if entrada_D is not None:
-                self.mappingVictim("L", entrada_I)
+                self.mappingVictim("R", entrada_D)
                 self.enviarMensajeVoC(entrada_D)
     
     def updatePosition(self):
