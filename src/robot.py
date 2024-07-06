@@ -433,6 +433,9 @@ class Robot:
                 self.lidar.updateWalls3(self.rotation, self.map, tiles_intersecting)
         elif len(tiles_intersecting) >= 3:
             # print("CASO 4")
+            # print('valores rayitos:', self.lidar.ver_walls(self.rotation))
+            # print('---')
+            # print('valores paredes:', self.lidar.get_walls_4(self.rotation))
             self.lidar.updateWalls4(self.rotation, self.map, tiles_intersecting)
 
         self.mapvis.send_map(self.map)
