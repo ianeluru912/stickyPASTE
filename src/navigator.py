@@ -1,4 +1,8 @@
-from map import TileType
+from map import Tile, TileType
+from point import Point
+from rectangle import Rectangle
+
+import random
 
 class Navigator:
 
@@ -29,4 +33,84 @@ class Navigator1(Navigator):
         return tiles
     
 class Navigator2(Navigator):
-    pass
+    def __init__(self):
+        self.minitiles = {} # (c,r) -> visits
+
+    def positionToMiniGrid(self, pos): 
+        # pos ya tiene que venir relativa a la posición inicial del robot
+        half_width = Tile.WIDTH/2
+        half_height = Tile.HEIGHT/2
+
+        columna = round(pos.x / half_width)
+        fila = round(pos.y / half_height)
+        return (columna, fila)
+    
+    def getNeighbours(self, coords):
+        result = []
+        c = coords[0]
+        r = coords[1]
+        for d in [(-1, 0), (-1, -1), (0, -1), (1, -1), \
+                  ( 1, 0), ( 1,  1), (0,  1), (-1, 1)]:
+            result.append((c + d[0], r + d[1]))
+        return result
+    
+    def removeObstructed(self, neighbours, robot):
+        result = []
+        for minitile in neighbours:
+            if not self.isObstructed(minitile, robot):
+                result.append(minitile)
+        return result
+    
+    def isObstructed(self, minitile, robot):
+        minitile_pos = self.getPosition(minitile, robot)
+
+        rect = self.getRectangle(minitile_pos)
+
+        tiles = robot.map.getTilesIntersecting(rect)
+
+        for tile in tiles:
+            if not tile.isOpenAt(minitile_pos):
+                return True
+        
+        return False
+            
+    def getPosition(self, minitile, robot):
+        c = minitile[0]
+        r = minitile[1]
+
+        x = c * Tile.WIDTH/2 + robot.posicion_inicial.x
+        y = r * Tile.HEIGHT/2 + robot.posicion_inicial.y
+        return Point(x, y)
+
+    def getRectangle(self, minitile_pos):        
+        left = minitile_pos.x - Tile.WIDTH/4
+        right = minitile_pos.x + Tile.WIDTH/4
+        top = minitile_pos.y - Tile.HEIGHT/4
+        bottom = minitile_pos.y + Tile.HEIGHT/4
+        return Rectangle(top, left, bottom, right)
+
+    def incrementVisits(self, minitile):
+        # (c,r) -> visits 
+        previous_value = self.minitiles.get(minitile, 0)
+        self.minitiles[minitile] = previous_value + 1
+
+    def whereToGo(self, robot):
+        # 1) Encontrar la minitile en la que está el robot
+        x = robot.position.x - robot.posicion_inicial.x
+        y = robot.position.y - robot.posicion_inicial.y
+        minitile_coord = self.positionToMiniGrid(Point(x, y))
+        self.incrementVisits(minitile_coord)
+        
+        # 2) Calcular las minitiles vecinas
+        neighbours = self.getNeighbours(minitile_coord)
+
+        # 3) Eliminar las minitiles que tienen paredes
+        neighbours = self.removeObstructed(neighbours, robot)
+        
+        # 4) Elegimos una que tenga la menor cantidad de visitas
+        # target = random.choice(neighbours) # TODO(Richo): No usar random!
+        neighbours.sort(key=lambda minitile: self.minitiles.get(minitile, 0))
+        target = neighbours[0]
+
+        # 5) Devolvemos el punto central de esa minitile
+        return self.getPosition(target, robot)

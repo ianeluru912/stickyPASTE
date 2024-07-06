@@ -148,6 +148,40 @@ class Tile:
     def __str__(self) -> str:
         return f"Tile ({self.col}, {self.row}) tipo: {self.type} visitas: {self.visits}	area: {self.area}"
     
+    def isOpenAt(self, pos):
+        center = self.__map.gridToPosition(self.col, self.row)
+        thresh = 0.02
+        if pos.x < center.x - thresh:
+            if pos.y < center.y - thresh:
+                # NW
+                return self.north[0] <= 0 and self.west[2] <= 0
+            elif pos.y > center.y + thresh:
+                # SW
+                return self.south[2] <= 0 and self.west[0] <= 0
+            else:
+                # W
+                return self.west[0] <= 0 and self.west[1] <= 0 and self.west[2] <= 0
+        elif pos.x > center.x + thresh:
+            if pos.y < center.y - thresh:
+                # NE
+                return self.north[2] <= 0 and self.east[0] <= 0
+            elif pos.y > center.y + thresh:
+                # SE
+                return self.east[2] <= 0 and self.south[0] <= 0
+            else:
+                # E
+                return self.east[0] <= 0 and self.east[1] <= 0 and self.east[2] <= 0
+        else:
+            if pos.y < center.y - thresh:
+                # N
+                return self.north[0] <= 0 and self.north[1] <= 0 and self.north[2] <= 0
+            elif pos.y > center.y + thresh:
+                # S
+                return self.south[0] <= 0 and self.south[1] <= 0 and self.south[2] <= 0
+            else: 
+                # CENTRO!
+                return self.north[1] <= 0 and self.east[1] <= 0 and self.south[1] <= 0 and self.west[1] <= 0
+
     def getRepresentation(self):
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles ACAACA
