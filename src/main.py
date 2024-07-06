@@ -12,13 +12,13 @@ inicio.set_area(1)
 inicio.type=TileType.STARTING
 
 while robot.step() != -1:
-    # print("Loop")
-    # robot.updateMap() 
+    print("Loop")
+    robot.updateMap() 
 
-    # navigator = robot.getNavigator()
-    # point = navigator.whereToGo(robot)
+    navigator = robot.getNavigator()
+    point = navigator.whereToGo(robot)
 
-    # robot.moveToPoint(point)
+    robot.moveToPoint(point)
  
     # valid_tiles = robot.map.getValidTiles()
     # for tile in valid_tiles:
