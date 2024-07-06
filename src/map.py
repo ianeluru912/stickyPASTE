@@ -33,7 +33,7 @@ class Map:
     def getTileAt(self, col, row):
         tile = self.tiles.get((col, row))
         if tile == None:
-            tile = Tile(col, row)
+            tile = Tile(col, row, self)
             self.tiles[(col, row)] = tile
         return tile
     
@@ -122,7 +122,8 @@ class Tile:
     WIDTH = 0.12  
     HEIGHT = 0.12
 
-    def __init__(self, col, row) -> None:
+    def __init__(self, col, row, map) -> None:
+        self.__map = map
         self.col = col
         self.row = row
         self.visits = 0
