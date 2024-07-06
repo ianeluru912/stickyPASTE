@@ -12,7 +12,6 @@ inicio.set_area(1)
 inicio.type=TileType.STARTING
 
 while robot.step() != -1:
-    print("Loop")
     robot.updateMap() 
 
     navigator = robot.getNavigator()
