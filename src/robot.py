@@ -71,7 +71,7 @@ class Robot:
         self.mapvis = MapVisualizer()
 
     def getNavigator(self):
-        return self.navigators[1] # TODO: Cambiar cuando anden los otros navigators 
+        return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
         return self.navigators[self.current_area]
 
     def step(self):
@@ -192,7 +192,7 @@ class Robot:
                         # print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
                     else:
                         self.current_area = currentTile.get_area()
-                        print(f"Robot ahora en area {self.current_area} en el tile ({currentTile.col}, {currentTile.row})")
+                        # print(f"Robot ahora en area {self.current_area} en el tile ({currentTile.col}, {currentTile.row})")
                     
                     color = currentTile.type
                     if color:
@@ -505,7 +505,8 @@ class Robot:
         self.classifyNeighbourTile()
         tileDestino=self.get_tile_ahead() # TODO: Esto me parece que debería ser el tile que esté en target_pos
         if tileDestino.hasObstacle or tileDestino.type == TileType.BLACK_HOLE:
-            print("Hay un obstaculo o agujero en el camino")
+            # print("Hay un obstaculo o agujero en el camino")
+            pass
         else:
             self.avanzar(target_vector.length())
 
