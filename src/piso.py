@@ -34,15 +34,18 @@ class Piso:
             and abs(self.greenValue - 47) < 15 \
             and abs(self.blueValue - 188) < 15
 
-    def del_suelo(self):
+    def estandar(self):
         return abs(self.redValue - 195) < 2 \
             and abs(self.greenValue - 195) < 2 \
             and abs(self.blueValue - 195) < 2
 
     def checkpoint(self):
-        return abs(self.redValue - 70) < 15 \
-            and abs(self.greenValue - 75) < 15 \
-            and abs(self.blueValue - 90) < 15
+        # return abs(self.redValue - 70) < 15 \
+        #     and abs(self.greenValue - 75) < 15 \
+        #     and abs(self.blueValue - 90) < 15
+        return abs(self.redValue - 42) < 15 \
+            and abs(self.greenValue - 47) < 15 \
+            and abs(self.blueValue - 64) < 15
     
     def orange(self):
         return abs(self.redValue - 234) < 15 \

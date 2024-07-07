@@ -61,11 +61,13 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
         self.map = None
-        self.step()
-
+        self.stepInit()
         self.posicion_inicial = self.position
         self.map = Map(self.posicion_inicial)
         self.current_area = 1
+        inicio=self.map.getTileAtPosition(self.posicion_inicial)
+        inicio.set_area(self.current_area)
+        inicio.type = TileType.STARTING
         self.doingLOP = False
 
         self.mapvis = MapVisualizer()
@@ -73,6 +75,15 @@ class Robot:
     def getNavigator(self):
         return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
         return self.navigators[self.current_area]
+
+    def stepInit(self): # este step lo hace una vez al comienzo de todo
+        result = self.robot.step(TIME_STEP)
+        self.updatePosition()
+        self.updateRotation()
+        self.updateLidar()
+        self.updateCamerasDetection()
+        return result
+
 
     def step(self):
         result = self.robot.step(TIME_STEP)
@@ -90,6 +101,7 @@ class Robot:
         self.updateRotation()
         self.updateLidar()
         self.updateCamerasDetection()
+        self.updateTiles()
         
         if self.map != None:
             x = self.position.x - self.posicion_inicial.x
@@ -99,6 +111,11 @@ class Robot:
             if x_valid and y_valid:
                 self.updateMap()
 
+    def updateTiles(self):
+        tile=self.getTilePointedByColorSensor()
+        if not(tile is None) and tile.type is None:
+            self.classifyTile(tile)
+            
     def updateCamerasDetection(self):
         return self.enviar_mensaje_imgs()
 
@@ -497,9 +514,7 @@ class Robot:
     def updateMap1(self, tile):
         self.lidar.updateWalls1(self.rotation, self.map, tile)
         # self.classifyNeighboursTile()
-        tile=self.getTilePointedByColorSensor()
-        if not(tile is None) and tile.type is None:
-            self.classifyTile(tile)
+
 
     def classifyTile(self, tile):
         # print(tile.type)
@@ -525,6 +540,12 @@ class Robot:
                 tile.type = TileType.YELLOW
             elif m.checkpoint():
                 tile.type = TileType.CHECKPOINT
+            elif m.estandar():
+                tile.type = TileType.STANDARD
+
+            if tile.type is not None:
+                print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
+
 
         
     def classifyNeighboursTile(self):
@@ -559,9 +580,11 @@ class Robot:
             # print(f"Area actualizada a {self.current_area} por color {color}")
 
     def getTilePointedByColorSensor(self):
+    
         if(self.lidar.rangeImage[256]>0.083):
             pointCS=utils.targetPoint(self.position, self.rotation, 0.083)
-            # print(pointCS)
+            print(f"Yo estoy en {self.position}, con rotación {self.rotation}, y voy a ver en {pointCS}")
+            
             return self.map.getTileAtPosition(pointCS)
         else:
             # Tengo algo delante que no me deja ver el tile

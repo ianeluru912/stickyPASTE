@@ -7,10 +7,13 @@ from piso import Piso
 
 robot = Robot()
 
-robot.step()
-inicio=robot.map.getTileAt(0, 0)
-inicio.set_area(1)
-inicio.type=TileType.STARTING
+# robot.moveToPoint(Point(robot.position.x-0.28, robot.position.y))
+# robot.moveToPoint(Point(robot.position.x, robot.position.y+0.02))
+# b,g,r,_=robot.colorSensor.getImage()
+# print(r,g,b)
+# robot.parar()
+# robot.delay(10000)
+
 while robot.step() != -1:
     robot.updateMap() 
 
