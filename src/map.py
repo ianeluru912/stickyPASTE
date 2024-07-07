@@ -153,13 +153,26 @@ class Tile:
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles ACAACA
         # Agregar paredes internas
+        # * * * * * 
+        # * * * * * 
+        # * * * * * 
+        # * * * * * 
+        # * * * * * 
+        
 
         rep=np.full((5,5), None)
-        # Agregar las paredes
+        # Agregar las paredes externas
         rep[0,0:5]=self.combinesWall(rep[0,0:5], self.getWallRepresentation(self.north))
         rep[4,0:5]=self.combinesWall(rep[4,0:5], self.getWallRepresentation(self.south))
         rep[0:5,0]=self.combinesWall(rep[0:5,0],self.getWallRepresentation(self.west))
         rep[0:5,4]=self.combinesWall(rep[0:5,4],self.getWallRepresentation(self.east))
+
+        # Agregar las paredes internas
+
+        # Agregar el color de la baldosa
+
+        # Agregar las víctimas y carteles
+
 
         return rep
 
@@ -172,8 +185,9 @@ class Tile:
             return None
 
     def combinesWall(self, w1, w2):
-        sol=[None, None, None, None, None]
-        for i in range(5):
+        size=len(w1)
+        sol=np.full(size, None)
+        for i in range(size):
             sol[i]=self.maxWall(w1[i],w2[i])
         return sol
 
