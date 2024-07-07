@@ -493,12 +493,16 @@ class Robot:
 
     def updateMap1(self, tile):
         self.lidar.updateWalls1(self.rotation, self.map, tile)
-        self.classifyNeighbourTile()
+        # self.classifyNeighboursTile()
+        tile=self.getTilePointedByColorSensor()
+        if not(tile is None) and tile.type is None:
+            self.classifyTile(tile)
 
-    def classifyAhead(self, tile):
+    def classifyTile(self, tile):
         # print(tile.type)
         b, g, r, _ = self.colorSensor.getImage()
         m = Piso(r, g, b)
+        
         if tile.type is None:
             if m.blackHole():
                 tile.type = TileType.BLACK_HOLE         
@@ -520,15 +524,15 @@ class Robot:
                 tile.type = TileType.CHECKPOINT
 
         
-    def classifyNeighbourTile(self):
+    def classifyNeighboursTile(self):
         tile_ahead=self.get_tile_ahead()
-        self.classifyAhead(tile_ahead)
-        if self.bh_izq():
-            tile_izq = self.get_tile_izq()
-            tile_izq.type = TileType.BLACK_HOLE
-        if self.bh_der():
-            tile_der = self.get_tile_der()
-            tile_der.type = TileType.BLACK_HOLE
+        self.classifyTile(tile_ahead)
+        # if self.bh_izq():
+        #     tile_izq = self.get_tile_izq()
+        #     tile_izq.type = TileType.BLACK_HOLE
+        # if self.bh_der():
+        #     tile_der = self.get_tile_der()
+        #     tile_der.type = TileType.BLACK_HOLE
            
     def update_area_by_color(self, color):
         possibleAreas = {
@@ -551,13 +555,25 @@ class Robot:
             self.current_area = possibleAreas[changeOfArea]
             # print(f"Area actualizada a {self.current_area} por color {color}")
 
+    def getTilePointedByColorSensor(self):
+        if(self.lidar.rangeImage[256]>0.083):
+            pointCS=utils.targetPoint(self.position, self.rotation, 0.083)
+            # print(pointCS)
+            return self.map.getTileAtPosition(pointCS)
+        else:
+            # Tengo algo delante que no me deja ver el tile
+            return None
+
     def moveToPoint(self, target_pos):
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
-        self.classifyNeighbourTile()
-        tileDestino=self.get_tile_ahead() # TODO: Esto me parece que debería ser el tile que esté en target_pos
+        # self.classifyNeighboursTile()
+        # tileDestino=self.get_tile_ahead() # TODO: Esto me parece que debería ser el tile que esté en target_pos
+        tileDestino=self.map.getTileAtPosition(target_pos)
+
+        
         if tileDestino.hasObstacle or tileDestino.type == TileType.BLACK_HOLE:
             # print("Hay un obstaculo o agujero en el camino")
             pass
