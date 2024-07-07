@@ -33,7 +33,7 @@ class Map:
     def getTileAt(self, col, row):
         tile = self.tiles.get((col, row))
         if tile == None:
-            tile = Tile(col, row)
+            tile = Tile(col, row, self)
             self.tiles[(col, row)] = tile
         return tile
     
@@ -122,7 +122,8 @@ class Tile:
     WIDTH = 0.12  
     HEIGHT = 0.12
 
-    def __init__(self, col, row) -> None:
+    def __init__(self, col, row, map) -> None:
+        self.__map = map
         self.col = col
         self.row = row
         self.visits = 0
@@ -261,3 +262,37 @@ class Tile:
         walls=self.north+self.west+self.east+self.south
         # if there is a 0 in the walls, then it is a valid tile
         return 0 in walls
+    
+    def isOpenAt(self, pos):
+        center = self.__map.gridToPosition(self.col, self.row)
+        thresh = 0.02
+        if pos.x < center.x - thresh:
+            if pos.y < center.y - thresh:
+                # NW
+                return self.north[0] <= 0 and self.west[2] <= 0
+            elif pos.y > center.y + thresh:
+                # SW
+                return self.south[2] <= 0 and self.west[0] <= 0
+            else:
+                # W
+                return self.west[0] <= 0 and self.west[1] <= 0 and self.west[2] <= 0
+        elif pos.x > center.x + thresh:
+            if pos.y < center.y - thresh:
+                # NE
+                return self.north[2] <= 0 and self.east[0] <= 0
+            elif pos.y > center.y + thresh:
+                # SE
+                return self.east[2] <= 0 and self.south[0] <= 0
+            else:
+                # E
+                return self.east[0] <= 0 and self.east[1] <= 0 and self.east[2] <= 0
+        else:
+            if pos.y < center.y - thresh:
+                # N
+                return self.north[0] <= 0 and self.north[1] <= 0 and self.north[2] <= 0
+            elif pos.y > center.y + thresh:
+                # S
+                return self.south[0] <= 0 and self.south[1] <= 0 and self.south[2] <= 0
+            else: 
+                # CENTRO!
+                return self.north[1] <= 0 and self.east[1] <= 0 and self.south[1] <= 0 and self.west[1] <= 0
