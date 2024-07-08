@@ -167,10 +167,9 @@ class Tile:
         rep[0:5,0]=self.combinesWall(rep[0:5,0],self.getWallRepresentation(self.west))
         rep[0:5,4]=self.combinesWall(rep[0:5,4],self.getWallRepresentation(self.east))
 
-        # Agregar las paredes internas
+        # TODO:Agregar las paredes internas
 
         # Agregar el color de la baldosa
-# Agregar el color de la baldosa 
         if self.type==TileType.GREEN:
             rep[1, 1]="g"
             rep[1, 3]="g"
@@ -221,9 +220,12 @@ class Tile:
             rep[1, 3]="5"
             rep[3, 1]="5"
             rep[3, 3]="5"
-        # Agregar las víctimas y carteles
+        # TODO: Agregar las víctimas y carteles
 
-
+        for fil in range(rep.shape[0]):
+                for colum in range(rep.shape[1]):
+                    if rep[fil, colum] is None:
+                        rep[fil, colum] = '0'
         return rep
 
     def maxWall(self, v1, v2):
