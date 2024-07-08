@@ -221,7 +221,41 @@ class Tile:
             rep[3, 1]="5"
             rep[3, 3]="5"
         # TODO: Agregar las víctimas y carteles
+        if self.tokensNorth != [0, 0, 0]:
+            if self.tokensNorth[0] != 0:
+                rep[0, 1] = self.tokensNorth[0]
+            if self.tokensNorth[1] != 0:
+                rep[0, 2] = self.tokensNorth[1]
+            if self.tokensNorth[2] != 0:
+                rep[0, 3] = self.tokensNorth[2]
 
+        if self.tokensSouth != [0, 0, 0]:
+            if self.tokensSouth[0] != 0:
+                rep[4, 1] = self.tokensSouth[0]
+            if self.tokensSouth[1] != 0:
+                rep[4, 2] = self.tokensSouth[1]
+            if self.tokensSouth[2] != 0:
+                rep[4, 3] = self.tokensSouth[2]
+
+        if self.tokensWest != [0, 0, 0]:
+            if self.tokensWest[0] != 0:
+                rep[1, 0] = self.tokensWest[0]
+            if self.tokensWest[1] != 0:
+                rep[2, 0] = self.tokensWest[1]
+            if self.tokensWest[2] != 0:
+                rep[3, 0] = self.tokensWest[2]
+
+        if self.tokensEast != [0, 0, 0]:
+            if self.tokensEast[0] != 0:
+                rep[1, 4] = self.tokensEast[0]
+            if self.tokensEast[1] != 0:
+                rep[2, 4] = self.tokensEast[1]
+            if self.tokensEast[2] != 0:
+                rep[3, 4] = self.tokensEast[2]
+        
+        
+        
+        
         for fil in range(rep.shape[0]):
                 for colum in range(rep.shape[1]):
                     if rep[fil, colum] is None:
