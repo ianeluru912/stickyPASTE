@@ -220,7 +220,7 @@ class Tile:
             rep[1, 3]="5"
             rep[3, 1]="5"
             rep[3, 3]="5"
-        # TODO: Agregar las víctimas y carteles
+        # DONE: Agregar las víctimas y carteles
         if self.tokensNorth != [0, 0, 0]:
             if self.tokensNorth[0] != 0:
                 rep[0, 1] = self.tokensNorth[0]
