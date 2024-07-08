@@ -543,8 +543,8 @@ class Robot:
             elif m.estandar():
                 tile.type = TileType.STANDARD
 
-            if tile.type is not None:
-                print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
+            # if tile.type is not None:
+            #     print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
 
 
         
@@ -583,7 +583,7 @@ class Robot:
     
         if(self.lidar.rangeImage[256]>0.083):
             pointCS=utils.targetPoint(self.position, self.rotation, 0.083)
-            print(f"Yo estoy en {self.position}, con rotación {self.rotation}, y voy a ver en {pointCS}")
+            # print(f"Yo estoy en {self.position}, con rotación {self.rotation}, y voy a ver en {pointCS}")
             
             return self.map.getTileAtPosition(pointCS)
         else:

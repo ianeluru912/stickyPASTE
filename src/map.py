@@ -170,7 +170,57 @@ class Tile:
         # Agregar las paredes internas
 
         # Agregar el color de la baldosa
-
+# Agregar el color de la baldosa 
+        if self.type==TileType.GREEN:
+            rep[1, 1]="g"
+            rep[1, 3]="g"
+            rep[3, 1]="g"
+            rep[3, 3]="g"
+        elif self.type==TileType.BLUE:
+            rep[1, 1]="b"
+            rep[1, 3]="b"
+            rep[3, 1]="b"
+            rep[3, 3]="b"
+        elif self.type==TileType.YELLOW:
+            rep[1, 1]="y"
+            rep[1, 3]="y"
+            rep[3, 1]="y"
+            rep[3, 3]="y"
+        elif self.type==TileType.PURPLE:
+            rep[1, 1]="p"
+            rep[1, 3]="p"
+            rep[3, 1]="p"
+            rep[3, 3]="p"
+        elif self.type==TileType.ORANGE:
+            rep[1, 1]="o"
+            rep[1, 3]="o"
+            rep[3, 1]="o"
+            rep[3, 3]="o"
+        elif self.type==TileType.RED:
+            rep[1, 1]="r"
+            rep[1, 3]="r"
+            rep[3, 1]="r"
+            rep[3, 3]="r"
+        elif self.type==TileType.BLACK_HOLE:
+            rep[1, 1]="2"
+            rep[1, 3]="2"
+            rep[3, 1]="2"
+            rep[3, 3]="2"
+        elif self.type==TileType.SWAMP:
+            rep[1, 1]="3"
+            rep[1, 3]="3"
+            rep[3, 1]="3"
+            rep[3, 3]="3"
+        elif self.type==TileType.CHECKPOINT:
+            rep[1, 1]="4"
+            rep[1, 3]="4"
+            rep[3, 1]="4"
+            rep[3, 3]="4"
+        elif self.type==TileType.STARTING:
+            rep[1, 1]="5"
+            rep[1, 3]="5"
+            rep[3, 1]="5"
+            rep[3, 3]="5"
         # Agregar las víctimas y carteles
 
 
