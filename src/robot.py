@@ -135,6 +135,7 @@ class Robot:
             return img_a_convertir
     
     def mappingVictim(self, side, token): # side = "L" o "R" token = cartelito o víctima
+        #TODO: falla en el mapeo cuando detecta una víctima estando en diagonal
         orientation=self.obtener_orientacion(self.rotation)
         xRobot = self.position.x
         yRobot = self.position.y
@@ -143,7 +144,8 @@ class Robot:
         if orientation == "N" or orientation == "S":
             # si mi posición en x está en el borde entre baldosas, yo estoy viendo la víctima en una pared interna
             # si no, lo estoy viendo en una pared externda
-            if abs(xRobotRel % 0.12) >0.03:
+            #if xRobotRel is near a multiple of 0.12
+            if not(utils.near_multiple(xRobotRel, 0.12, 0.03)):
                 # print("NS Estoy en el borde entre dos baldosas", xRobotRel, yRobotRel)
                 # Estoy caminando entre dos baldosas, es decir, estoy viendo algo en una pared interna vertical
                 if side == "L":
@@ -188,8 +190,8 @@ class Robot:
         else: # orientación de E a W
             # si mi posición en y está en el borde entre baldosas, yo estoy viendo la víctima en una pared interna
             # si no, lo estoy viendo en una pared externa
-            if abs(yRobotRel % 0.12) >0.03: 
-                # print("EO Estoy en el borde entre dos baldosas", yRobotRel, yRobot, abs(yRobotRel % 0.12))
+            if not(utils.near_multiple(yRobotRel, 0.12, 0.03)): 
+                # print("EO Estoy en el borde entre dos baldosas", yRobotRel, yRobot)
                 # Estoy caminando entre dos baldosas, es decir, estoy viendo algo en una pared interna horizontal
                 if side == "L":
                     if orientation == "E":
