@@ -147,8 +147,7 @@ class Tile:
         self.area = None
     
     def __str__(self) -> str:
-        return f"Tile ({self.col}, {self.row}) tipo: {self.type} visitas: {self.visits}	area: {self.area} \
-            self.north: {self.north} self.west: {self.west} self.east: {self.east} self.south: {self.south}"
+        return f"Tile ({self.col}, {self.row}) tipo: {self.type} visitas: {self.visits}	area: {self.area}"
     
     def getRepresentation(self):
         # create a numpy array 5x5
