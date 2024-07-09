@@ -147,7 +147,8 @@ class Tile:
         self.area = None
     
     def __str__(self) -> str:
-        return f"Tile ({self.col}, {self.row}) tipo: {self.type} visitas: {self.visits}	area: {self.area}"
+        return f"Tile ({self.col}, {self.row}) TN:{self.tokensNorth} TE:{self.tokensEast} \
+            TS:{self.tokensSouth} TW:{self.tokensWest} TVI:{self.tokensVerticalInternalWall} THI:{self.tokensHorizontalInternalWall}"
     
     def getRepresentation(self):
         # create a numpy array 5x5
@@ -162,64 +163,47 @@ class Tile:
 
         rep=np.full((5,5), None)
         # Agregar las paredes externas
+        # Dado que la representación de la pared sur y la oeste están invertidas, nos creamos una versión dada vuelta para generar
+        # la representación de la pared sur y la oeste
+        # create a copy of the south and west walls reversed
+        south_reversed = self.south.copy()
+        south_reversed.reverse()
+        west_reversed = self.west.copy()
+        west_reversed.reverse()
+
         rep[0,0:5]=self.combinesWall(rep[0,0:5], self.getWallRepresentation(self.north))
-        rep[4,0:5]=self.combinesWall(rep[4,0:5], self.getWallRepresentation(self.south))
-        rep[0:5,0]=self.combinesWall(rep[0:5,0],self.getWallRepresentation(self.west))
         rep[0:5,4]=self.combinesWall(rep[0:5,4],self.getWallRepresentation(self.east))
+        rep[4,0:5]=self.combinesWall(rep[4,0:5], self.getWallRepresentation(south_reversed))
+        rep[0:5,0]=self.combinesWall(rep[0:5,0],self.getWallRepresentation(west_reversed))
+
 
         # TODO:Agregar las paredes internas
+        # Pared interna vertical superior, es el valor del medio de self.north
+        if self.north[1]==1:
+            rep[0:3,2]=self.combinesWall(rep[0:3,2], ['1', '1', '1'])
+        elif self.north[1]==0:
+            rep[0:3,2]=self.combinesWall(rep[0:3,2], ['0', '0', '0'])
+        # Pared interna vertical inferior, es el valor del medio de self.south
+        if self.south[1]==1:
+            rep[2:5,2]=self.combinesWall(rep[2:5,2], ['1', '1', '1'])
+        elif self.south[1]==0:
+            rep[2:5,2]=self.combinesWall(rep[2:5,2], ['0', '0', '0'])
+        # Pared interna horizontal izquierda, es el valor del medio de self.west
+        if self.west[1]==1:
+            rep[2,0:3]=self.combinesWall(rep[2,0:3], ['1', '1', '1'])
+        elif self.west[1]==0:
+            rep[2,0:3]=self.combinesWall(rep[2,0:3], ['0', '0', '0'])
+        # Pared interna horizontal derecha, es el valor del medio de self.east
+        if self.east[1]==1:
+            rep[2,2:5]=self.combinesWall(rep[2,2:5], ['1', '1', '1'])
+        elif self.east[1]==0:
+            rep[2,2:5]=self.combinesWall(rep[2,2:5], ['0', '0', '0'])
+
 
         # Agregar el color de la baldosa
-        if self.type==TileType.GREEN:
-            rep[1, 1]="g"
-            rep[1, 3]="g"
-            rep[3, 1]="g"
-            rep[3, 3]="g"
-        elif self.type==TileType.BLUE:
-            rep[1, 1]="b"
-            rep[1, 3]="b"
-            rep[3, 1]="b"
-            rep[3, 3]="b"
-        elif self.type==TileType.YELLOW:
-            rep[1, 1]="y"
-            rep[1, 3]="y"
-            rep[3, 1]="y"
-            rep[3, 3]="y"
-        elif self.type==TileType.PURPLE:
-            rep[1, 1]="p"
-            rep[1, 3]="p"
-            rep[3, 1]="p"
-            rep[3, 3]="p"
-        elif self.type==TileType.ORANGE:
-            rep[1, 1]="o"
-            rep[1, 3]="o"
-            rep[3, 1]="o"
-            rep[3, 3]="o"
-        elif self.type==TileType.RED:
-            rep[1, 1]="r"
-            rep[1, 3]="r"
-            rep[3, 1]="r"
-            rep[3, 3]="r"
-        elif self.type==TileType.BLACK_HOLE:
-            rep[1, 1]="2"
-            rep[1, 3]="2"
-            rep[3, 1]="2"
-            rep[3, 3]="2"
-        elif self.type==TileType.SWAMP:
-            rep[1, 1]="3"
-            rep[1, 3]="3"
-            rep[3, 1]="3"
-            rep[3, 3]="3"
-        elif self.type==TileType.CHECKPOINT:
-            rep[1, 1]="4"
-            rep[1, 3]="4"
-            rep[3, 1]="4"
-            rep[3, 3]="4"
-        elif self.type==TileType.STARTING:
-            rep[1, 1]="5"
-            rep[1, 3]="5"
-            rep[3, 1]="5"
-            rep[3, 3]="5"
+        if not(self.type==TileType.STANDARD or self.type==None):
+            rep[1, 1]=rep[1, 3]=rep[3, 1]=rep[3, 3]=self.type.value
+
         # DONE: Agregar las víctimas y carteles
         if self.tokensNorth != [0, 0, 0]:
             if self.tokensNorth[0] != 0:
@@ -253,20 +237,27 @@ class Tile:
             if self.tokensEast[2] != 0:
                 rep[3, 4] = self.tokensEast[2]
         
+        #TODO: Agregar vícitmas y carteles internos
+        if not(self.tokensVerticalInternalWall[0]==0):
+            rep[1,2]=self.tokensVerticalInternalWall[0]
+        if not(self.tokensVerticalInternalWall[1]==0):
+            rep[3,2]=self.tokensVerticalInternalWall[1]
+        if not(self.tokensHorizontalInternalWall[0]==0):
+            rep[2,1]=self.tokensHorizontalInternalWall[0]
+        if not(self.tokensHorizontalInternalWall[1]==0):
+            rep[2,3]=self.tokensHorizontalInternalWall[1]
         
-        
-        
-        for fil in range(rep.shape[0]):
-                for colum in range(rep.shape[1]):
-                    if rep[fil, colum] is None:
-                        rep[fil, colum] = '0'
+        # for fil in range(rep.shape[0]):
+        #         for colum in range(rep.shape[1]):
+        #             if rep[fil, colum] is None:
+        #                 rep[fil, colum] = '0'
         return rep
 
     def maxWall(self, v1, v2):
-        if v1==1 or v2==1:
-            return 1
-        elif v1==0 or v2==0:
-            return 0
+        if v1=='1' or v2=='1':
+            return '1'
+        elif v1=='0' or v2=='0':
+            return '0'
         else:
             return None
 
@@ -283,21 +274,21 @@ class Tile:
         if left==-1 and right==-1:
             return [None, None, None, None, None]
         elif left==-1 and right==0:
-            return [None, None, 0, 0, 0]
+            return [None, None, '0', '0', '0']
         elif left==-1 and right==1:
-            return [None, None, 1, 1, 1]
+            return [None, None, '1', '1', '1']
         elif left==0 and right==-1:
-            return [0, 0, 0, None, None]
+            return ['0', '0', '0', None, None]
         elif left==0 and right==0:
-            return [0, 0, 0, 0, 0]
+            return ['0', '0', '0', '0', '0']
         elif left==0 and right==1:
-            return [0, 0, 1, 1, 1]
+            return ['0', '0', '1', '1', '1']
         elif left==1 and right==-1:
-            return [1, 1, 1, None, None]
+            return ['1', '1', '1', None, None]
         elif left==1 and right==0:
-            return [1, 1, 1, 0, 0]
+            return ['1', '1', '1', '0', '0']
         elif left==1 and right==1:
-            return [1, 1, 1, 1, 1]
+            return ['1', '1', '1', '1', '1']
 
 
     def getDirectionTo(self, tile):
