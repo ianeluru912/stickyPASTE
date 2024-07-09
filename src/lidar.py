@@ -112,9 +112,9 @@ class Lidar:
         self.setWall(tile.south, 1, walls[7])
         self.setWall(tile.south, 2, walls[8])
         
-        self.setWall(tile.west, 0, walls[9])
+        self.setWall(tile.west, 0, walls[11])
         self.setWall(tile.west, 1, walls[10])
-        self.setWall(tile.west, 2, walls[11])
+        self.setWall(tile.west, 2, walls[9])
         
         self.fixNeighbours(map, tile)
     
