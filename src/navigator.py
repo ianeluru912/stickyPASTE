@@ -1,5 +1,6 @@
 from map import Tile, TileType
 from point import Point
+from piso import Piso
 from rectangle import Rectangle
 
 import random
@@ -71,7 +72,10 @@ class Navigator2(Navigator):
         for tile in tiles:
             if not tile.isOpenAt(minitile_pos):
                 return True
-        
+            if tile.type == TileType.BLACK_HOLE:
+                return True
+            if tile.hasObstacle:
+                return True
         return False
             
     def getPosition(self, minitile, robot):
