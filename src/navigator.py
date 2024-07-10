@@ -29,7 +29,9 @@ class Navigator1(Navigator):
         tiles = []
         for c, r in tile_order[orient]:
             tile = robot.map.getTileAt(col + c, row + r)
-            if current_tile.isConnectedTo(tile) and not tile.type== TileType.BLACK_HOLE and not tile.hasObstacle:
+            if current_tile.isConnectedTo(tile) \
+                and not tile.type == TileType.BLACK_HOLE \
+                and not tile.hasObstacle():
                 tiles.append(tile)
         return tiles
     
@@ -74,8 +76,12 @@ class Navigator2(Navigator):
                 return True
             if tile.type == TileType.BLACK_HOLE:
                 return True
-            if tile.hasObstacle:
+            
+        for obstacle in robot.map.obstacles:
+            obstacle_rect = robot.map.getObstacleRectangle(obstacle)
+            if obstacle_rect.intersects(rect):
                 return True
+            
         return False
             
     def getPosition(self, minitile, robot):

@@ -359,26 +359,6 @@ class Robot:
         self.wheelR.setVelocity(0)
 
         if hasObstacle:
-            # 1) Obtener el tile en el que está el obstáculo
-            col, row = self.map.positionToGrid(initPos)
-            # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa.
-            # Acá habría que calcular cuál es la posición destino para después pedirle al mapa qué
-            # tile corresponde con esa punto.
-            orient = self.obtener_orientacion(self.rotation)
-            if orient == "N":
-                row -= 1
-            elif orient == "S":
-                row += 1
-            elif orient == "E":
-                col += 1
-            elif orient == "W":
-                col -= 1
-            tile = self.map.getTileAt(col, row)
-
-            # 2) Marcar ese tile como hasObstacle = True
-            tile.hasObstacle = True
-
-            # 3) Retroceder la misma distancia que avancé
             dist = initPos.distance_to(self.position)
             self.avanzar(-dist)
     
@@ -612,8 +592,7 @@ class Robot:
         # tileDestino=self.get_tile_ahead() # TODO: Esto me parece que debería ser el tile que esté en target_pos
         tileDestino=self.map.getTileAtPosition(target_pos)
 
-        
-        if tileDestino.hasObstacle or tileDestino.type == TileType.BLACK_HOLE:
+        if tileDestino.type == TileType.BLACK_HOLE:
             # print("Hay un obstaculo o agujero en el camino")
             pass
         else:
