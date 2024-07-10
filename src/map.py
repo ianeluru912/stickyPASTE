@@ -119,6 +119,54 @@ class Map:
         salida=[tile for tile in self.tiles.values() if tile.isValid()]
         return salida
     
+    def combineTiles(self, tileMapa, tileAUbicar):
+        for i in range(5):
+            for j in range(5):
+                if tileAUbicar[i, j] != None:
+                    tileMapa[i, j] = tileAUbicar[i, j]
+                
+        
+
+
+    def getRepresentation(self):
+        # obtener tiles validos
+        valid_tiles = self.getValidTiles()
+
+        # detectar la columnna mínima y máxima de los tiles válidos
+        colmin = min([tile.col for tile in valid_tiles])
+        colmax = max([tile.col for tile in valid_tiles])
+        rowmin = min([tile.row for tile in valid_tiles])
+        rowmax = max([tile.row for tile in valid_tiles])
+
+        totCol=(colmax-colmin+1)*4+1
+        totRow=(rowmax-rowmin+1)*4+1
+        repre=np.full((totRow, totCol), '0')
+
+        for tile in valid_tiles:
+            # Calcula la columna donde tiene que poner el tile dentro de la representación
+            col=(tile.col-colmin)*4
+            # Calcula la fila donde tiene que poner el tile dentro de la representación
+            row=(tile.row-rowmin)*4
+            # Obtiene la representación del tile
+            rep=tile.getRepresentation()
+            # Combinar lo que ya había en la representación con lo que acabo de obtener.
+            self.combineTiles(repre[row:row+5, col:col+5], rep)
+        
+        return repre
+
+        
+
+
+        # detectar la fila mínima y máxima de los tiles válidos
+
+        # crear un array de numpy con las dimensiones correspondientes (columna máxima - columna mínima + 1, fila máxima - fila mínima + 1)
+
+        # para cada tile en los tiles válidos
+        # obtener la columna y fila del tile
+        # obtener la representación del tile
+        # insertar la representación en el array de numpy en la posición correspondiente 
+
+        # retornar el array de numpy
 class Tile:
     WIDTH = 0.12  
     HEIGHT = 0.12
@@ -147,8 +195,7 @@ class Tile:
         self.area = None
     
     def __str__(self) -> str:
-        return f"Tile ({self.col}, {self.row}) TN:{self.tokensNorth} TE:{self.tokensEast} \
-            TS:{self.tokensSouth} TW:{self.tokensWest} TVI:{self.tokensVerticalInternalWall} THI:{self.tokensHorizontalInternalWall}"
+        return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"
     
     def getRepresentation(self):
         # create a numpy array 5x5
@@ -247,19 +294,18 @@ class Tile:
         if not(self.tokensHorizontalInternalWall[1]==0):
             rep[2,3]=self.tokensHorizontalInternalWall[1]
         
-        # for fil in range(rep.shape[0]):
-        #         for colum in range(rep.shape[1]):
-        #             if rep[fil, colum] is None:
-        #                 rep[fil, colum] = '0'
+        for fil in range(1,rep.shape[0]-1):
+                for colum in range(1,rep.shape[1]-1):
+                    if rep[fil, colum] is None:
+                        rep[fil, colum] = '0'
         return rep
 
     def maxWall(self, v1, v2):
         if v1=='1' or v2=='1':
             return '1'
-        elif v1=='0' or v2=='0':
+        if v1=='0' and v2=='0':
             return '0'
-        else:
-            return None
+        return None
 
     def combinesWall(self, w1, w2):
         size=len(w1)

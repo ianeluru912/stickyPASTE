@@ -22,12 +22,9 @@ while robot.step() != -1:
 
     robot.moveToPoint(point)
 
-    # for tile in robot.map.getValidTiles():
-    #     print(tile)
-    #     print("/////////////////////////////////////")
-    #     print(tile.getRepresentation())
-    #     print("-------------------------------------")
-
+    # print(robot.map.getRepresentation())
+    # # for tiles in robot.map.getValidTiles():
+    # #     print(tiles)
     # print("############################################################")
     # valid_tiles = robot.map.getValidTiles()
     # for tile in valid_tiles:
