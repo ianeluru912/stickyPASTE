@@ -20,6 +20,10 @@ class Map:
     def __init__(self, origin) -> None:
         self.origin = origin
         self.tiles = {}
+        self.obstacles = []
+
+    def addObstacle(self, point):
+        self.obstacles.append(point)
 
     def gridToPosition(self, col, row):
         x = self.origin.x + col * Tile.WIDTH

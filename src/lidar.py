@@ -490,3 +490,16 @@ class Lidar:
             print('obstacle is not allowing passage')
             return True
         return False
+
+    def getNearestObstacle(self):
+        threshold = 0.05
+        min_dist = math.inf
+        min_ray = None
+        # TODO: Verificar rango porque puede ser muy amplio!
+        for ray_idx in range(196, 316):
+            dist = self.rangeImage[ray_idx]
+            if dist < threshold and dist < min_dist:
+                min_dist = dist
+                min_ray = ray_idx
+        return (min_ray, min_dist)
+            

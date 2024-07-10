@@ -249,7 +249,7 @@ class Robot:
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
-        # print(self.lastPosition, self.position)
+        print(self.position)
         
         self.position = Point(x, y)
         if self.lastPosition is None:
@@ -337,10 +337,22 @@ class Robot:
             self.wheelL.setVelocity(vel*MAX_VEL)
             self.wheelR.setVelocity(vel*MAX_VEL)
 
-            if distance > 0 and self.lidar.is_obstacle_preventing_passage():
-                # print('hay algo delante')
-                hasObstacle = True
-                break
+            if distance > 0:
+                ray_idx, dist = self.lidar.getNearestObstacle()
+                if ray_idx is not None:
+                    ray_offset = 256 - ray_idx
+                    delta_angle = ray_offset * (2*math.pi/512)
+                    angle = self.normalizar_radianes(self.rotation + delta_angle)
+                    diameter = 0.04 # Diámetro estimado del obstáculo
+                    target_point = utils.targetPoint(self.position, angle, dist + (diameter/2))
+                    # print(f"position: {self.position}, rotation: {self.rotation}")
+                    # print(f"ray_idx: {ray_idx}, dist: {dist}")
+                    # print(f"ray_offset: {ray_offset}, delta_angle: {delta_angle}")
+                    # print(f"angle: {angle}")
+                    # print(f"target_point: {target_point}")
+                    self.map.addObstacle(target_point)
+                    hasObstacle = True
+                    break
 
             if diff < 0.001:
                 break
