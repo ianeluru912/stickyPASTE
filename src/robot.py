@@ -249,7 +249,6 @@ class Robot:
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
-        print(self.position)
         
         self.position = Point(x, y)
         if self.lastPosition is None:
@@ -343,8 +342,7 @@ class Robot:
                     ray_offset = 256 - ray_idx
                     delta_angle = ray_offset * (2*math.pi/512)
                     angle = self.normalizar_radianes(self.rotation + delta_angle)
-                    diameter = 0.04 # Diámetro estimado del obstáculo
-                    target_point = utils.targetPoint(self.position, angle, dist + (diameter/2))
+                    target_point = utils.targetPoint(self.position, angle, dist)
                     # print(f"position: {self.position}, rotation: {self.rotation}")
                     # print(f"ray_idx: {ray_idx}, dist: {dist}")
                     # print(f"ray_offset: {ray_offset}, delta_angle: {delta_angle}")
