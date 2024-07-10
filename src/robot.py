@@ -51,6 +51,8 @@ class Robot:
         self.rotation = 0
         self.posicion_inicial = None
 
+        self.step_counter = 0
+
         self.navigators = {1: Navigator1(), 2: Navigator2()}
 
         # self.holeIZ = self.imageProcessor.see_hole()
@@ -75,6 +77,7 @@ class Robot:
 
     def stepInit(self): # este step lo hace una vez al comienzo de todo
         result = self.robot.step(TIME_STEP)
+        self.step_counter += 1
         self.updatePosition()
         self.updateRotation()
         self.updateLidar()
@@ -84,6 +87,7 @@ class Robot:
 
     def step(self):
         result = self.robot.step(TIME_STEP)
+        self.step_counter += 1
         self.updateVars()
         return result
 
@@ -103,8 +107,8 @@ class Robot:
         if self.map != None:
             x = self.position.x - self.posicion_inicial.x
             y = self.position.y - self.posicion_inicial.y
-            x_valid = round(x * 100) % 6 <= 0
-            y_valid = round(y * 100) % 6 <= 0
+            x_valid = utils.near_multiple(x, base=0.06, tolerance=0.0025)
+            y_valid = utils.near_multiple(y, base=0.06, tolerance=0.0025)
             if x_valid and y_valid:
                 self.updateMap()
 
@@ -489,20 +493,20 @@ class Robot:
         rect = self.getRectangle()
         tiles_intersecting = self.map.getTilesIntersecting(rect)
         if len(tiles_intersecting) == 1:
-            # print("CASO 1")
+            # print(f"{self.step_counter} -> CASO 1")
             self.updateMap1(tiles_intersecting[0])
         elif len(tiles_intersecting) == 2:
             direction = tiles_intersecting[0].getDirectionTo(tiles_intersecting[1])
             if direction == "S" or direction == "N":
                 # Caso 2
-                # print("CASO 2")
+                # print(f"{self.step_counter} -> CASO 2")
                 self.lidar.updateWalls2(self.rotation, self.map, tiles_intersecting)
             else:
                 # Caso 3
-                # print("CASO 3")
+                # print(f"{self.step_counter} -> CASO 3")
                 self.lidar.updateWalls3(self.rotation, self.map, tiles_intersecting)
         elif len(tiles_intersecting) >= 3:
-            # print("CASO 4")
+            # print(f"{self.step_counter} -> CASO 4")
             # print('valores rayitos:', self.lidar.ver_walls(self.rotation))
             # print('---')
             # print('valores paredes:', self.lidar.get_walls_4(self.rotation))
