@@ -46,12 +46,9 @@ class Robot:
 
         self.imageProcessor = ImageProcessor()
     
-        self.point = Point(0, 0)
-
         self.position = None
         self.lastPosition=None
         self.rotation = 0
-        self.rangeImage = None
         self.posicion_inicial = None
 
         self.navigators = {1: Navigator1(), 2: Navigator2()}
