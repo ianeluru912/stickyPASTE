@@ -433,8 +433,14 @@ class Lidar:
         self.fixNeighbours(map, se_tile)
 
     def setWall(self, tile_wall, idx, value):
+        if value < 0: return 
+        
         # si ya hay un 1 o un 0, en una pared, confiamos en el valor que ya tiene (Gonzalo)
-        if value < 0 or tile_wall[idx] == 1 or tile_wall[idx] == 0: return 
+        if tile_wall[idx] == 0 and value != 0:
+            print("VEO PARED DONDE ANTES NO VEIA")
+        if tile_wall[idx] == 1 and value != 1:
+            print("NO VEO PARED DONDE ANTES SI VEIA")
+            
         tile_wall[idx] = value 
 
     def fixNeighbours(self, map, tile):
