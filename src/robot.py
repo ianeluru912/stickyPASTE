@@ -21,6 +21,8 @@ class Robot:
         self.piso = Piso(0, 0, 0)
         self.robot = WebotsRobot()
         self.emitter = self.robot.getDevice("emitter")
+        self.receiver = self.robot.getDevice("receiver")
+        self.receiver.enable(TIME_STEP)
         self.wheelL = self.robot.getDevice("wheel1 motor")
         self.wheelL.setPosition(float("inf"))
 
@@ -71,11 +73,19 @@ class Robot:
         self.doingLOP = False
 
         self.mapvis = MapVisualizer()
+        self.lastRequestTime = 0
+
+        self.gameScore=None
+        self.timeRemaining=None
+        self.realTimeRemaining=None
 
     def getNavigator(self):
         return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
         return self.navigators[self.current_area]
 
+    def getTime(self):
+        return self.robot.getTime()
+    
     def stepInit(self): # este step lo hace una vez al comienzo de todo
         result = self.robot.step(TIME_STEP)
         self.updatePosition()
@@ -102,6 +112,7 @@ class Robot:
         self.updateLidar()
         self.updateCamerasDetection()
         self.updateTiles()
+        self.updateGameScoreAndTimes()
         
         if self.map != None:
             x = self.position.x - self.posicion_inicial.x
@@ -110,6 +121,11 @@ class Robot:
             y_valid = round(y * 100) % 6 <= 0
             if x_valid and y_valid:
                 self.updateMap()
+
+    def updateGameScoreAndTimes(self):
+        if self.robot.getTime() - self.lastRequestTime > 1: #Defino acá cada cuánto quiero que me actualice los datos
+            self.gameScore, self.timeRemaining, self.realTimeRemaining = self.getGameScoreAndtimeRemaining()
+            self.lastRequestTime = self.robot.getTime()
 
     def updateTiles(self):
         tile=self.getTilePointedByColorSensor()
@@ -615,3 +631,53 @@ class Robot:
         top = self.position.y - diameter/2
         bottom = self.position.y + diameter/2
         return Rectangle(top, left, bottom, right)
+    
+    def sendMapToSupervisorAndExit(self, rep):
+        ## Get shape
+        s = rep.shape
+        ## Get shape as bytes
+        s_bytes = struct.pack('2i',*s)
+
+        ## Flattening the matrix and join with ','
+        flatMap = ','.join(rep.flatten())
+        ## Encode
+        sub_bytes = flatMap.encode('utf-8')
+
+        ## Add togeather, shape + map
+        a_bytes = s_bytes + sub_bytes
+
+        ## Send map data
+        self.emitter.send(a_bytes)
+
+        #STEP3 Send map evaluate request
+        map_evaluate_request = struct.pack('c', b'M')
+        self.send(map_evaluate_request)
+
+        #STEP4 Send an Exit message to get Map Bonus
+        ## Exit message
+        exit_mes = struct.pack('c', b'E')
+        self.send(exit_mes)
+
+    def getGameScoreAndtimeRemaining(self):
+
+        message = struct.pack('c', 'G'.encode()) # message = 'G' for game information
+        self.emitter.send(message) # send message
+        gs=None
+        tr=None
+        rtr=None
+        self.robot.step()
+        self.robot.step()
+
+        if self.receiver.getQueueLength() > 0: # If receiver queue is not empty
+            receivedData = self.receiver.getBytes()
+            lenReceivedData = len(receivedData)
+            if lenReceivedData==16: # If received data is of length 16
+                # De casualidad descubrimos que también devuelve el tiempo del mundo real restante
+                tup = struct.unpack('c f i i', receivedData) # Parse data into char, float, int, int
+                if tup[0].decode("utf-8") == 'G':
+                    gs=tup[1] #game score
+                    tr=tup[2] #time remaining
+                    rtr=tup[3] #real time remaining
+                    self.receiver.nextPacket() # Discard the current data packet
+            
+        return gs, tr, rtr

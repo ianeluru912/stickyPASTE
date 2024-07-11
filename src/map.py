@@ -125,13 +125,11 @@ class Map:
                 if tileAUbicar[i, j] != None:
                     tileMapa[i, j] = tileAUbicar[i, j]
                 
-        
-
-
+    
     def getRepresentation(self):
         # obtener tiles validos
         valid_tiles = self.getValidTiles()
-
+        #TODO: En los tiles de área 4, poner asteriscos (ver dónde)
         # detectar la columnna mínima y máxima de los tiles válidos
         colmin = min([tile.col for tile in valid_tiles])
         colmax = max([tile.col for tile in valid_tiles])
