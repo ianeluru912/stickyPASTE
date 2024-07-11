@@ -3,11 +3,11 @@ import math
 class Lidar:
     shift ={'N': 0, 'E': 384, 'S': 256, 'W':128}
 
-    rays_1 ={0:[214,0.06, 0.08],1:[256,0,0], 2:[299, 0.06, 0.08], 3:[342,0.057, 0.08],\
-             4: [384,0, 0], 5: [427, 0.057, 0.08], 6:[470, 0.06, 0.08], 7:[0, 0,0], \
-                8:[43, 0.06, 0.08],9:[86,0.057, 0.08],10:[128,0,0],11:[171,0.057, 0.08], \
-                    12:[210, 0.095, 0.12], 13:[302, 0.095, 0.12], 14:[338, 0.095, 0.12], 15:[430,0.095, 0.12], \
-                        16:[466,0.095, 0.12], 17:[46,0.095, 0.12], 18:[82,0.095, 0.12], 19:[174,0.095, 0.12]}
+    rays_1 ={0:[210, 0.095, 0.12],1:[210, 0.06, 0.08], 2:[256, 0.05, 0.075], 3:[302, 0.06, 0.08],\
+            4: [302, 0.095, 0.12], 5: [338, 0.095, 0.12], 6:[338,0.06, 0.085], 7:[384,0.045, 0.075], \
+            8:[430,0.06, 0.085],9:[430,0.095, 0.12],10:[466,0.095, 0.12],11:[466,0.06, 0.085], 12:[0,0.05, 0.075], \
+            13:[46,0.06, 0.085], 14:[46,0.095, 0.12], 15:[82,0.095, 0.12], 16:[82,0.06, 0.085], 17:[128,0.045, 0.075], \
+            18:[174,0.06, 0.085], 19:[174,0.095, 0.12]}
     """rays_1 ={0:[210, 0.095, 0.12],1:[210, 0.06, 0.08], 2:[256, 0.05, 0.075], 3:[299, 0.06, 0.08],\
             4: [302, 0.095, 0.12], 5: [338, 0.095, 0.12], 6:[338, 0.06,], 7:[0, 0,0], \
             8:[43, 0.06, 0.08],9:[86,0.057, 0.08],10:[128,0,0],11:[171,0.057, 0.08]}"""
@@ -95,33 +95,102 @@ class Lidar:
             upperLimit=self.rays_1[i][2]
 
             if rayDistance>=lowerLimit and rayDistance<=upperLimit:
-                # add wall witk key i and value 1
                 walls[i]=1
+                # walls[i]=(1, lowerLimit,upperLimit,rayDistance)
+            elif rayDistance<lowerLimit:
+                walls[i]=-1
+                # walls[i]=(-1,lowerLimit,upperLimit,rayDistance)
             else:
                 walls[i]=0
-            # walls.append(rangeLocal[self.rays_1[i][0]])
+                # walls[i]=(0,lowerLimit,upperLimit,rayDistance)
+        if walls[3] == 1:
+            walls[2] = -1
+            walls[4] = -1
+        if walls[1] == 1:
+            walls[0] = -1
+            walls[2] = -1
+        if walls[6] == 1:
+            walls[5] = -1
+            walls[7] = -1
+        if walls[8] == 1:
+            walls[7] = -1
+            walls[9] = -1
+        if walls[11] == 1:
+            walls[10] = -1
+            walls[12] = -1
+        if walls[13] == 1:
+            walls[12] = -1
+            walls[14] = -1
+        if walls[16] == 1:
+            walls[15] = -1
+            walls[17] = -1
+        if walls[18] == 1:
+            walls[17] = -1
+            walls[19] = -1
+            #walls.append(rangeLocal[self.rays_1[i][0]])
         return walls
     
     def updateWalls1(self, rotation, map, tile):
         walls = self.get_walls_1(rotation)
+
+        self.setWall(tile.north, 0, walls[1])
+        self.setWall(tile.north, 1, 0)
+        self.setWall(tile.north, 2, walls[3])
+
+        self.setWall(tile.east, 0, walls[6])
+        self.setWall(tile.east, 1, 0)
+        self.setWall(tile.east, 2, walls[8])
+
+        self.setWall(tile.south, 0, walls[11])
+        self.setWall(tile.south, 1, 0)
+        self.setWall(tile.south, 2, walls[13])
+
+        self.setWall(tile.west, 0, walls[16])
+        self.setWall(tile.west, 1, 0)
+        self.setWall(tile.west, 2, walls[18])
+
+        north_tile = map.getTileAt(tile.col, tile.row - 1)
+        east_tile = map.getTileAt(tile.col + 1, tile.row)
+        west_tile = map.getTileAt(tile.col - 1, tile.row)
+        south_tile = map.getTileAt(tile.col, tile.row + 1)
+
+        self.setWall(north_tile.west, 0, walls[0])
+
+        self.setWall(north_tile.south, 0, walls[3])
+        self.setWall(north_tile.south, 1, walls[2])
+        self.setWall(north_tile.south, 2, walls[1])
+
+        self.setWall(north_tile.east, 2, walls[4])
+
+        self.setWall(east_tile.north, 0, walls[5])
+
+        self.setWall(east_tile.west, 0, walls[8])
+        self.setWall(east_tile.west, 1, walls[7])
+        self.setWall(east_tile.west, 2, walls[6])
+
+        self.setWall(east_tile.south, 2, walls[9])
+
+        self.setWall(south_tile.east, 0, walls[10])
+
+        self.setWall(south_tile.north, 0, walls[13])
+        self.setWall(south_tile.north, 1, walls[12])
+        self.setWall(south_tile.north, 2, walls[11])
+
+        self.setWall(south_tile.west, 2, walls[14])
         
-        self.setWall(tile.north, 0, walls[0])
-        self.setWall(tile.north, 1, walls[1])
-        self.setWall(tile.north, 2, walls[2])
-        
-        self.setWall(tile.east, 0, walls[3])
-        self.setWall(tile.east, 1, walls[4])
-        self.setWall(tile.east, 2, walls[5])
-        
-        self.setWall(tile.south, 0, walls[6])
-        self.setWall(tile.south, 1, walls[7])
-        self.setWall(tile.south, 2, walls[8])
-        
-        self.setWall(tile.west, 0, walls[9])
-        self.setWall(tile.west, 1, walls[10])
-        self.setWall(tile.west, 2, walls[11])
-        
+        self.setWall(west_tile.south, 0, walls[15])
+
+        self.setWall(west_tile.east, 0, walls[18])
+        self.setWall(west_tile.east, 1, walls[17])
+        self.setWall(west_tile.east, 2, walls[16])
+
+        self.setWall(west_tile.north, 2, walls[19])
+
         self.fixNeighbours(map, tile)
+        self.fixNeighbours(map,north_tile)
+        self.fixNeighbours(map,south_tile)
+        self.fixNeighbours(map,east_tile)
+        self.fixNeighbours(map,west_tile)
     
     def get_walls_2(self, rotation):
         shift = self.rotToLidar(rotation)
