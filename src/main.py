@@ -22,6 +22,7 @@ while robot.step() != -1:
 
     robot.moveToPoint(point)
 
+    # print(robot.gameScore, robot.timeRemaining, robot.realTimeRemaining)
     # print(robot.map.getRepresentation())
     # # for tiles in robot.map.getValidTiles():
     # #     print(tiles)
