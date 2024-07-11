@@ -5,7 +5,12 @@ class Lidar:
 
     rays_1 ={0:[214,0.06, 0.08],1:[256,0,0], 2:[299, 0.06, 0.08], 3:[342,0.057, 0.08],\
              4: [384,0, 0], 5: [427, 0.057, 0.08], 6:[470, 0.06, 0.08], 7:[0, 0,0], \
-                8:[43, 0.06, 0.08],9:[86,0.057, 0.08],10:[128,0,0],11:[171,0.057, 0.08]}
+                8:[43, 0.06, 0.08],9:[86,0.057, 0.08],10:[128,0,0],11:[171,0.057, 0.08], \
+                    12:[210, 0.095, 0.12], 13:[302, 0.095, 0.12], 14:[338, 0.095, 0.12], 15:[430,0.095, 0.12], \
+                        16:[466,0.095, 0.12], 17:[46,0.095, 0.12], 18:[82,0.095, 0.12], 19:[174,0.095, 0.12]}
+    """rays_1 ={0:[210, 0.095, 0.12],1:[210, 0.06, 0.08], 2:[256, 0.05, 0.075], 3:[299, 0.06, 0.08],\
+            4: [302, 0.095, 0.12], 5: [338, 0.095, 0.12], 6:[338, 0.06,], 7:[0, 0,0], \
+            8:[43, 0.06, 0.08],9:[86,0.057, 0.08],10:[128,0,0],11:[171,0.057, 0.08]}"""
     
     rays_2 ={0: [230,0.112, 0.1354], 1: [256, 0.05, 0.075], 2: [282,0.112, 0.1354], 3:[302,0.095, 0.12], 4:[302,0.06, 0.085], 5:[340,0.057, 0.077], 6:[428,0.057, 0.077],\
             7:[466,0.06, 0.085], 8:[466,0.095, 0.12], 9:[486,0.112, 0.1354], 10:[0,0.05, 0.075], 11:[26,0.112, 0.1354], 12:[46,0.095, 0.12], 13:[46,0.06, 0.085],\
@@ -433,8 +438,14 @@ class Lidar:
         self.fixNeighbours(map, se_tile)
 
     def setWall(self, tile_wall, idx, value):
+        if value < 0: return 
+        
         # si ya hay un 1 o un 0, en una pared, confiamos en el valor que ya tiene (Gonzalo)
-        if value < 0 or tile_wall[idx] == 1 or tile_wall[idx] == 0: return 
+        if tile_wall[idx] == 0 and value != 0:
+            print("VEO PARED DONDE ANTES NO VEIA")
+        if tile_wall[idx] == 1 and value != 1:
+            print("NO VEO PARED DONDE ANTES SI VEIA")
+            
         tile_wall[idx] = value 
 
     def fixNeighbours(self, map, tile):
@@ -479,3 +490,16 @@ class Lidar:
             print('obstacle is not allowing passage')
             return True
         return False
+
+    def getNearestObstacle(self):
+        threshold = 0.05
+        min_dist = math.inf
+        min_ray = None
+        # TODO: Verificar rango porque puede ser muy amplio!
+        for ray_idx in range(196, 316):
+            dist = self.rangeImage[ray_idx]
+            if dist < threshold and dist < min_dist:
+                min_dist = dist
+                min_ray = ray_idx
+        return (min_ray, min_dist)
+            

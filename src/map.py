@@ -20,6 +20,17 @@ class Map:
     def __init__(self, origin) -> None:
         self.origin = origin
         self.tiles = {}
+        self.obstacles = []
+
+    def addObstacle(self, point):
+        self.obstacles.append(point)
+
+    def getObstacleRectangle(self, obstacle):
+        top = obstacle.y - 0.02
+        left = obstacle.x - 0.02
+        bottom = obstacle.y + 0.02
+        right = obstacle.x + 0.02
+        return Rectangle(top, left, bottom, right)
 
     def gridToPosition(self, col, row):
         x = self.origin.x + col * Tile.WIDTH
@@ -189,11 +200,20 @@ class Tile:
         self.tokensHorizontalInternalWall=[0,0]
 
         self.type=None
-        self.hasObstacle = False
         self.area = None
     
     def __str__(self) -> str:
         return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"
+    
+    def hasObstacle(self):
+        for obstacle in self.__map.obstacles:
+            obstacle_rect = self.__map.getObstacleRectangle(obstacle)
+            if obstacle_rect.intersects(self.getRectangle()):
+                return True
+        return False
+    
+    def getRectangle(self):
+        return self.__map.getTileRectangle(self.col, self.row)
     
     def getRepresentation(self):
         # create a numpy array 5x5

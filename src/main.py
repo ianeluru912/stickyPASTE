@@ -15,8 +15,6 @@ robot = Robot()
 # robot.delay(10000)
 
 while robot.step() != -1:
-    robot.updateMap() 
-
     navigator = robot.getNavigator()
     point = navigator.whereToGo(robot)
 

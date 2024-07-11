@@ -48,13 +48,12 @@ class Robot:
 
         self.imageProcessor = ImageProcessor()
     
-        self.point = Point(0, 0)
-
         self.position = None
         self.lastPosition=None
         self.rotation = 0
-        self.rangeImage = None
         self.posicion_inicial = None
+
+        self.step_counter = 0
 
         self.navigators = {1: Navigator1(), 2: Navigator2()}
 
@@ -88,6 +87,7 @@ class Robot:
     
     def stepInit(self): # este step lo hace una vez al comienzo de todo
         result = self.robot.step(TIME_STEP)
+        self.step_counter += 1
         self.updatePosition()
         self.updateRotation()
         self.updateLidar()
@@ -97,6 +97,7 @@ class Robot:
 
     def step(self):
         result = self.robot.step(TIME_STEP)
+        self.step_counter += 1
         self.updateVars()
         return result
 
@@ -117,8 +118,8 @@ class Robot:
         if self.map != None:
             x = self.position.x - self.posicion_inicial.x
             y = self.position.y - self.posicion_inicial.y
-            x_valid = round(x * 100) % 6 <= 0
-            y_valid = round(y * 100) % 6 <= 0
+            x_valid = utils.near_multiple(x, base=0.06, tolerance=0.0025)
+            y_valid = utils.near_multiple(y, base=0.06, tolerance=0.0025)
             if x_valid and y_valid:
                 self.updateMap()
 
@@ -264,7 +265,6 @@ class Robot:
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
-        # print(self.lastPosition, self.position)
         
         self.position = Point(x, y)
         if self.lastPosition is None:
@@ -352,10 +352,21 @@ class Robot:
             self.wheelL.setVelocity(vel*MAX_VEL)
             self.wheelR.setVelocity(vel*MAX_VEL)
 
-            if distance > 0 and self.lidar.is_obstacle_preventing_passage():
-                # print('hay algo delante')
-                hasObstacle = True
-                break
+            if distance > 0:
+                ray_idx, dist = self.lidar.getNearestObstacle()
+                if ray_idx is not None:
+                    ray_offset = 256 - ray_idx
+                    delta_angle = ray_offset * (2*math.pi/512)
+                    angle = self.normalizar_radianes(self.rotation + delta_angle)
+                    target_point = utils.targetPoint(self.position, angle, dist)
+                    # print(f"position: {self.position}, rotation: {self.rotation}")
+                    # print(f"ray_idx: {ray_idx}, dist: {dist}")
+                    # print(f"ray_offset: {ray_offset}, delta_angle: {delta_angle}")
+                    # print(f"angle: {angle}")
+                    # print(f"target_point: {target_point}")
+                    self.map.addObstacle(target_point)
+                    hasObstacle = True
+                    break
 
             if diff < 0.001:
                 break
@@ -364,26 +375,6 @@ class Robot:
         self.wheelR.setVelocity(0)
 
         if hasObstacle:
-            # 1) Obtener el tile en el que está el obstáculo
-            col, row = self.map.positionToGrid(initPos)
-            # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa.
-            # Acá habría que calcular cuál es la posición destino para después pedirle al mapa qué
-            # tile corresponde con esa punto.
-            orient = self.obtener_orientacion(self.rotation)
-            if orient == "N":
-                row -= 1
-            elif orient == "S":
-                row += 1
-            elif orient == "E":
-                col += 1
-            elif orient == "W":
-                col -= 1
-            tile = self.map.getTileAt(col, row)
-
-            # 2) Marcar ese tile como hasObstacle = True
-            tile.hasObstacle = True
-
-            # 3) Retroceder la misma distancia que avancé
             dist = initPos.distance_to(self.position)
             self.avanzar(-dist)
     
@@ -508,20 +499,20 @@ class Robot:
         rect = self.getRectangle()
         tiles_intersecting = self.map.getTilesIntersecting(rect)
         if len(tiles_intersecting) == 1:
-            # print("CASO 1")
+            # print(f"{self.step_counter} -> CASO 1")
             self.updateMap1(tiles_intersecting[0])
         elif len(tiles_intersecting) == 2:
             direction = tiles_intersecting[0].getDirectionTo(tiles_intersecting[1])
             if direction == "S" or direction == "N":
                 # Caso 2
-                # print("CASO 2")
+                # print(f"{self.step_counter} -> CASO 2")
                 self.lidar.updateWalls2(self.rotation, self.map, tiles_intersecting)
             else:
                 # Caso 3
-                # print("CASO 3")
+                # print(f"{self.step_counter} -> CASO 3")
                 self.lidar.updateWalls3(self.rotation, self.map, tiles_intersecting)
         elif len(tiles_intersecting) >= 3:
-            # print("CASO 4")
+            # print(f"{self.step_counter} -> CASO 4")
             # print('valores rayitos:', self.lidar.ver_walls(self.rotation))
             # print('---')
             # print('valores paredes:', self.lidar.get_walls_4(self.rotation))
@@ -617,8 +608,7 @@ class Robot:
         # tileDestino=self.get_tile_ahead() # TODO: Esto me parece que debería ser el tile que esté en target_pos
         tileDestino=self.map.getTileAtPosition(target_pos)
 
-        
-        if tileDestino.hasObstacle or tileDestino.type == TileType.BLACK_HOLE:
+        if tileDestino.type == TileType.BLACK_HOLE:
             # print("Hay un obstaculo o agujero en el camino")
             pass
         else:
