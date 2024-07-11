@@ -49,6 +49,7 @@ class Robot:
         self.lastPosition=None
         self.rotation = 0
         self.posicion_inicial = None
+        self.targetPoint = None
 
         self.step_counter = 0
 
@@ -319,9 +320,8 @@ class Robot:
         self.wheelR.setVelocity(0)
 
     def avanzar(self, distance):
-        
         initPos = self.position
-        hasObstacle = False
+        goBack = False
 
         while self.step() != -1:
             if self.doingLOP:
@@ -349,8 +349,20 @@ class Robot:
                     # print(f"angle: {angle}")
                     # print(f"target_point: {target_point}")
                     self.map.addObstacle(target_point)
-                    hasObstacle = True
+                    goBack = True
                     break
+            
+                if self.targetPoint != None:
+                    top = self.targetPoint.y - 0.02
+                    left = self.targetPoint.x - 0.02
+                    bottom = self.targetPoint.y + 0.02
+                    right = self.targetPoint.x + 0.02
+                    tiles = self.map.getTilesIntersecting(Rectangle(top, left, bottom, right))
+                    for tile in tiles:
+                        if tile.type == TileType.BLACK_HOLE:
+                            goBack = True
+                    if goBack:
+                        break
 
             if diff < 0.001:
                 break
@@ -358,7 +370,7 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-        if hasObstacle:
+        if goBack:
             dist = initPos.distance_to(self.position)
             self.avanzar(-dist)
     
@@ -584,19 +596,12 @@ class Robot:
             return None
 
     def moveToPoint(self, target_pos):
+        self.targetPoint = target_pos
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
-        # self.classifyNeighboursTile()
-        # tileDestino=self.get_tile_ahead() # TODO: Esto me parece que debería ser el tile que esté en target_pos
-        tileDestino=self.map.getTileAtPosition(target_pos)
-
-        if tileDestino.type == TileType.BLACK_HOLE:
-            # print("Hay un obstaculo o agujero en el camino")
-            pass
-        else:
-            self.avanzar(target_vector.length())
+        self.avanzar(target_vector.length())
 
     def getRectangle(self):
         diameter = 0.07
