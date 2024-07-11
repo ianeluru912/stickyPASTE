@@ -3,7 +3,7 @@ from point import Point
 from piso import Piso
 from rectangle import Rectangle
 
-import random
+import math
 
 class Navigator:
 
@@ -47,7 +47,7 @@ class Navigator2(Navigator):
         columna = round(pos.x / half_width)
         fila = round(pos.y / half_height)
         return (columna, fila)
-    
+
     def getNeighbours(self, coords):
         result = []
         c = coords[0]
@@ -104,6 +104,11 @@ class Navigator2(Navigator):
         previous_value = self.minitiles.get(minitile, 0)
         self.minitiles[minitile] = previous_value + 1
 
+    def shiftByRotation(self, neighbours, rotation):
+        delta_angle = (math.pi*2)/8
+        idx = int(round(rotation / -delta_angle)) % 8
+        return neighbours[idx:] + neighbours[:idx]
+
     def whereToGo(self, robot):
         # 1) Encontrar la minitile en la que está el robot
         x = robot.position.x - robot.posicion_inicial.x
@@ -113,6 +118,7 @@ class Navigator2(Navigator):
         
         # 2) Calcular las minitiles vecinas
         neighbours = self.getNeighbours(minitile_coord)
+        neighbours = self.shiftByRotation(neighbours, robot.rotation)
 
         # 3) Eliminar las minitiles que tienen paredes
         neighbours = self.removeObstructed(neighbours, robot)
