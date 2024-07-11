@@ -55,7 +55,11 @@ class Robot:
 
         self.step_counter = 0
 
-        self.navigators = {1: Navigator1(), 2: Navigator2()}
+        self.navigators = {}
+        self.navigators[1] = Navigator1()
+        self.navigators[2] = Navigator2()
+        self.navigators[3] = self.navigators[2]
+        self.navigators[4] = self.navigators[2]
 
         # self.holeIZ = self.imageProcessor.see_hole()
         # self.holeDER = self.imageProcessor.see_hole()
