@@ -18,7 +18,6 @@ MAX_VEL = 6.28
 
 class Robot:
     def __init__(self):
-        self.piso = Piso(0, 0, 0)
         self.robot = WebotsRobot()
         self.emitter = self.robot.getDevice("emitter")
         self.wheelL = self.robot.getDevice("wheel1 motor")
