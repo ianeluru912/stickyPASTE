@@ -48,6 +48,7 @@ class MapVisualizer:
         self.start()
 
         self.previousMessage = None
+        self.lastRobotUpdate = 0
 
     def start(self):
         self.thread = threading.Thread(target=self.accept_connections, args=(), daemon=True)
@@ -68,8 +69,35 @@ class MapVisualizer:
             data = JSON.stringify(map).encode("utf8")
             if data == self.previousMessage: return
             self.previousMessage = data
+            type = (0).to_bytes()
             count = len(data).to_bytes(4, "little")
-            self.connection.sendall(count + data)
+            self.connection.sendall(type + count + data)
+        except Exception:
+            print("Connection lost!")
+            print(traceback.format_exc())
+            self.connection.close()
+            self.connection = None
+            self.start()
+
+    def send_robot(self, robot):        
+        if self.connection == None: return
+        try:
+            if robot.step_counter - self.lastRobotUpdate < 8:
+                return
+            self.lastRobotUpdate = robot.step_counter
+            data = {
+                "position": robot.position,
+                "rotation": robot.rotation,
+                "navigators": robot.navigators,
+                "current_area": robot.current_area,
+                "initial_position": robot.posicion_inicial
+            }
+            data = JSON.stringify(data).encode("utf8")
+            if data == self.previousMessage: return
+            self.previousMessage = data
+            type = (1).to_bytes()
+            count = len(data).to_bytes(4, "little")
+            self.connection.sendall(type + count + data)
         except Exception:
             print("Connection lost!")
             print(traceback.format_exc())
