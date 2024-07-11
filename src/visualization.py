@@ -90,6 +90,7 @@ class MapVisualizer:
                 "rotation": robot.rotation,
                 "navigators": robot.navigators,
                 "current_area": robot.current_area,
+                "targetPoint": robot.targetPoint,
                 "initial_position": robot.posicion_inicial
             }
             data = JSON.stringify(data).encode("utf8")
