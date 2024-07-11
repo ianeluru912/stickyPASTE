@@ -551,21 +551,15 @@ class Lidar:
     def hayAlgoDerecha(self):
         rightDist = self.rangeImage[128*3]
         return rightDist < 0.08
-    
-    def is_obstacle_preventing_passage(self):
-        rays = self.rangeImage[224:288]
-        not_available_rays = filter(lambda x: x < 0.05, rays)
-        if len(list(not_available_rays)) >= 1:
-            print('obstacle is not allowing passage')
-            return True
-        return False
 
     def getNearestObstacle(self):
         threshold = 0.05
         min_dist = math.inf
         min_ray = None
-        # TODO: Verificar rango porque puede ser muy amplio!
-        for ray_idx in range(196, 316):
+        # Si achicamos el offset corremos el riesgo de quedarnos trabados por un 
+        # obstáculo, mejor ser conservador...
+        offset = 60
+        for ray_idx in range(256-offset, 257+offset):
             dist = self.rangeImage[ray_idx]
             if dist < threshold and dist < min_dist:
                 min_dist = dist
