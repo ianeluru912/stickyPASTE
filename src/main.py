@@ -20,7 +20,13 @@ while robot.step() != -1:
 
     robot.moveToPoint(point)
 
-    # print(robot.gameScore, robot.timeRemaining, robot.realTimeRemaining)
+    # if robot.timeRemaining < 300 or robot.realTimeRemaining < 300:
+    #     print(robot.map.getTileAt(0,1))
+    #     print(robot.map.getTileAt(1,2))
+    #     rep=robot.map.getRepresentation()
+    #     robot.comm.sendMap(rep)
+    #     # print(rep)
+    #     robot.comm.sendExit()
     # print(robot.map.getRepresentation())
     # # for tiles in robot.map.getValidTiles():
     # #     print(tiles)

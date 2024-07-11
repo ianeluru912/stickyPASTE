@@ -452,3 +452,69 @@ class Tile:
             else: 
                 # CENTRO!
                 return self.north[1] <= 0 and self.east[1] <= 0 and self.south[1] <= 0 and self.west[1] <= 0
+
+    def setTokenOnAWall(self, point, token):
+        print(token)
+        print(self.col, self.row)
+        center = self.__map.gridToPosition(self.col, self.row)
+        umbralChico = 0.02
+        umbralGrande = 0.05
+        difx=center.x-point.x
+        dify=center.y-point.y
+        if difx > umbralChico and difx<umbralGrande:
+            if dify> umbralGrande:
+                print("Norte Izquierda")
+                self.tokensNorth[0]=token
+            elif dify<-umbralGrande:
+                print("Sur Izquierda")
+                self.tokensSouth[0]=token
+            else:
+                print("Interna izquierda")
+                self.tokensHorizontalInternalWall[0]=token
+
+        elif difx>umbralGrande:
+            if dify>umbralChico:
+                print("Oeste Arriba")
+                self.tokensWest[0]=token
+            elif dify<-umbralChico:
+                print("Oeste Abajo")
+                self.tokensWest[2]=token
+            else:
+                print("Oeste Medio")
+                self.tokensWest[1]=token
+        elif difx<=umbralChico and difx>=-umbralChico:
+            if dify>umbralGrande:
+                print("Norte Medio")
+                self.tokensNorth[1]=token
+            elif dify>=umbralChico and dify<=umbralGrande:
+                print("Interna Arriba")
+                self.tokensVerticalInternalWall[0]=token
+            elif dify<=-umbralChico and dify>=-umbralGrande:
+                print("Interna Abajo")
+                self.tokensVerticalInternalWall[1]=token
+            else:
+                print("Sur Medio")
+                self.tokensSouth[1]=token
+        elif difx<-umbralChico and difx>-umbralGrande:
+            if dify>umbralGrande:
+                print("Norte derecha")
+                self.tokensNorth[2]=token
+            elif dify<-umbralGrande:
+                print("Sur Derecha")
+                self.tokensSouth[2]=token
+            else:
+                print("Interna derecha")
+                self.tokensHorizontalInternalWall[1]=token
+        else:
+            if dify>umbralChico:
+                print("Este Arriba")
+                self.tokensEast[0]=token
+            elif dify<-umbralChico:
+                print("Este Abajo")
+                self.tokensEast[2]=token
+            else:
+                print("Este Medio")
+                self.tokensEast[1]=token
+            
+
+ 
