@@ -89,6 +89,7 @@ class Robot:
         result = self.robot.step(TIME_STEP)
         self.step_counter += 1
         self.updateVars()
+        self.mapvis.send_robot(self)
         return result
 
     def delay(self, ms):
