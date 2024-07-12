@@ -85,7 +85,7 @@ class Robot:
         self.realTimeRemaining=None
 
     def getNavigator(self):
-        return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
+        # return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
         return self.navigators[self.current_area]
 
     def getTime(self):
@@ -303,7 +303,8 @@ class Robot:
 
                 if not self.doingLOP:
                     if currentTile.get_area() is None:
-                        currentTile.set_area(self.current_area)
+                        if not currentTile.isColorPassage():
+                            currentTile.set_area(self.current_area)
                         # print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
                     else:
                         self.current_area = currentTile.get_area()
@@ -564,8 +565,6 @@ class Robot:
 
     def updateMap1(self, tile):
         self.lidar.updateWalls1(self.rotation, self.map, tile)
-        # self.classifyNeighboursTile()
-
 
     def classifyTile(self, tile):
         # print(tile.type)
@@ -594,21 +593,11 @@ class Robot:
             elif m.estandar():
                 tile.type = TileType.STANDARD
 
-            # if tile.type is not None:
-            #     print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
+            if tile.type is not None:
+                print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
 
-
-        
-    def classifyNeighboursTile(self):
-        tile_ahead=self.get_tile_ahead()
-        self.classifyTile(tile_ahead)
-        # if self.bh_izq():
-        #     tile_izq = self.get_tile_izq()
-        #     tile_izq.type = TileType.BLACK_HOLE
-        # if self.bh_der():
-        #     tile_der = self.get_tile_der()
-        #     tile_der.type = TileType.BLACK_HOLE
-           
+            self.mapvis.send_map(self.map)
+          
     def update_area_by_color(self, color):
         possibleAreas = {
             (1, TileType.BLUE): 2, #area 1, azul? area 2

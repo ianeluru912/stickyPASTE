@@ -395,26 +395,16 @@ class Tile:
         return False
     
     def set_area(self, area):
+        if self.isColorPassage(): return
         self.area = area
 
     def get_area(self):
         return self.area
     
-    # def get_color(self):
-    #     if self.isBlue:
-    #         return 'Blue'
-    #     elif self.isPurple:
-    #         return 'Purple'
-    #     elif self.isYellow:
-    #         return 'Yellow'
-    #     elif self.isGreen:
-    #         return 'Green'
-    #     elif self.isRed:
-    #         return 'Red'
-    #     elif self.isOrange:
-    #         return 'Orange'
-    #     else:
-    #         return None
+    def isColorPassage(self):
+        colored_types = [TileType.BLUE, TileType.YELLOW, TileType.GREEN, \
+                         TileType.PURPLE, TileType.ORANGE, TileType.RED]
+        return self.type in colored_types
     
     def isValid(self):
         #join self.north,self.west,self.east,self.south
