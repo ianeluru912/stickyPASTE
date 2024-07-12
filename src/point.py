@@ -19,3 +19,6 @@ class Point:
     def __str__(self) -> str:
         return f"({self.x:.3f}, {self.y:.3f})"
     
+    def subtract(self, point):
+        return Point(self.x - point.x, self.y - point.y)
+    
