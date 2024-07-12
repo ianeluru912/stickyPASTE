@@ -6,6 +6,7 @@ from piso import Piso
 from lidar import Lidar
 from rectangle import Rectangle
 from navigator import Navigator1, Navigator2
+from comm import Comm
 import math
 import utils
 import struct
@@ -13,15 +14,16 @@ import numpy as np
 
 from visualization import MapVisualizer
 
+
 TIME_STEP = 16
 MAX_VEL = 6.28
 
 class Robot:
     def __init__(self):
         self.robot = WebotsRobot()
-        self.emitter = self.robot.getDevice("emitter")
-        self.receiver = self.robot.getDevice("receiver")
-        self.receiver.enable(TIME_STEP)
+        receiver = self.robot.getDevice("receiver")
+        receiver.enable(TIME_STEP)
+        self.comm=Comm(self.robot.getDevice("emitter"), receiver,self)
         self.wheelL = self.robot.getDevice("wheel1 motor")
         self.wheelL.setPosition(float("inf"))
 
@@ -130,7 +132,7 @@ class Robot:
 
     def updateGameScoreAndTimes(self):
         if self.robot.getTime() - self.lastRequestTime > 1: #Defino acá cada cuánto quiero que me actualice los datos
-            self.gameScore, self.timeRemaining, self.realTimeRemaining = self.getGameScoreAndtimeRemaining()
+            self.gameScore, self.timeRemaining, self.realTimeRemaining = self.comm.getGameScoreAndtimeRemaining()
             self.lastRequestTime = self.robot.getTime()
 
     def updateTiles(self):
@@ -141,24 +143,43 @@ class Robot:
     def updateCamerasDetection(self):
         return self.enviar_mensaje_imgs()
 
-    def enviarMensaje(self, pos1, pos2, letra):
-        let = bytes(letra, 'utf-8')  
-        mensaje = struct.pack("i i c", pos1, pos2, let) 
-        self.emitter.send(mensaje)
-
     def enviarMensajeVoC(self, entrada):
         self.parar()
         self.delay(1500)
-        self.enviarMensaje(int(self.position.x * 100), int(self.position.y * 100), entrada)
+        self.comm.sendToken(int(self.position.x * 100), int(self.position.y * 100), entrada)
         self.delay(100)
 
     def convertir_camara(self, img, alto, ancho):  
             img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
             return img_a_convertir
     
+    def mappingVictim2(self, side, token): # side = "L" o "R" token = cartelito o víctima
+        # obtener la distancia del rayito 128 si es la L o 384 si es la R. Para calcular targetPoint, si es L, la rotación del 
+        # robot + pi/2, si es R, la rotación del robot - pi/2
+        if side == "L":
+            dist = self.lidar.rangeImage[128]
+            rot=self.rotation+math.pi/2
+        else:
+            dist = self.lidar.rangeImage[384]
+            rot=self.rotation-math.pi/2
+        # usando targetPoint, obtener el punto de la pared donde estaría el cartel.
+        targetPoint=utils.targetPoint(self.position, rot, dist)
+        # pedirle a map que me de el tile en esa posición
+        tileToTag=self.map.getTileAtPosition(targetPoint)
+        # print(tileToTag.col, tileToTag.row, token) # ES correcto el tile que calculó donde está la víctima????
+        # agregar en tile un método que dado un punto, me diga qué pared es (NL, NC, NR, SL, SC, SR, EU, EC, ED, WU, WC, WD, IN, IS, IE, IW)
+        tileToTag.setTokenOnAWall(targetPoint, token)
+    
     def mappingVictim(self, side, token): # side = "L" o "R" token = cartelito o víctima
         #TODO: falla en el mapeo cuando detecta una víctima estando en diagonal
+        # self.mappingVictim2(side, token)
+        umbralPared=0.01
+        umbralRotation=math.pi/10
+        if not utils.near_multiple(self.rotation, math.pi/2, umbralRotation):
+            return
+
         orientation=self.obtener_orientacion(self.rotation)
+        
         xRobot = self.position.x
         yRobot = self.position.y
         xRobotRel = abs(xRobot - self.posicion_inicial.x)
@@ -203,9 +224,9 @@ class Robot:
                     else: # estoy yendo para el sur
                         wall=tileToTag.tokensWest
                 yTtoTag=tileToTagPosition=self.map.gridToPosition(tileToTag.col, tileToTag.row).y 
-                if yRobot< yTtoTag-0.02: #Considero que estoy en la parte superior de la baldosa
+                if yRobot< yTtoTag-umbralPared: #Considero que estoy en la parte superior de la baldosa
                     wall[0]=token
-                elif yRobot> yTtoTag+0.02: # PArte inferior
+                elif yRobot> yTtoTag+umbralPared: # PArte inferior
                     wall[2]=token
                 else: # En el medio de la pared
                     wall[1]=token 
@@ -248,9 +269,9 @@ class Robot:
                     else: # estoy yendo para el oeste
                         wall=tileToTag.tokensNorth
                 xTtoTag=tileToTagPosition=self.map.gridToPosition(tileToTag.col, tileToTag.row).x 
-                if xRobot< xTtoTag-0.02: #Considero que estoy en la parte inferior de la baldosa
+                if xRobot< xTtoTag-umbralPared: #Considero que estoy en la parte inferior de la baldosa
                     wall[0]=token
-                elif xRobot> xTtoTag+0.02: # PArte superior
+                elif xRobot> xTtoTag+umbralPared: # PArte superior
                     wall[2]=token
                 else: # En el medio de la pared
                     wall[1]=token 
@@ -259,13 +280,13 @@ class Robot:
         if self.lidar.hayAlgoIzquierda():
             entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
             if entrada_I is not None:
-                self.mappingVictim("L", entrada_I)
+                self.mappingVictim2("L", entrada_I)
                 self.enviarMensajeVoC(entrada_I)
         
         if self.lidar.hayAlgoDerecha():
             entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
             if entrada_D is not None:
-                self.mappingVictim("R", entrada_D)
+                self.mappingVictim2("R", entrada_D)
                 self.enviarMensajeVoC(entrada_D)
     
     def updatePosition(self):
@@ -638,52 +659,7 @@ class Robot:
         bottom = self.position.y + diameter/2
         return Rectangle(top, left, bottom, right)
     
-    def sendMapToSupervisorAndExit(self, rep):
-        ## Get shape
-        s = rep.shape
-        ## Get shape as bytes
-        s_bytes = struct.pack('2i',*s)
-
-        ## Flattening the matrix and join with ','
-        flatMap = ','.join(rep.flatten())
-        ## Encode
-        sub_bytes = flatMap.encode('utf-8')
-
-        ## Add togeather, shape + map
-        a_bytes = s_bytes + sub_bytes
-
-        ## Send map data
-        self.emitter.send(a_bytes)
-
-        #STEP3 Send map evaluate request
-        map_evaluate_request = struct.pack('c', b'M')
-        self.send(map_evaluate_request)
-
-        #STEP4 Send an Exit message to get Map Bonus
-        ## Exit message
-        exit_mes = struct.pack('c', b'E')
-        self.send(exit_mes)
-
-    def getGameScoreAndtimeRemaining(self):
-
-        message = struct.pack('c', 'G'.encode()) # message = 'G' for game information
-        self.emitter.send(message) # send message
-        gs=None
-        tr=None
-        rtr=None
-        self.robot.step()
-        self.robot.step()
-
-        if self.receiver.getQueueLength() > 0: # If receiver queue is not empty
-            receivedData = self.receiver.getBytes()
-            lenReceivedData = len(receivedData)
-            if lenReceivedData==16: # If received data is of length 16
-                # De casualidad descubrimos que también devuelve el tiempo del mundo real restante
-                tup = struct.unpack('c f i i', receivedData) # Parse data into char, float, int, int
-                if tup[0].decode("utf-8") == 'G':
-                    gs=tup[1] #game score
-                    tr=tup[2] #time remaining
-                    rtr=tup[3] #real time remaining
-                    self.receiver.nextPacket() # Discard the current data packet
-            
-        return gs, tr, rtr
+    def exit(self, rep):
+       
+        self.comm.sendMap(rep)
+        self.comm.sendExit()
