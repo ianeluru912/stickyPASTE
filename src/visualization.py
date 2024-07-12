@@ -13,6 +13,10 @@ def to_json_dict(obj):
     if isinstance(obj, bool): return obj
     if isinstance(obj, float): return obj
     if isinstance(obj, Enum): return obj.value
+    if isinstance(obj, tuple):
+        return to_json_dict(list(obj))
+    if isinstance(obj, set):
+        return to_json_dict(list(obj))
 
     if isinstance(obj, list):
         result = []
