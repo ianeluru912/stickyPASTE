@@ -369,6 +369,7 @@ class Robot:
                     # print(f"angle: {angle}")
                     # print(f"target_point: {target_point}")
                     self.map.addObstacle(target_point)
+                    self.addBlockedPath(initPos, self.targetPoint)
                     goBack = True
                     break
             
@@ -393,6 +394,12 @@ class Robot:
         if goBack:
             dist = initPos.distance_to(self.position)
             self.avanzar(-dist)
+
+    def addBlockedPath(self, start, dest):
+        navigator = self.getNavigator()
+        start = start.subtract(self.posicion_inicial)
+        dest = dest.subtract(self.posicion_inicial)
+        navigator.addBlockedPath(start, dest)
     
     def bh_izq(self):
         # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa

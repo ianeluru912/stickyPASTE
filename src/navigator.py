@@ -5,6 +5,13 @@ from rectangle import Rectangle
 
 import math
 
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Movement:
+    start : tuple[int, int] 
+    dest : tuple[int, int]
+
 class Navigator:
 
     def whereToGo(self, robot):
@@ -38,6 +45,15 @@ class Navigator1(Navigator):
 class Navigator2(Navigator):
     def __init__(self):
         self.minitiles = {} # (c,r) -> visits
+        self.blockedPaths = set()
+
+    def addBlockedPath(self, start, dest):
+        start = self.positionToMiniGrid(start)
+        dest = self.positionToMiniGrid(dest)
+        movement = Movement(start, dest)
+        self.blockedPaths.add(movement)
+
+        print(self.blockedPaths)
 
     def positionToMiniGrid(self, pos): 
         # pos ya tiene que venir relativa a la posición inicial del robot
@@ -58,10 +74,17 @@ class Navigator2(Navigator):
         return result
     
     def removeObstructed(self, neighbours, robot):
+        start = self.positionToMiniGrid(robot.position.subtract(robot.posicion_inicial))
         result = []
         for minitile in neighbours:
-            if not self.isObstructed(minitile, robot):
-                result.append(minitile)
+            movement = Movement(start, minitile)
+            if movement not in self.blockedPaths:
+                if not self.isObstructed(minitile, robot):
+                    if len(self.blockedPaths) > 0:
+                        print(f"Movement is allowed: {movement}")
+                    result.append(minitile)
+            else:
+                print(f"Movement blocked! {movement}")
         return result
     
     def isObstructed(self, minitile, robot):
