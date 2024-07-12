@@ -58,8 +58,8 @@ class Robot:
         self.step_counter = 0
 
         self.navigators = {}
-        self.navigators[1] = Navigator1()
-        self.navigators[2] = Navigator2()
+        self.navigators[1] = Navigator1(self)
+        self.navigators[2] = Navigator2(self)
         self.navigators[3] = self.navigators[2]
         self.navigators[4] = self.navigators[2]
 
@@ -418,8 +418,6 @@ class Robot:
 
     def addBlockedPath(self, start, dest):
         navigator = self.getNavigator()
-        start = start.subtract(self.posicion_inicial)
-        dest = dest.subtract(self.posicion_inicial)
         navigator.addBlockedPath(start, dest)
     
     def bh_izq(self):

@@ -16,7 +16,7 @@ robot = Robot()
 
 while robot.step() != -1:
     navigator = robot.getNavigator()
-    point = navigator.whereToGo(robot)
+    point = navigator.whereToGo()
 
     robot.moveToPoint(point)
 

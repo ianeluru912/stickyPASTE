@@ -14,18 +14,32 @@ class Movement:
 
 class Navigator:
 
-    def whereToGo(self, robot):
-        return robot.position
+    def __init__(self, robot) -> None:
+        self._robot = robot
+        self.blockedPaths = set()
+
+    def addBlockedPath(self, start, dest):
+        raise NotImplementedError()
+
+    def whereToGo(self):
+        return self._robot.position
     
 class Navigator1(Navigator):
 
-    def whereToGo(self, robot):
-        tiles = self.checkNeighbours(robot)
+    def addBlockedPath(self, start, dest):
+        start_coords = self._robot.map.positionToGrid(start)
+        dest_coords = self._robot.map.positionToGrid(dest)
+        movement = Movement(start_coords, dest_coords)
+        self.blockedPaths.add(movement)
+
+    def whereToGo(self):
+        tiles = self.checkNeighbours()
         tiles.sort(key=lambda t: t.visits)
         tile = tiles[0]
-        return robot.map.gridToPosition(tile.col, tile.row)
+        return self._robot.map.gridToPosition(tile.col, tile.row)
     
-    def checkNeighbours(self, robot):
+    def checkNeighbours(self):
+        robot = self._robot
         orient = robot.obtener_orientacion(robot.rotation)
         col, row = robot.map.positionToGrid(robot.position)
         current_tile = robot.map.getTileAt(col, row)
@@ -36,30 +50,30 @@ class Navigator1(Navigator):
         tiles = []
         for c, r in tile_order[orient]:
             tile = robot.map.getTileAt(col + c, row + r)
+            movement = Movement((col, row), (tile.col, tile.row))
             if current_tile.isConnectedTo(tile) \
                 and not tile.type == TileType.BLACK_HOLE \
-                and not tile.hasObstacle():
+                and movement not in self.blockedPaths:
                 tiles.append(tile)
         return tiles
     
 class Navigator2(Navigator):
-    def __init__(self):
+    def __init__(self, robot):
+        super().__init__(robot)
         self.minitiles = {} # (c,r) -> visits
-        self.blockedPaths = set()
 
     def addBlockedPath(self, start, dest):
-        start = self.positionToMiniGrid(start)
-        dest = self.positionToMiniGrid(dest)
-        movement = Movement(start, dest)
+        start_coords = self.positionToMiniGrid(start)
+        dest_coords = self.positionToMiniGrid(dest)
+        movement = Movement(start_coords, dest_coords)
         self.blockedPaths.add(movement)
 
     def positionToMiniGrid(self, pos): 
-        # pos ya tiene que venir relativa a la posición inicial del robot
         half_width = Tile.WIDTH/2
         half_height = Tile.HEIGHT/2
 
-        columna = round(pos.x / half_width)
-        fila = round(pos.y / half_height)
+        columna = round((pos.x - self._robot.posicion_inicial.x) / half_width)
+        fila = round((pos.y - self._robot.posicion_inicial.y) / half_height)
         return (columna, fila)
 
     def getNeighbours(self, coords):
@@ -71,22 +85,22 @@ class Navigator2(Navigator):
             result.append((c + d[0], r + d[1]))
         return result
     
-    def removeObstructed(self, neighbours, robot):
-        start = self.positionToMiniGrid(robot.position.subtract(robot.posicion_inicial))
+    def removeObstructed(self, neighbours):
+        start = self.positionToMiniGrid(self._robot.position)
         result = []
         for minitile in neighbours:
             movement = Movement(start, minitile)
             if movement not in self.blockedPaths:
-                if not self.isObstructed(minitile, robot):
+                if not self.isObstructed(minitile):
                     result.append(minitile)
         return result
     
-    def isObstructed(self, minitile, robot):
-        minitile_pos = self.getPosition(minitile, robot)
+    def isObstructed(self, minitile):
+        minitile_pos = self.getPosition(minitile)
 
         rect = self.getRectangle(minitile_pos)
 
-        tiles = robot.map.getTilesIntersecting(rect)
+        tiles = self._robot.map.getTilesIntersecting(rect)
 
         for tile in tiles:
             if not tile.isOpenAt(minitile_pos):
@@ -94,19 +108,19 @@ class Navigator2(Navigator):
             if tile.type == TileType.BLACK_HOLE:
                 return True
             
-        for obstacle in robot.map.obstacles:
-            obstacle_rect = robot.map.getObstacleRectangle(obstacle)
+        for obstacle in self._robot.map.obstacles:
+            obstacle_rect = self._robot.map.getObstacleRectangle(obstacle)
             if obstacle_rect.intersects(rect):
                 return True
             
         return False
             
-    def getPosition(self, minitile, robot):
+    def getPosition(self, minitile):
         c = minitile[0]
         r = minitile[1]
 
-        x = c * Tile.WIDTH/2 + robot.posicion_inicial.x
-        y = r * Tile.HEIGHT/2 + robot.posicion_inicial.y
+        x = c * Tile.WIDTH/2 + self._robot.posicion_inicial.x
+        y = r * Tile.HEIGHT/2 + self._robot.posicion_inicial.y
         return Point(x, y)
 
     def getRectangle(self, minitile_pos):        
@@ -126,19 +140,16 @@ class Navigator2(Navigator):
         idx = int(round(rotation / -delta_angle)) % 8
         return neighbours[idx:] + neighbours[:idx]
 
-    def whereToGo(self, robot):
-        # 1) Encontrar la minitile en la que está el robot
-        x = robot.position.x - robot.posicion_inicial.x
-        y = robot.position.y - robot.posicion_inicial.y
-        minitile_coord = self.positionToMiniGrid(Point(x, y))
+    def whereToGo(self):
+        minitile_coord = self.positionToMiniGrid(self._robot.position)
         self.incrementVisits(minitile_coord)
         
         # 2) Calcular las minitiles vecinas
         neighbours = self.getNeighbours(minitile_coord)
-        neighbours = self.shiftByRotation(neighbours, robot.rotation)
+        neighbours = self.shiftByRotation(neighbours, self._robot.rotation)
 
         # 3) Eliminar las minitiles que tienen paredes
-        neighbours = self.removeObstructed(neighbours, robot)
+        neighbours = self.removeObstructed(neighbours)
         
         # 4) Elegimos una que tenga la menor cantidad de visitas
         # target = random.choice(neighbours) # TODO(Richo): No usar random!
@@ -146,4 +157,4 @@ class Navigator2(Navigator):
         target = neighbours[0]
 
         # 5) Devolvemos el punto central de esa minitile
-        return self.getPosition(target, robot)
+        return self.getPosition(target)

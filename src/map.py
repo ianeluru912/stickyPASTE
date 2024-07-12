@@ -106,8 +106,6 @@ class Map:
                         chars[1][1] = "A"
                     elif t.visits == 0:
                         chars[1][1] = "?"
-                    # elif t.hasObstacle:
-                    #     chars[1][1] = "O"
                     else:
                         chars[1][1] = " "
                     
@@ -204,14 +202,7 @@ class Tile:
     
     def __str__(self) -> str:
         return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"
-    
-    def hasObstacle(self):
-        for obstacle in self.__map.obstacles:
-            obstacle_rect = self.__map.getObstacleRectangle(obstacle)
-            if obstacle_rect.intersects(self.getRectangle()):
-                return True
-        return False
-    
+        
     def getRectangle(self):
         return self.__map.getTileRectangle(self.col, self.row)
 
