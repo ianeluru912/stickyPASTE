@@ -85,7 +85,7 @@ class Robot:
         self.realTimeRemaining=None
 
     def getNavigator(self):
-        return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
+        # return self.navigators[1] # TODO: Cambiar cuando anden los otros navigators 
         return self.navigators[self.current_area]
 
     def getTime(self):

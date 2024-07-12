@@ -1,4 +1,4 @@
-from map import Tile, TileType
+from map import Tile, TileType, Map
 from point import Point
 from piso import Piso
 from rectangle import Rectangle
@@ -19,15 +19,47 @@ class Navigator:
     
 class Navigator1(Navigator):
 
-    def whereToGo(self, robot):
-        tiles = self.checkNeighbours(robot)
-        tiles.sort(key=lambda t: t.visits)
-        tile = tiles[0]
-        return robot.map.gridToPosition(tile.col, tile.row)
+    def __init__(self):
+        self.blockedPaths = set()
+
+    def addBlockedPath(self, start, dest):
+        start, dest = self.positionToGrid(start, dest)
+        movement = Movement(start, dest)
+        self.blockedPaths.add(movement)
+
+    def positionToGrid(self, pos, origin):
+        columna = round((pos.x - origin.x) / Tile.WIDTH)
+        fila = round((pos.y - origin.y) / Tile.HEIGHT)
+        return (columna, fila)
+
+    def isObstructed(self, tile, robot):
+        tile_pos = robot.map.gridToPosition(tile.col, tile.row)
+        rect = robot.map.getTileRectangle(tile.col, tile.row)
+        if tile.type == TileType.BLACK_HOLE:
+            return True
+        if not tile.isOpenAt(tile_pos):
+            return True
+        for obstacle in robot.map.obstacles:
+            obstacle_rect = robot.map.getObstacleRectangle(obstacle)
+            if obstacle_rect.intersects(rect):
+                return True
+
+        return False
     
+    def removeObstructed(self, neighbours, robot):
+        start = self.positionToGrid(robot.position, robot.posicion_inicial)
+        result = []
+        for tile in neighbours:
+            movement = Movement(start, (tile.col, tile.row))
+            if movement not in self.blockedPaths:
+                if not self.isObstructed(tile, robot):
+                    result.append(tile)
+        return result
+
     def checkNeighbours(self, robot):
         orient = robot.obtener_orientacion(robot.rotation)
-        col, row = robot.map.positionToGrid(robot.position)
+        col, row = self.positionToGrid(robot.position, robot.posicion_inicial)
+        print(f'posicion actual: ({col}, {row})')
         current_tile = robot.map.getTileAt(col, row)
         tile_order = {"N": ((-1, 0), (0, -1), (1, 0), (0, 1)),
                       "E": ((0, -1), (1, 0), (0, 1), (-1, 0)),
@@ -41,6 +73,13 @@ class Navigator1(Navigator):
                 and not tile.hasObstacle():
                 tiles.append(tile)
         return tiles
+
+    def whereToGo(self, robot):
+        tiles = self.checkNeighbours(robot)
+        tiles = self.removeObstructed(tiles, robot)
+        tiles.sort(key=lambda t: t.visits)
+        tile = tiles[0]
+        return robot.map.gridToPosition(tile.col, tile.row)
     
 class Navigator2(Navigator):
     def __init__(self):
