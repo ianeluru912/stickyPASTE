@@ -86,7 +86,7 @@ class MapVisualizer:
     def send_robot(self, robot):        
         if self.connection == None: return
         try:
-            if robot.step_counter - self.lastRobotUpdate < 8:
+            if robot.step_counter - self.lastRobotUpdate < 16:
                 return
             self.lastRobotUpdate = robot.step_counter
             data = {
