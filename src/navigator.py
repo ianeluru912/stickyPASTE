@@ -53,8 +53,6 @@ class Navigator2(Navigator):
         movement = Movement(start, dest)
         self.blockedPaths.add(movement)
 
-        print(self.blockedPaths)
-
     def positionToMiniGrid(self, pos): 
         # pos ya tiene que venir relativa a la posición inicial del robot
         half_width = Tile.WIDTH/2
@@ -80,11 +78,7 @@ class Navigator2(Navigator):
             movement = Movement(start, minitile)
             if movement not in self.blockedPaths:
                 if not self.isObstructed(minitile, robot):
-                    if len(self.blockedPaths) > 0:
-                        print(f"Movement is allowed: {movement}")
                     result.append(minitile)
-            else:
-                print(f"Movement blocked! {movement}")
         return result
     
     def isObstructed(self, minitile, robot):
