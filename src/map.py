@@ -214,6 +214,18 @@ class Tile:
     
     def getRectangle(self):
         return self.__map.getTileRectangle(self.col, self.row)
+
+    def getNorthTile(self):
+        return self.__map.getTileAt(self.col, self.row - 1)
+    
+    def getEastTile(self):
+        return self.__map.getTileAt(self.col + 1, self.row)
+
+    def getSouthTile(self):
+        return self.__map.getTileAt(self.col, self.row + 1)
+
+    def getWestTile(self):
+        return self.__map.getTileAt(self.col - 1, self.row)
     
     def getRepresentation(self):
         # create a numpy array 5x5
