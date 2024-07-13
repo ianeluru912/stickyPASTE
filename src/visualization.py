@@ -13,6 +13,10 @@ def to_json_dict(obj):
     if isinstance(obj, bool): return obj
     if isinstance(obj, float): return obj
     if isinstance(obj, Enum): return obj.value
+    if isinstance(obj, tuple):
+        return to_json_dict(list(obj))
+    if isinstance(obj, set):
+        return to_json_dict(list(obj))
 
     if isinstance(obj, list):
         result = []
@@ -29,7 +33,11 @@ def to_json_dict(obj):
                 result[str(key)] = to_json_dict(obj[key])
         return result
     
-    return to_json_dict(obj.__dict__)
+    d = {}
+    for k, v in obj.__dict__.items():
+        if not k.startswith("_"):
+            d[k] = v
+    return to_json_dict(d)
 
 class JSON:
     @classmethod
@@ -43,7 +51,8 @@ class MapVisualizer:
         self.connection = None
         self.start()
 
-        self.previousMessage = None
+        self.previousMessage = {}
+        self.lastRobotUpdate = 0
 
     def start(self):
         self.thread = threading.Thread(target=self.accept_connections, args=(), daemon=True)
@@ -61,11 +70,59 @@ class MapVisualizer:
     def send_map(self, map):
         if self.connection == None: return
         try:
+            type = 0
             data = JSON.stringify(map).encode("utf8")
-            if data == self.previousMessage: return
-            self.previousMessage = data
+            if data == self.previousMessage.get(type): return
+            self.previousMessage[type] = data
+            type = type.to_bytes()
             count = len(data).to_bytes(4, "little")
-            self.connection.sendall(count + data)
+            self.connection.sendall(type + count + data)
+        except Exception:
+            print("Connection lost!")
+            print(traceback.format_exc())
+            self.connection.close()
+            self.connection = None
+            self.start()
+
+    def send_robot(self, robot):        
+        if self.connection == None: return
+        try:
+            if robot.step_counter - self.lastRobotUpdate < 4:
+                return
+            self.lastRobotUpdate = robot.step_counter
+            type = 1
+            data = {
+                "position": robot.position,
+                "rotation": robot.rotation,
+                "current_area": robot.current_area,
+                "targetPoint": robot.targetPoint,
+                "initial_position": robot.posicion_inicial
+            }
+            data = JSON.stringify(data).encode("utf8")
+            if data == self.previousMessage.get(type): return
+            self.previousMessage[type] = data
+            type = type.to_bytes()
+            count = len(data).to_bytes(4, "little")
+            self.connection.sendall(type + count + data)
+        except Exception:
+            print("Connection lost!")
+            print(traceback.format_exc())
+            self.connection.close()
+            self.connection = None
+            self.start()
+
+    
+    def send_minitiles(self, robot):
+        if self.connection == None: return
+        try:
+            type = 2
+            data = robot.navigators[2].minitiles
+            data = JSON.stringify(data).encode("utf8")
+            if data == self.previousMessage.get(type): return
+            self.previousMessage[type] = data
+            type = type.to_bytes()
+            count = len(data).to_bytes(4, "little")
+            self.connection.sendall(type + count + data)
         except Exception:
             print("Connection lost!")
             print(traceback.format_exc())

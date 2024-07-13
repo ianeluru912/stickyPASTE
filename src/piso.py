@@ -8,9 +8,9 @@ class Piso:
             and abs(self.greenValue - 135) < 15 \
             and abs(self.blueValue - 75) < 15
     def blackHole(self):
-        return abs(self.redValue) < 30 \
-            and abs(self.greenValue) < 30 \
-            and abs(self.blueValue) < 30
+        return abs(self.redValue) < 35 \
+            and abs(self.greenValue) < 35 \
+            and abs(self.blueValue) < 35
     def green(self):
         return abs(self.redValue - 25) < 15 \
             and abs(self.greenValue - 227) < 15 \
@@ -34,15 +34,18 @@ class Piso:
             and abs(self.greenValue - 47) < 15 \
             and abs(self.blueValue - 188) < 15
 
-    def del_suelo(self):
+    def estandar(self):
         return abs(self.redValue - 195) < 2 \
             and abs(self.greenValue - 195) < 2 \
             and abs(self.blueValue - 195) < 2
 
     def checkpoint(self):
-        return abs(self.redValue - 70) < 15 \
-            and abs(self.greenValue - 75) < 15 \
-            and abs(self.blueValue - 90) < 15
+        # return abs(self.redValue - 70) < 15 \
+        #     and abs(self.greenValue - 75) < 15 \
+        #     and abs(self.blueValue - 90) < 15
+        return abs(self.redValue - 42) < 15 \
+            and abs(self.greenValue - 47) < 15 \
+            and abs(self.blueValue - 64) < 15
     
     def orange(self):
         return abs(self.redValue - 234) < 15 \

@@ -3,31 +3,41 @@ from point import Point
 import cv2
 from math import pi as PI
 from map import TileType
+from piso import Piso
 
 robot = Robot()
 
-robot.step()
-inicio=robot.map.getTileAt(0, 0)
-inicio.set_area(1)
-inicio.type=TileType.STARTING
+# robot.moveToPoint(Point(robot.position.x-0.28, robot.position.y))
+# robot.moveToPoint(Point(robot.position.x, robot.position.y+0.02))
+# b,g,r,_=robot.colorSensor.getImage()
+# print(r,g,b)
+# robot.parar()
+# robot.delay(10000)
+
+# robot.moveToPoint(Point(robot.position.x+0.36, robot.position.y))
+# robot.moveToPoint(Point(robot.position.x, robot.position.y+0.24))
+
+
 while robot.step() != -1:
-    print("Loop")
-    # 0. Actualizar mapa
-    robot.updateMap() 
+    navigator = robot.getNavigator()
+    point = navigator.whereToGo()
 
-    # 1. Dame baldosas vecinas candidatas a donde puedo moverme
-    tiles = robot.checkNeighbours()
-    
-    # 2. Elegir una baldosa de las candidatas
-    tiles.sort(key=lambda t: t.visits)
-    tile = tiles[0]
+    robot.moveToPoint(point)
 
-    # 3. Mover robot a baldosa elegida
-    robot.moveToTile(tile)
-
-    # print all tiles that are valids
-    # for t in robot.map.tiles.values():
-    #     print(t.col,t.row, t.isValid())
-
-    # 4. Repetir
-    
+    # if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
+    #     # print(robot.map.getTileAt(0,1))
+    #     # print(robot.map.getTileAt(1,2))
+    #     rep=robot.map.getRepresentation()
+    #     robot.comm.sendMap(rep)
+    #     # print(rep)
+    #     robot.comm.sendExit()
+    # # for tiles in robot.map.getValidTiles():
+    # #     print(tiles)
+    # # print("############################################################")
+    # # valid_tiles = robot.map.getValidTiles()
+    # for tile in valid_tiles:
+    #     print(tile.col, tile.row)
+    #     print(tile.tokensWest)
+    #     print(tile.tokensVerticalInternalWall)
+    #     print(tile.tokensEast)
+    #     print("------")
