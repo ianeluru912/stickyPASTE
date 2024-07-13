@@ -24,7 +24,7 @@ while robot.step() != -1:
 
     robot.moveToPoint(point)
 
-    # if robot.timeRemaining < 300 or robot.realTimeRemaining < 300:
+    # if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
     #     # print(robot.map.getTileAt(0,1))
     #     # print(robot.map.getTileAt(1,2))
     #     rep=robot.map.getRepresentation()
@@ -33,8 +33,8 @@ while robot.step() != -1:
     #     robot.comm.sendExit()
     # # for tiles in robot.map.getValidTiles():
     # #     print(tiles)
-    # print("############################################################")
-    # valid_tiles = robot.map.getValidTiles()
+    # # print("############################################################")
+    # # valid_tiles = robot.map.getValidTiles()
     # for tile in valid_tiles:
     #     print(tile.col, tile.row)
     #     print(tile.tokensWest)
