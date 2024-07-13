@@ -30,7 +30,7 @@ class ImageProcessor:
 
         
         gris = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
+        _, thresh = cv2.threshold(gris, 160, 255, cv2.THRESH_BINARY)
         paraMostrarDespues=thresh.copy()
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(contours) == 0:
@@ -89,8 +89,8 @@ class ImageProcessor:
                     oriPoints= utils.sortCw(oriPoints)
                     dstPoints= utils.sortCw(dstPoints)
                     
-                    # minXPoint = oriPoints[0]
-                    # maxXPoint = oriPoints[1]
+                    minXPoint = oriPoints[0]
+                    maxXPoint = oriPoints[1]
                     # print("Llegué a calcular los puntos")
                     M = cv2.getPerspectiveTransform(oriPoints, dstPoints)
                     thresh = cv2.warpPerspective(thresh, M, (64, 64))
@@ -99,11 +99,11 @@ class ImageProcessor:
 
                     # print("Quedó de ", len(contours), len(contours[0]))
                     recorte=2 # cantidad de pixels que recorto de cada lado para sacar bordes negros
-                    # print("MinXPoint: ",minXPoint)
-                    # print("MaxXPoint: ",maxXPoint)
+                    print("MinXPoint: ",minXPoint)
+                    print("MaxXPoint: ",maxXPoint)
             else:
                 pass
-                # print("Encontró una letra copada sin tener que transformarla")
+                print("Encontró una letra copada sin tener que transformarla")
 
             if len(contours) == 1 and len(contours[0]) <=40:    
                 
@@ -162,13 +162,13 @@ class ImageProcessor:
                         self.salida = 'U'
                     elif pixeles_negros_abajo >= 1 and pixeles_negros_arriba >= 1:
                         return self.salida
-                    # print("Pixeles")
-                    # print(pixeles_negros_arriba, pixeles_negros_central, pixeles_negros_abajo)
-                    # print(self.salida)
+                    print("Pixeles")
+                    print(pixeles_negros_arriba, pixeles_negros_central, pixeles_negros_abajo)
+                    print(self.salida)
                     # Descomentar para ver si hay falsos positivos
-                    # self.debugShow(self.img)
-                    # self.debugShow(paraMostrarDespues)
-                    # self.debugShow(rect)
+                    self.debugShow(self.img)
+                    self.debugShow(paraMostrarDespues)
+                    self.debugShow(rect)
             return self.salida
         
     def reconocer_limpiar_cartel(self):

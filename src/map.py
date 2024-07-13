@@ -259,11 +259,11 @@ class Tile:
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles ACAACA
         # Agregar paredes internas
-        # * * * * * 
-        # * * * * * 
-        # * * * * * 
-        # * * * * * 
-        # * * * * * 
+  
+        # si es area 4, hacer todos * y retornarlo
+        if self.area == 4:
+            return np.full((5,5), "*")
+            return rep
         
 
         rep=np.full((5,5), None)
