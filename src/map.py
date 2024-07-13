@@ -269,26 +269,42 @@ class Tile:
         west_reversed = self.west.copy()
         west_reversed.reverse()
 
+        if self.col==0 and self.row==-1:
+            print("Estoy analizando la baldosa 0,-1")
+            print(self.__map.existTileAt(self.col-1, self.row))
+            tile=self.__map.getTileAt(self.col-1, self.row)
+            print(tile.isValid())
 
-        if not(self.__map.existTileAt(self.col, self.row-1)): 
-            northWall=['1','1','1','1','1']
-        else:
+        if self.__map.getTileAt(self.col, self.row-1).isValid():
             northWall=self.getWallRepresentation(self.north)
-
-        if not(self.__map.existTileAt(self.col+1, self.row)): 
-            eastWall=['1','1','1','1','1']
         else:
+            northWall=['1','1','1','1','1']
+
+        if self.__map.getTileAt(self.col+1, self.row).isValid():
             eastWall=self.getWallRepresentation(self.east)
-
-        if not(self.__map.existTileAt(self.col, self.row+1)):
-            southWall=['1','1','1','1','1']
         else:
+            eastWall=['1','1','1','1','1']
+
+        if self.__map.getTileAt(self.col, self.row+1).isValid():
             southWall=self.getWallRepresentation(south_reversed)
-
-        if not(self.__map.existTileAt(self.col-1, self.row)):
-            westWall=['1','1','1','1','1']
         else:
+            southWall=['1','1','1','1','1']
+
+        if self.__map.getTileAt(self.col-1, self.row).isValid():
             westWall=self.getWallRepresentation(west_reversed)
+        else:
+            westWall=['1','1','1','1','1']
+
+
+        # if not(self.__map.existTileAt(self.col, self.row+1)):
+        #     southWall=['1','1','1','1','1']
+        # else:
+        #     southWall=self.getWallRepresentation(south_reversed)
+
+        # if not(self.__map.existTileAt(self.col-1, self.row)):
+        #     westWall=['1','1','1','1','1']
+        # else:
+        #     westWall=self.getWallRepresentation(west_reversed)
 
         rep[0,0:5]=self.combinesWall(rep[0,0:5], northWall)
         rep[0:5,4]=self.combinesWall(rep[0:5,4], eastWall)
