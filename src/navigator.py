@@ -143,6 +143,8 @@ class Navigator2(Navigator):
     def whereToGo(self):
         minitile_coord = self.positionToMiniGrid(self._robot.position)
         self.incrementVisits(minitile_coord)
+
+        self._robot.mapvis.send_minitiles(self._robot)
         
         # 2) Calcular las minitiles vecinas
         neighbours = self.getNeighbours(minitile_coord)
@@ -152,9 +154,9 @@ class Navigator2(Navigator):
         neighbours = self.removeObstructed(neighbours)
         
         # 4) Elegimos una que tenga la menor cantidad de visitas
-        # target = random.choice(neighbours) # TODO(Richo): No usar random!
         neighbours.sort(key=lambda minitile: self.minitiles.get(minitile, 0))
         target = neighbours[0]
+
 
         # 5) Devolvemos el punto central de esa minitile
         return self.getPosition(target)
