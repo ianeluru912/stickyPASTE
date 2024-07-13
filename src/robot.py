@@ -137,6 +137,7 @@ class Robot:
 
     def updateTiles(self):
         tile=self.getTilePointedByColorSensor()
+        
         if not(tile is None) and tile.type is None:
             self.classifyTile(tile)
             
@@ -570,6 +571,11 @@ class Robot:
         # print(tile.type)
         b, g, r, _ = self.colorSensor.getImage()
         m = Piso(r, g, b)
+        if tile.col==8 and tile.row==2:
+            print(f"Tile en ({tile.col}, {tile.row})")
+            print(f"Color: {r}, {g}, {b}")
+            print(utils.targetPoint(self.position, self.rotation, 0.083))
+
         
         if tile.type is None:
             if m.blackHole():

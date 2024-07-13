@@ -198,19 +198,10 @@ class Map:
                     repre[i, j] = '0'
         return repre
 
-        
+    def existTileAt(self, col, row):
+        return (col, row) in self.tiles      
 
-
-        # detectar la fila mínima y máxima de los tiles válidos
-
-        # crear un array de numpy con las dimensiones correspondientes (columna máxima - columna mínima + 1, fila máxima - fila mínima + 1)
-
-        # para cada tile en los tiles válidos
-        # obtener la columna y fila del tile
-        # obtener la representación del tile
-        # insertar la representación en el array de numpy en la posición correspondiente 
-
-        # retornar el array de numpy
+  
 class Tile:
     WIDTH = 0.12  
     HEIGHT = 0.12
@@ -255,6 +246,8 @@ class Tile:
     def getWestTile(self):
         return self.__map.getTileAt(self.col - 1, self.row)
     
+
+    
     def getRepresentation(self):
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles ACAACA
@@ -276,10 +269,31 @@ class Tile:
         west_reversed = self.west.copy()
         west_reversed.reverse()
 
-        rep[0,0:5]=self.combinesWall(rep[0,0:5], self.getWallRepresentation(self.north))
-        rep[0:5,4]=self.combinesWall(rep[0:5,4],self.getWallRepresentation(self.east))
-        rep[4,0:5]=self.combinesWall(rep[4,0:5], self.getWallRepresentation(south_reversed))
-        rep[0:5,0]=self.combinesWall(rep[0:5,0],self.getWallRepresentation(west_reversed))
+
+        if not(self.__map.existTileAt(self.col, self.row-1)): 
+            northWall=['1','1','1','1','1']
+        else:
+            northWall=self.getWallRepresentation(self.north)
+
+        if not(self.__map.existTileAt(self.col+1, self.row)): 
+            eastWall=['1','1','1','1','1']
+        else:
+            eastWall=self.getWallRepresentation(self.east)
+
+        if not(self.__map.existTileAt(self.col, self.row+1)):
+            southWall=['1','1','1','1','1']
+        else:
+            southWall=self.getWallRepresentation(south_reversed)
+
+        if not(self.__map.existTileAt(self.col-1, self.row)):
+            westWall=['1','1','1','1','1']
+        else:
+            westWall=self.getWallRepresentation(west_reversed)
+
+        rep[0,0:5]=self.combinesWall(rep[0,0:5], northWall)
+        rep[0:5,4]=self.combinesWall(rep[0:5,4], eastWall)
+        rep[4,0:5]=self.combinesWall(rep[4,0:5], southWall)
+        rep[0:5,0]=self.combinesWall(rep[0:5,0], westWall)
 
 
         # TODO:Agregar las paredes internas
