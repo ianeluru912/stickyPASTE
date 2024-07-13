@@ -3531,8 +3531,8 @@
             zPos 10
             floor TRUE
             topWall 0
-            rightWall 1
-            bottomWall 0
+            rightWall 3
+            bottomWall 3
             leftWall 0
             tile1Walls [ 0, 0, 0, 0 ]
             tile2Walls [ 0, 0, 0, 0 ]
@@ -3562,7 +3562,7 @@
             zPos 11
             floor TRUE
             topWall 0
-            rightWall 3
+            rightWall 6
             bottomWall 3
             leftWall 0
             tile1Walls [ 0, 0, 0, 0 ]
@@ -3751,8 +3751,8 @@
             children [
               
         DEF OBSTACLE0 Solid {
-            translation -0.35331 0 -0.72775
-			rotation 0 1 0 5.729
+            translation -0.38026 0 -0.7234999999999999
+			rotation 0 1 0 6.188
             children [
                 Shape {
                     appearance Appearance {
@@ -3761,7 +3761,7 @@
 						}
                     }
                     geometry DEF OBSTACLEBOX0 Box {
-						size 0.059478733294008004 0.06 0.038324543825192514
+						size 0.02767088375671799 0.06 0.04315251986175815
                     }
                 }
             ]
@@ -3773,8 +3773,8 @@
         }
         
         DEF OBSTACLE1 Solid {
-            translation 0.13526 0 -0.26269
-			rotation 0 1 0 2.096
+            translation 0.12183 0 -0.246
+			rotation 0 1 0 3.498
             children [
                 Shape {
                     appearance Appearance {
@@ -3783,7 +3783,7 @@
 						}
                     }
                     geometry DEF OBSTACLEBOX1 Box {
-						size 0.04499294944676013 0.06 0.039247385126661496
+						size 0.051573740824354244 0.06 0.05344045857781853
                     }
                 }
             ]
@@ -3795,8 +3795,8 @@
         }
         
         DEF OBSTACLE2 Solid {
-            translation 0.21659000000000012 0 -0.46568
-			rotation 0 1 0 1.453
+            translation 0.2416000000000001 0 -0.49401999999999996
+			rotation 0 1 0 5.348
             children [
                 Shape {
                     appearance Appearance {
@@ -3805,7 +3805,7 @@
 						}
                     }
                     geometry DEF OBSTACLEBOX2 Box {
-						size 0.04199541183842793 0.06 0.031711960711457834
+						size 0.05021992853346803 0.06 0.029182789125377407
                     }
                 }
             ]
@@ -3817,8 +3817,8 @@
         }
         
         DEF OBSTACLE3 Solid {
-            translation 0.4855099999999999 0 0.1273500000000001
-			rotation 0 1 0 4.509
+            translation 0.4498799999999999 0 0.14005000000000012
+			rotation 0 1 0 1.793
             children [
                 Shape {
                     appearance Appearance {
@@ -3827,7 +3827,7 @@
 						}
                     }
                     geometry DEF OBSTACLEBOX3 Box {
-						size 0.03867199783111518 0.06 0.05455122061818016
+						size 0.035347840902972154 0.06 0.039343971087943796
                     }
                 }
             ]
@@ -3845,7 +3845,7 @@
             children [
               
         Victim {
-            translation -0.352 0 -0.05500000000000001
+            translation -0.39 0 -0.054400000000000004
             rotation 0 1 0 3.14
             name "Victim0"
             type "stable"
@@ -3853,7 +3853,7 @@
         }
         
         Victim {
-            translation -0.185 0 0.6000000000000001
+            translation -0.1856 0 0.5700000000000001
             rotation 0 1 0 1.57
             name "Victim1"
             type "unharmed"
@@ -3861,7 +3861,7 @@
         }
         
         Victim {
-            translation -0.06499999999999999 0 -0.268
+            translation -0.06499999999999999 0 -0.247
             rotation 0 1 0 1.57
             name "Victim2"
             type "harmed"
@@ -3869,7 +3869,7 @@
         }
         
         Victim {
-            translation -0.054999999999999896 0 0.3889999999999999
+            translation -0.05439999999999989 0 0.3899999999999999
             rotation 0 1 0 -1.57
             name "Victim3"
             type "harmed"
@@ -3877,7 +3877,7 @@
         }
         
         Victim {
-            translation 0.06499999999999999 0 -0.08699999999999988
+            translation 0.06559999999999999 0 -0.08999999999999989
             rotation 0 1 0 -1.57
             name "Victim4"
             type "harmed"
@@ -3885,7 +3885,7 @@
         }
         
         Victim {
-            translation 0.47999999999999987 0 -0.775
+            translation 0.5099999999999999 0 -0.7744
             rotation 0 1 0 3.14
             name "Victim5"
             type "stable"
@@ -3893,7 +3893,7 @@
         }
         
         Victim {
-            translation 0.47999999999999987 0 -0.06499999999999988
+            translation 0.44999999999999984 0 -0.06559999999999988
             rotation 0 1 0 0
             name "Victim6"
             type "harmed"
@@ -3901,7 +3901,7 @@
         }
         
         Victim {
-            translation 0.5349999999999999 0 0.24
+            translation 0.5343999999999999 0 0.27
             rotation 0 1 0 1.57
             name "Victim7"
             type "unharmed"
@@ -3923,7 +3923,7 @@
         }
         
         HazardMap {
-            translation -0.02799999999999989 0 -0.4256
+            translation 0.03000000000000011 0 -0.4256
             rotation 0 1 0 0
             name "Hazard1"
             type "P"
@@ -3931,7 +3931,7 @@
         }
         
         HazardMap {
-            translation 0.12 0 0.5456000000000001
+            translation 0.15 0 0.5456000000000001
             rotation 0 1 0 3.14
             name "Hazard2"
             type "F"
@@ -3939,7 +3939,7 @@
         }
         
         HazardMap {
-            translation 0.365 0 0.30559999999999987
+            translation 0.39 0 0.30559999999999987
             rotation 0 1 0 3.14
             name "Hazard3"
             type "C"

@@ -1741,8 +1741,8 @@
             children [
               
         DEF OBSTACLE0 Solid {
-            translation -0.35935 0 -0.18170999999999998
-			rotation 0 1 0 4.061
+            translation -0.34936999999999996 0 -0.18852
+			rotation 0 1 0 6.0200000000000005
             children [
                 Shape {
                     appearance Appearance {
@@ -1751,7 +1751,7 @@
 						}
                     }
                     geometry DEF OBSTACLEBOX0 Box {
-						size 0.053779355056498016 0.06 0.05437325800354001
+						size 0.03480245143969644 0.06 0.05634419491599035
                     }
                 }
             ]
@@ -1801,7 +1801,7 @@
         }
         
         Victim {
-            translation 0.254 0 -0.12499999999999999
+            translation 0.252 0 -0.12499999999999999
             rotation 0 1 0 0
             name "Victim4"
             type "stable"
@@ -1823,7 +1823,7 @@
         }
         
         HazardMap {
-            translation -0.054400000000000004 0 -0.028999999999999998
+            translation -0.054400000000000004 0 -0.051
             rotation 0 1 0 -1.57
             name "Hazard1"
             type "P"
