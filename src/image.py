@@ -154,7 +154,7 @@ class ImageProcessor:
                     pixeles_negros_arriba = np.count_nonzero(cuadritoArriba == 0)
                     pixeles_negros_abajo = np.count_nonzero(cuadritoAbajo == 0)
 
-                    if pixeles_negros_abajo <= 3 and pixeles_negros_arriba <= 6 and pixeles_negros_central >= 35:
+                    if pixeles_negros_abajo <= 3 and pixeles_negros_arriba <= 6 and pixeles_negros_central >= 30: #ACAACA decía 35 lo relajamos
                         self.salida = 'H'
                     elif pixeles_negros_abajo >= 13 and pixeles_negros_arriba >= 13:
                         self.salida = 'S'
@@ -162,13 +162,13 @@ class ImageProcessor:
                         self.salida = 'U'
                     elif pixeles_negros_abajo >= 1 and pixeles_negros_arriba >= 1:
                         return self.salida
-                    # print("Pixeles")
-                    # print(pixeles_negros_arriba, pixeles_negros_central, pixeles_negros_abajo)
-                    # print(self.salida)
-                    # # Descomentar para ver si hay falsos positivos
-                    # self.debugShow(self.img)
-                    # self.debugShow(paraMostrarDespues)
-                    # self.debugShow(rect)
+                    print("Pixeles")
+                    print(pixeles_negros_arriba, pixeles_negros_central, pixeles_negros_abajo)
+                    print(self.salida)
+                    # Descomentar para ver si hay falsos positivos
+                    self.debugShow(self.img)
+                    self.debugShow(paraMostrarDespues)
+                    self.debugShow(rect)
             return self.salida
         
     def reconocer_limpiar_cartel(self):
