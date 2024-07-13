@@ -135,7 +135,7 @@ class Map:
         # None<*<0,1<letra
         for i in range(5):
             for j in range(5):
-                print(i,j)
+                # print(i,j)
                 # Si lo que viene es un None, no lo pongo.
                 if tileAUbicar[i, j] == None:
                     # print("Caso 1")
