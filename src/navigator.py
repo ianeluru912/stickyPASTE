@@ -2,6 +2,7 @@ from map import Tile, TileType
 from point import Point
 from piso import Piso
 from rectangle import Rectangle
+import utils
 
 import math
 
@@ -76,7 +77,15 @@ class Navigator2(Navigator):
         fila = round((pos.y - self._robot.posicion_inicial.y) / half_height)
         return (columna, fila)
 
-    def getNeighbours(self, coords):
+    def getNeighbours1(self, coords):
+        result = []
+        c = coords[0]
+        r = coords[1]
+        for d in [(-2, 0), (0, -2), (2, 0), (0, 2)]:
+            result.append((c + d[0], r + d[1]))
+        return result
+    
+    def getNeighbours2(self, coords):
         result = []
         c = coords[0]
         r = coords[1]
@@ -85,7 +94,34 @@ class Navigator2(Navigator):
             result.append((c + d[0], r + d[1]))
         return result
     
-    def removeObstructed(self, neighbours):
+    def removeObstructed1(self, neighbours):
+        robot = self._robot
+        if self.getRotationIdx(robot.rotation, 8) % 2 != 0: 
+            return []
+        
+        valid_x = utils.near_multiple(robot.position.x - robot.posicion_inicial.x, 0.12, 0.0025)
+        valid_y = utils.near_multiple(robot.position.y - robot.posicion_inicial.y, 0.12, 0.0025)
+        if not (valid_x and valid_y):
+            return []
+        
+        start = self.positionToMiniGrid(robot.position)
+        col, row = robot.map.positionToGrid(robot.position)
+        current_tile = robot.map.getTileAt(col, row)
+        tiles = []
+        for minitile in neighbours:
+            pos = self.getPosition(minitile)
+            tile = robot.map.getTileAtPosition(pos)
+            movement = Movement(start, minitile)
+            inbetween = (minitile[0] + start[0]) / 2, (minitile[1] + start[1]) / 2
+            if current_tile.isConnectedTo(tile) \
+                    and not tile.type == TileType.BLACK_HOLE \
+                    and movement not in self.blockedPaths \
+                    and not self.isObstructed(minitile) \
+                    and not self.isObstructed(inbetween):
+                tiles.append(minitile)
+        return tiles
+    
+    def removeObstructed2(self, neighbours):
         start = self.positionToMiniGrid(self._robot.position)
         result = []
         for minitile in neighbours:
@@ -135,10 +171,13 @@ class Navigator2(Navigator):
         previous_value = self.minitiles.get(minitile, 0)
         self.minitiles[minitile] = previous_value + 1
 
+    def getRotationIdx(self, rotation, count):
+        delta_angle = (math.pi*2)/count
+        return int(round(rotation / -delta_angle)) % count
+
     def shiftByRotation(self, neighbours, rotation):
-        delta_angle = (math.pi*2)/8
-        idx = int(round(rotation / -delta_angle)) % 8
-        return neighbours[idx:] + neighbours[:idx]
+        rotation_idx = self.getRotationIdx(rotation, len(neighbours))
+        return neighbours[rotation_idx:] + neighbours[:rotation_idx]
 
     def whereToGo(self):
         minitile_coord = self.positionToMiniGrid(self._robot.position)
@@ -147,16 +186,34 @@ class Navigator2(Navigator):
         self._robot.mapvis.send_minitiles(self._robot)
         
         # 2) Calcular las minitiles vecinas
-        neighbours = self.getNeighbours(minitile_coord)
-        neighbours = self.shiftByRotation(neighbours, self._robot.rotation)
+        neighbours1 = self.getNeighbours1(minitile_coord)
+        neighbours1 = self.shiftByRotation(neighbours1, self._robot.rotation)
+        neighbours2 = self.getNeighbours2(minitile_coord)
+        neighbours2 = self.shiftByRotation(neighbours2, self._robot.rotation)
 
         # 3) Eliminar las minitiles que tienen paredes
-        neighbours = self.removeObstructed(neighbours)
-        
+        neighbours1 = self.removeObstructed1(neighbours1)
+        neighbours2 = self.removeObstructed2(neighbours2)
+                
         # 4) Elegimos una que tenga la menor cantidad de visitas
-        neighbours.sort(key=lambda minitile: self.minitiles.get(minitile, 0))
-        target = neighbours[0]
+        currentTile = self._robot.map.getTileAtPosition(self._robot.position)
+        if not currentTile.isColorPassage():
+            neighbours1.sort(key=lambda minitile: self.minitiles.get(minitile, 0))
+            neighbours2.sort(key=lambda minitile: self.minitiles.get(minitile, 0))
+        target1 = neighbours1[0] if len(neighbours1) > 0 else None
+        target2 = neighbours2[0] if len(neighbours2) > 0 else None
+        print(f"T1: {target1}, T2: {target2}")
 
+        target = None
+        if target1 == None:
+            target = target2
+            print("TARGET1 es None")
+        elif self.minitiles.get(target1, 0) <= self.minitiles.get(target2, 0):
+            target = target1
+            print("TARGET1 tiene menos visitas")
+        else:
+            target = target2
+            print("TARGET1 tiene más visitas")
 
         # 5) Devolvemos el punto central de esa minitile
         return self.getPosition(target)

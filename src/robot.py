@@ -85,7 +85,7 @@ class Robot:
         self.realTimeRemaining=None
 
     def getNavigator(self):
-        # return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
+        return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
         return self.navigators[self.current_area]
 
     def getTime(self):
@@ -593,8 +593,8 @@ class Robot:
             elif m.estandar():
                 tile.type = TileType.STANDARD
 
-            if tile.type is not None:
-                print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
+            # if tile.type is not None:
+            #     print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
 
             self.mapvis.send_map(self.map)
           
