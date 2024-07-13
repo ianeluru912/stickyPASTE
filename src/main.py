@@ -19,22 +19,23 @@ robot = Robot()
 
 
 while robot.step() != -1:
+    # b,g,r,_=robot.colorSensor.getImage()
+    # print(r,g,b)
     navigator = robot.getNavigator()
     point = navigator.whereToGo()
 
     robot.moveToPoint(point)
 
-    # if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
-    #     # print(robot.map.getTileAt(0,1))
-    #     # print(robot.map.getTileAt(1,2))
-    #     rep=robot.map.getRepresentation()
-    #     robot.comm.sendMap(rep)
-    #     # print(rep)
-    #     robot.comm.sendExit()
+    if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
+        rep=robot.map.getRepresentation()
+        robot.comm.sendMap(rep)
+        # print(rep)
+        robot.comm.sendExit()
+    
     # # for tiles in robot.map.getValidTiles():
-    # #     print(tiles)
-    # # print("############################################################")
-    # # valid_tiles = robot.map.getValidTiles()
+    #     print(tiles)
+    # print("############################################################")
+    # valid_tiles = robot.map.getValidTiles()
     # for tile in valid_tiles:
     #     print(tile.col, tile.row)
     #     print(tile.tokensWest)
