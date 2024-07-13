@@ -57,7 +57,11 @@ class Robot:
 
         self.step_counter = 0
 
-        self.navigators = {1: Navigator1(), 2: Navigator2()}
+        self.navigators = {}
+        self.navigators[1] = Navigator1(self)
+        self.navigators[2] = Navigator2(self)
+        self.navigators[3] = self.navigators[2]
+        self.navigators[4] = self.navigators[2]
 
         # self.holeIZ = self.imageProcessor.see_hole()
         # self.holeDER = self.imageProcessor.see_hole()
@@ -299,7 +303,8 @@ class Robot:
 
                 if not self.doingLOP:
                     if currentTile.get_area() is None:
-                        currentTile.set_area(self.current_area)
+                        if not currentTile.isColorPassage():
+                            currentTile.set_area(self.current_area)
                         # print(f"Tile en ({tile.col}, {tile.row}) marcada en area {tile.area}")
                     else:
                         self.current_area = currentTile.get_area()
@@ -386,6 +391,7 @@ class Robot:
                     # print(f"angle: {angle}")
                     # print(f"target_point: {target_point}")
                     self.map.addObstacle(target_point)
+                    self.addBlockedPath(initPos, self.targetPoint)
                     goBack = True
                     break
             
@@ -410,6 +416,10 @@ class Robot:
         if goBack:
             dist = initPos.distance_to(self.position)
             self.avanzar(-dist)
+
+    def addBlockedPath(self, start, dest):
+        navigator = self.getNavigator()
+        navigator.addBlockedPath(start, dest)
     
     def bh_izq(self):
         # TODO(Richo): Este código asume navegación de centro de baldosa a centro de baldosa
@@ -555,8 +565,6 @@ class Robot:
 
     def updateMap1(self, tile):
         self.lidar.updateWalls1(self.rotation, self.map, tile)
-        # self.classifyNeighboursTile()
-
 
     def classifyTile(self, tile):
         # print(tile.type)
@@ -588,18 +596,8 @@ class Robot:
             # if tile.type is not None:
             #     print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
 
-
-        
-    def classifyNeighboursTile(self):
-        tile_ahead=self.get_tile_ahead()
-        self.classifyTile(tile_ahead)
-        # if self.bh_izq():
-        #     tile_izq = self.get_tile_izq()
-        #     tile_izq.type = TileType.BLACK_HOLE
-        # if self.bh_der():
-        #     tile_der = self.get_tile_der()
-        #     tile_der.type = TileType.BLACK_HOLE
-           
+            self.mapvis.send_map(self.map)
+          
     def update_area_by_color(self, color):
         possibleAreas = {
             (1, TileType.BLUE): 2, #area 1, azul? area 2

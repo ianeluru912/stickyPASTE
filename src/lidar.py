@@ -149,10 +149,10 @@ class Lidar:
         self.setWall(tile.west, 1, 0)
         self.setWall(tile.west, 2, walls[18])
 
-        north_tile = map.getTileAt(tile.col, tile.row - 1)
-        east_tile = map.getTileAt(tile.col + 1, tile.row)
-        west_tile = map.getTileAt(tile.col - 1, tile.row)
-        south_tile = map.getTileAt(tile.col, tile.row + 1)
+        north_tile = tile.getNorthTile()
+        east_tile = tile.getEastTile()
+        west_tile = tile.getWestTile()
+        south_tile = tile.getSouthTile()
 
         self.setWall(north_tile.west, 0, walls[0])
 
@@ -186,11 +186,11 @@ class Lidar:
 
         self.setWall(west_tile.north, 2, walls[19])
 
-        self.fixNeighbours(map, tile)
-        self.fixNeighbours(map,north_tile)
-        self.fixNeighbours(map,south_tile)
-        self.fixNeighbours(map,east_tile)
-        self.fixNeighbours(map,west_tile)
+        self.fixNeighbours(tile)
+        self.fixNeighbours(north_tile)
+        self.fixNeighbours(south_tile)
+        self.fixNeighbours(east_tile)
+        self.fixNeighbours(west_tile)
     
     def get_walls_2(self, rotation):
         shift = self.rotToLidar(rotation)
@@ -268,8 +268,8 @@ class Lidar:
         self.setWall(south_tile.west, 1, walls[13])
         self.setWall(south_tile.west, 2, walls[14])
 
-        self.fixNeighbours(map, north_tile)
-        self.fixNeighbours(map, south_tile)
+        self.fixNeighbours(north_tile)
+        self.fixNeighbours(south_tile)
         
     def get_walls_3(self, rotation):
         shift = self.rotToLidar(rotation)
@@ -348,8 +348,8 @@ class Lidar:
 
         east_tile.west = [0, 0, 0]
 
-        self.fixNeighbours(map, west_tile)
-        self.fixNeighbours(map, east_tile)
+        self.fixNeighbours(west_tile)
+        self.fixNeighbours(east_tile)
     
     def get_walls_4(self, rotation):
         # print(self.ver_walls(rotation))
@@ -501,10 +501,10 @@ class Lidar:
         self.setWall(se_tile.west, 1, walls[32])
         self.setWall(se_tile.west, 2, 0)
 
-        self.fixNeighbours(map, nw_tile)
-        self.fixNeighbours(map, ne_tile)
-        self.fixNeighbours(map, sw_tile)
-        self.fixNeighbours(map, se_tile)
+        self.fixNeighbours(nw_tile)
+        self.fixNeighbours(ne_tile)
+        self.fixNeighbours(sw_tile)
+        self.fixNeighbours(se_tile)
 
     def setWall(self, tile_wall, idx, value):
         if value < 0: return 
@@ -517,28 +517,23 @@ class Lidar:
             
         tile_wall[idx] = value 
 
-    def fixNeighbours(self, map, tile):
-        north_tile = map.getTileAt(tile.col, tile.row - 1)
-        east_tile = map.getTileAt(tile.col + 1, tile.row)
-        west_tile = map.getTileAt(tile.col - 1, tile.row)
-        south_tile = map.getTileAt(tile.col, tile.row + 1)
-
+    def fixNeighbours(self, tile):
         if tile.north[0] != -1:
-            north_tile.south[2] = tile.north[0]
+            tile.getNorthTile().south[2] = tile.north[0]
         if tile.north[2] != -1:
-            north_tile.south[0] = tile.north[2]
+            tile.getNorthTile().south[0] = tile.north[2]
         if tile.east[0] != -1:
-            east_tile.west[2] = tile.east[0]
+            tile.getEastTile().west[2] = tile.east[0]
         if tile.east[2] != -1:
-            east_tile.west[0] = tile.east[2]
+            tile.getEastTile().west[0] = tile.east[2]
         if tile.west[0] != -1:
-            west_tile.east[2] = tile.west[0]
+            tile.getWestTile().east[2] = tile.west[0]
         if tile.west[2] != -1:
-            west_tile.east[0] = tile.west[2]
+            tile.getWestTile().east[0] = tile.west[2]
         if tile.south[0] != -1:
-            south_tile.north[2] = tile.south[0]
+            tile.getSouthTile().north[2] = tile.south[0]
         if tile.south[2] != -1:
-            south_tile.north[0] = tile.south[2]
+            tile.getSouthTile().north[0] = tile.south[2]
 
     def rotToLidar(self, rot):
         #Cuánto girar los rayos para tomar referencia norte
@@ -551,21 +546,15 @@ class Lidar:
     def hayAlgoDerecha(self):
         rightDist = self.rangeImage[128*3]
         return rightDist < 0.08
-    
-    def is_obstacle_preventing_passage(self):
-        rays = self.rangeImage[224:288]
-        not_available_rays = filter(lambda x: x < 0.05, rays)
-        if len(list(not_available_rays)) >= 1:
-            print('obstacle is not allowing passage')
-            return True
-        return False
 
     def getNearestObstacle(self):
         threshold = 0.05
         min_dist = math.inf
         min_ray = None
-        # TODO: Verificar rango porque puede ser muy amplio!
-        for ray_idx in range(196, 316):
+        # Si achicamos el offset corremos el riesgo de quedarnos trabados por un 
+        # obstáculo, mejor ser conservador...
+        offset = 60
+        for ray_idx in range(256-offset, 257+offset):
             dist = self.rangeImage[ray_idx]
             if dist < threshold and dist < min_dist:
                 min_dist = dist

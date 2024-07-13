@@ -106,8 +106,6 @@ class Map:
                         chars[1][1] = "A"
                     elif t.visits == 0:
                         chars[1][1] = "?"
-                    # elif t.hasObstacle:
-                    #     chars[1][1] = "O"
                     else:
                         chars[1][1] = " "
                     
@@ -241,16 +239,21 @@ class Tile:
     
     def __str__(self) -> str:
         return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"
-    
-    def hasObstacle(self):
-        for obstacle in self.__map.obstacles:
-            obstacle_rect = self.__map.getObstacleRectangle(obstacle)
-            if obstacle_rect.intersects(self.getRectangle()):
-                return True
-        return False
-    
+        
     def getRectangle(self):
         return self.__map.getTileRectangle(self.col, self.row)
+
+    def getNorthTile(self):
+        return self.__map.getTileAt(self.col, self.row - 1)
+    
+    def getEastTile(self):
+        return self.__map.getTileAt(self.col + 1, self.row)
+
+    def getSouthTile(self):
+        return self.__map.getTileAt(self.col, self.row + 1)
+
+    def getWestTile(self):
+        return self.__map.getTileAt(self.col - 1, self.row)
     
     def getRepresentation(self):
         # create a numpy array 5x5
@@ -429,26 +432,16 @@ class Tile:
         return False
     
     def set_area(self, area):
+        if self.isColorPassage(): return
         self.area = area
 
     def get_area(self):
         return self.area
     
-    # def get_color(self):
-    #     if self.isBlue:
-    #         return 'Blue'
-    #     elif self.isPurple:
-    #         return 'Purple'
-    #     elif self.isYellow:
-    #         return 'Yellow'
-    #     elif self.isGreen:
-    #         return 'Green'
-    #     elif self.isRed:
-    #         return 'Red'
-    #     elif self.isOrange:
-    #         return 'Orange'
-    #     else:
-    #         return None
+    def isColorPassage(self):
+        colored_types = [TileType.BLUE, TileType.YELLOW, TileType.GREEN, \
+                         TileType.PURPLE, TileType.ORANGE, TileType.RED]
+        return self.type in colored_types
     
     def isValid(self):
         #join self.north,self.west,self.east,self.south
