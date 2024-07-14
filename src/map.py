@@ -129,9 +129,31 @@ class Map:
         return salida
     
     def combineTiles(self, tileMapa, tileAUbicar):
+        # en cada casilla del mapa que recibe tengo 1, 0, o una letra
+        # None<*<0,1<letra
         for i in range(5):
             for j in range(5):
-                if tileAUbicar[i, j] != None:
+                # print(i,j)
+                # Si lo que viene es un None, no lo pongo.
+                if tileAUbicar[i, j] == None:
+                    # print("Caso 1")
+                    # No hace nada
+                    continue
+
+                # Sino, si lo que recibe es un None, pongo lo que venga
+                elif tileMapa[i, j] == None:
+                    # print("Caso 2")
+                    tileMapa[i, j] = tileAUbicar[i, j]
+ 
+                # Sino, si lo que tenía es un * pongo lo que venga (porque sé que no es un None)
+                elif tileMapa[i, j] == "*":
+                    # print("Caso 3")
+                    tileMapa[i, j] = tileAUbicar[i, j]
+                
+                # Sino, si lo que tenía es un 0 o un 1, y lo que viene es una letra, pongo la letra
+                elif (tileMapa[i, j] == "0" or tileMapa[i, j] == "1") and (tileAUbicar[i, j] != "0" and \
+                    tileAUbicar[i, j] != "1" and tileAUbicar[i, j] != "*"):
+                    # print("Caso 4")
                     tileMapa[i, j] = tileAUbicar[i, j]
                 
     
@@ -147,9 +169,10 @@ class Map:
 
         totCol=(colmax-colmin+1)*4+1
         totRow=(rowmax-rowmin+1)*4+1
-        repre=np.full((totRow, totCol), '0')
+        repre=np.full((totRow, totCol), None)
 
         for tile in valid_tiles:
+
             # Calcula la columna donde tiene que poner el tile dentro de la representación
             col=(tile.col-colmin)*4
             # Calcula la fila donde tiene que poner el tile dentro de la representación
@@ -157,23 +180,28 @@ class Map:
             # Obtiene la representación del tile
             rep=tile.getRepresentation()
             # Combinar lo que ya había en la representación con lo que acabo de obtener.
+            # if tile.col==1 and tile.row==1:
+            #     print(f"Col: {tile.col}, Row: {tile.row}")
+            #     print("Tile")
+            #     print(rep)
+            #     print("El que recibe el tile")
+            #     print(repre[row:row+5, col:col+5])
+            #     print("====")
             self.combineTiles(repre[row:row+5, col:col+5], rep)
+            # if tile.col==1 and tile.row==1:
+            #     print("Como quedó después de la combineta")
+            #     print(repre[row:row+5, col:col+5])
         
+        for i in range(totRow):
+            for j in range(totCol):
+                if repre[i, j] == None:
+                    repre[i, j] = '0'
         return repre
 
-        
+    def existTileAt(self, col, row):
+        return (col, row) in self.tiles      
 
-
-        # detectar la fila mínima y máxima de los tiles válidos
-
-        # crear un array de numpy con las dimensiones correspondientes (columna máxima - columna mínima + 1, fila máxima - fila mínima + 1)
-
-        # para cada tile en los tiles válidos
-        # obtener la columna y fila del tile
-        # obtener la representación del tile
-        # insertar la representación en el array de numpy en la posición correspondiente 
-
-        # retornar el array de numpy
+  
 class Tile:
     WIDTH = 0.12  
     HEIGHT = 0.12
@@ -218,15 +246,17 @@ class Tile:
     def getWestTile(self):
         return self.__map.getTileAt(self.col - 1, self.row)
     
+
+    
     def getRepresentation(self):
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles ACAACA
         # Agregar paredes internas
-        # * * * * * 
-        # * * * * * 
-        # * * * * * 
-        # * * * * * 
-        # * * * * * 
+  
+        # si es area 4, hacer todos * y retornarlo
+        if self.area == 4:
+            return np.full((5,5), "*")
+            return rep
         
 
         rep=np.full((5,5), None)
@@ -239,10 +269,47 @@ class Tile:
         west_reversed = self.west.copy()
         west_reversed.reverse()
 
-        rep[0,0:5]=self.combinesWall(rep[0,0:5], self.getWallRepresentation(self.north))
-        rep[0:5,4]=self.combinesWall(rep[0:5,4],self.getWallRepresentation(self.east))
-        rep[4,0:5]=self.combinesWall(rep[4,0:5], self.getWallRepresentation(south_reversed))
-        rep[0:5,0]=self.combinesWall(rep[0:5,0],self.getWallRepresentation(west_reversed))
+        if self.col==0 and self.row==-1:
+            print("Estoy analizando la baldosa 0,-1")
+            print(self.__map.existTileAt(self.col-1, self.row))
+            tile=self.__map.getTileAt(self.col-1, self.row)
+            print(tile.isValid())
+
+        if self.__map.getTileAt(self.col, self.row-1).isValid():
+            northWall=self.getWallRepresentation(self.north)
+        else:
+            northWall=['1','1','1','1','1']
+
+        if self.__map.getTileAt(self.col+1, self.row).isValid():
+            eastWall=self.getWallRepresentation(self.east)
+        else:
+            eastWall=['1','1','1','1','1']
+
+        if self.__map.getTileAt(self.col, self.row+1).isValid():
+            southWall=self.getWallRepresentation(south_reversed)
+        else:
+            southWall=['1','1','1','1','1']
+
+        if self.__map.getTileAt(self.col-1, self.row).isValid():
+            westWall=self.getWallRepresentation(west_reversed)
+        else:
+            westWall=['1','1','1','1','1']
+
+
+        # if not(self.__map.existTileAt(self.col, self.row+1)):
+        #     southWall=['1','1','1','1','1']
+        # else:
+        #     southWall=self.getWallRepresentation(south_reversed)
+
+        # if not(self.__map.existTileAt(self.col-1, self.row)):
+        #     westWall=['1','1','1','1','1']
+        # else:
+        #     westWall=self.getWallRepresentation(west_reversed)
+
+        rep[0,0:5]=self.combinesWall(rep[0,0:5], northWall)
+        rep[0:5,4]=self.combinesWall(rep[0:5,4], eastWall)
+        rep[4,0:5]=self.combinesWall(rep[4,0:5], southWall)
+        rep[0:5,0]=self.combinesWall(rep[0:5,0], westWall)
 
 
         # TODO:Agregar las paredes internas
@@ -447,8 +514,8 @@ class Tile:
                 return self.north[1] <= 0 and self.east[1] <= 0 and self.south[1] <= 0 and self.west[1] <= 0
 
     def setTokenOnAWall(self, point, token):
-        print(token)
-        print(self.col, self.row)
+        # print(token)
+        # print(self.col, self.row)
         center = self.__map.gridToPosition(self.col, self.row)
         umbralChico = 0.02
         umbralGrande = 0.05
@@ -456,57 +523,57 @@ class Tile:
         dify=center.y-point.y
         if difx > umbralChico and difx<umbralGrande:
             if dify> umbralGrande:
-                print("Norte Izquierda")
+                # print("Norte Izquierda")
                 self.tokensNorth[0]=token
             elif dify<-umbralGrande:
-                print("Sur Izquierda")
+                # print("Sur Izquierda")
                 self.tokensSouth[0]=token
             else:
-                print("Interna izquierda")
+                # print("Interna izquierda")
                 self.tokensHorizontalInternalWall[0]=token
 
         elif difx>umbralGrande:
             if dify>umbralChico:
-                print("Oeste Arriba")
+                # print("Oeste Arriba")
                 self.tokensWest[0]=token
             elif dify<-umbralChico:
-                print("Oeste Abajo")
+                # print("Oeste Abajo")
                 self.tokensWest[2]=token
             else:
-                print("Oeste Medio")
+                # print("Oeste Medio")
                 self.tokensWest[1]=token
         elif difx<=umbralChico and difx>=-umbralChico:
             if dify>umbralGrande:
-                print("Norte Medio")
+                # print("Norte Medio")
                 self.tokensNorth[1]=token
             elif dify>=umbralChico and dify<=umbralGrande:
-                print("Interna Arriba")
+                # print("Interna Arriba")
                 self.tokensVerticalInternalWall[0]=token
             elif dify<=-umbralChico and dify>=-umbralGrande:
-                print("Interna Abajo")
+                # print("Interna Abajo")
                 self.tokensVerticalInternalWall[1]=token
             else:
-                print("Sur Medio")
+                # print("Sur Medio")
                 self.tokensSouth[1]=token
         elif difx<-umbralChico and difx>-umbralGrande:
             if dify>umbralGrande:
-                print("Norte derecha")
+                # print("Norte derecha")
                 self.tokensNorth[2]=token
             elif dify<-umbralGrande:
-                print("Sur Derecha")
+                # print("Sur Derecha")
                 self.tokensSouth[2]=token
             else:
-                print("Interna derecha")
+                # print("Interna derecha")
                 self.tokensHorizontalInternalWall[1]=token
         else:
             if dify>umbralChico:
-                print("Este Arriba")
+                # print("Este Arriba")
                 self.tokensEast[0]=token
             elif dify<-umbralChico:
-                print("Este Abajo")
+                # print("Este Abajo")
                 self.tokensEast[2]=token
             else:
-                print("Este Medio")
+                # print("Este Medio")
                 self.tokensEast[1]=token
             
 

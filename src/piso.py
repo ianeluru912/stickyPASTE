@@ -43,9 +43,15 @@ class Piso:
         # return abs(self.redValue - 70) < 15 \
         #     and abs(self.greenValue - 75) < 15 \
         #     and abs(self.blueValue - 90) < 15
-        return abs(self.redValue - 42) < 15 \
-            and abs(self.greenValue - 47) < 15 \
-            and abs(self.blueValue - 64) < 15
+        # return (abs(self.redValue - 42) < 20 \
+        #     and abs(self.greenValue - 47) < 20 \
+        #     and abs(self.blueValue - 64) < 20) or (abs(self.redValue - 73) < 5 \
+        #                                            and abs(self.greenValue - 78) < 5 \
+        #                                             and abs(self.blueValue - 94) < 5)
+        difRedGreen=abs(self.redValue-self.greenValue)
+        difRedBlue=abs(self.redValue-self.blueValue)
+        if abs(difRedGreen-5)<4 and (difRedBlue-21)<4:
+            return True
     
     def orange(self):
         return abs(self.redValue - 234) < 15 \
