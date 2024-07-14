@@ -162,13 +162,13 @@ class ImageProcessor:
                         self.salida = 'U'
                     elif pixeles_negros_abajo >= 1 and pixeles_negros_arriba >= 1:
                         return self.salida
-                    print("Pixeles")
-                    print(pixeles_negros_arriba, pixeles_negros_central, pixeles_negros_abajo)
-                    print(self.salida)
-                    # Descomentar para ver si hay falsos positivos
-                    self.debugShow(self.img)
-                    self.debugShow(paraMostrarDespues)
-                    self.debugShow(rect)
+                    # print("Pixeles")
+                    # print(pixeles_negros_arriba, pixeles_negros_central, pixeles_negros_abajo)
+                    # print(self.salida)
+                    # # Descomentar para ver si hay falsos positivos
+                    # self.debugShow(self.img)
+                    # self.debugShow(paraMostrarDespues)
+                    # self.debugShow(rect)
             return self.salida
         
     def reconocer_limpiar_cartel(self):
