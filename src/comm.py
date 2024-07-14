@@ -22,6 +22,9 @@ class Comm:
         self.robot.robot.step()
 
         if self.receiver.getQueueLength() > 0: # If receiver queue is not empty
+            # recorro hasta quedarme sólo con el último
+            while self.receiver.getQueueLength() > 1:
+                self.receiver.nextPacket()
             receivedData = self.receiver.getBytes()
             lenReceivedData = len(receivedData)
             if lenReceivedData==16: # If received data is of length 16
@@ -31,7 +34,7 @@ class Comm:
                     gs=tup[1] #game score
                     tr=tup[2] #time remaining
                     rtr=tup[3] #real time remaining
-                    self.receiver.nextPacket() # Discard the current data packet
+            self.receiver.nextPacket() # Discard the current data packet
             
         return gs, tr, rtr
 
