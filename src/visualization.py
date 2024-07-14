@@ -116,7 +116,7 @@ class MapVisualizer:
         if self.connection == None: return
         try:
             type = 2
-            data = robot.navigators[2].minitiles
+            data = robot.navigator.minitiles
             data = JSON.stringify(data).encode("utf8")
             if data == self.previousMessage.get(type): return
             self.previousMessage[type] = data

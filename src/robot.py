@@ -5,7 +5,7 @@ from point import Point
 from piso import Piso
 from lidar import Lidar
 from rectangle import Rectangle
-from navigator import Navigator1, Navigator2
+from navigator import Navigator
 from comm import Comm
 import math
 import utils
@@ -57,11 +57,7 @@ class Robot:
 
         self.step_counter = 0
 
-        self.navigators = {}
-        self.navigators[1] = Navigator1(self)
-        self.navigators[2] = Navigator2(self)
-        self.navigators[3] = self.navigators[2]
-        self.navigators[4] = self.navigators[2]
+        self.navigator = Navigator(self)
 
         # self.holeIZ = self.imageProcessor.see_hole()
         # self.holeDER = self.imageProcessor.see_hole()
@@ -85,8 +81,7 @@ class Robot:
         self.realTimeRemaining=None
 
     def getNavigator(self):
-        return self.navigators[2] # TODO: Cambiar cuando anden los otros navigators 
-        return self.navigators[self.current_area]
+        return self.navigator
 
     def getTime(self):
         return self.robot.getTime()
