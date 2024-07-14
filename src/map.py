@@ -128,8 +128,8 @@ class Map:
         salida=[tile for tile in self.tiles.values() if tile.isValid()]
         return salida
     
-    def combineTiles(self, tileMapa, tileAUbicar):
-        # en cada casilla del mapa que recibe tengo 1, 0, o una letra
+    def combineTilesReg(self, tileMapa, tileAUbicar):
+        # en cada casilla del mapa que recibe tengo 1, 0, una letra o un *
         # None<*<0,1<letra
         for i in range(5):
             for j in range(5):
@@ -155,7 +155,31 @@ class Map:
                     tileAUbicar[i, j] != "1" and tileAUbicar[i, j] != "*"):
                     # print("Caso 4")
                     tileMapa[i, j] = tileAUbicar[i, j]
+
+    def combineTilesReal(self, tileMapa, tileAUbicar):
+        # en cada casilla del mapa que recibe tengo 1, 0, una letra o un *
+        # None<*<0,1<letra
+        for i in range(5):
+            for j in range(5):
+                # print(i,j)
+                # Si lo que viene es un None O LO QUE TENGO ES UN ASTERISCO, no lo pongo.
+                if tileAUbicar[i, j] == None or tileMapa[i, j] == "*":
+                    # print("Caso 1")
+                    # No hace nada
+                    continue
+
+                # Sino, si lo que recibe es un None, pongo lo que venga
+                elif tileMapa[i, j] == None or tileAUbicar[i, j] == "*":
+                    # print("Caso 2")
+                    tileMapa[i, j] = tileAUbicar[i, j]
+ 
+                # Sino, si lo que tenía es un 0 o un 1, y lo que viene es una letra, pongo la letra
+                elif (tileMapa[i, j] == "0" or tileMapa[i, j] == "1") and (tileAUbicar[i, j] != "0" and \
+                    tileAUbicar[i, j] != "1"):
+                    # print("Caso 4")
+                    tileMapa[i, j] = tileAUbicar[i, j]
                 
+                # Si teníamos un 0 o un 1, y viene un 0 o un 1, debería ser coherente. No hacemos nada
     
     def getRepresentation(self):
         # obtener tiles validos
@@ -187,7 +211,9 @@ class Map:
             #     print("El que recibe el tile")
             #     print(repre[row:row+5, col:col+5])
             #     print("====")
-            self.combineTiles(repre[row:row+5, col:col+5], rep)
+
+            # ACAACA CAMBIAR POR COMBINETILESREG SI EL ASTERISCO ES LO QUE MENOS PESA (COMO MUESTRA EL EJEMPLO DEL REGLAMENTO)
+            self.combineTilesReal(repre[row:row+5, col:col+5], rep)
             # if tile.col==1 and tile.row==1:
             #     print("Como quedó después de la combineta")
             #     print(repre[row:row+5, col:col+5])
@@ -195,7 +221,7 @@ class Map:
         for i in range(totRow):
             for j in range(totCol):
                 if repre[i, j] == None:
-                    repre[i, j] = '0'
+                    repre[i, j] = '0' #ACAACA Conviene poner 0 o *?????
         return repre
 
     def existTileAt(self, col, row):
@@ -250,13 +276,13 @@ class Tile:
     
     def getRepresentation(self):
         # create a numpy array 5x5
-        # Agregar en la tile las víctimas y carteles ACAACA
+        # Agregar en la tile las víctimas y carteles 
         # Agregar paredes internas
   
         # si es area 4, hacer todos * y retornarlo
         if self.area == 4:
             return np.full((5,5), "*")
-            return rep
+           
         
 
         rep=np.full((5,5), None)
@@ -269,11 +295,11 @@ class Tile:
         west_reversed = self.west.copy()
         west_reversed.reverse()
 
-        if self.col==0 and self.row==-1:
-            print("Estoy analizando la baldosa 0,-1")
-            print(self.__map.existTileAt(self.col-1, self.row))
-            tile=self.__map.getTileAt(self.col-1, self.row)
-            print(tile.isValid())
+        # if self.col==0 and self.row==-1:
+        #     print("Estoy analizando la baldosa 0,-1")
+        #     print(self.__map.existTileAt(self.col-1, self.row))
+        #     tile=self.__map.getTileAt(self.col-1, self.row)
+        #     print(tile.isValid())
 
         if self.__map.getTileAt(self.col, self.row-1).isValid():
             northWall=self.getWallRepresentation(self.north)

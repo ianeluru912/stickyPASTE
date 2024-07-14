@@ -74,7 +74,7 @@ class MapVisualizer:
             data = JSON.stringify(map).encode("utf8")
             if data == self.previousMessage.get(type): return
             self.previousMessage[type] = data
-            type = type.to_bytes()
+            type = type.to_bytes(1, byteorder="little")
             count = len(data).to_bytes(4, "little")
             self.connection.sendall(type + count + data)
         except Exception:
@@ -101,7 +101,7 @@ class MapVisualizer:
             data = JSON.stringify(data).encode("utf8")
             if data == self.previousMessage.get(type): return
             self.previousMessage[type] = data
-            type = type.to_bytes()
+            type = type.to_bytes(1,byteorder="little")
             count = len(data).to_bytes(4, "little")
             self.connection.sendall(type + count + data)
         except Exception:
@@ -120,7 +120,7 @@ class MapVisualizer:
             data = JSON.stringify(data).encode("utf8")
             if data == self.previousMessage.get(type): return
             self.previousMessage[type] = data
-            type = type.to_bytes()
+            type = type.to_bytes(1, byteorder="little")
             count = len(data).to_bytes(4, "little")
             self.connection.sendall(type + count + data)
         except Exception:

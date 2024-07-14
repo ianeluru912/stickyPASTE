@@ -126,8 +126,13 @@ class Robot:
                 self.updateMap()
 
     def updateGameScoreAndTimes(self):
+
         if self.robot.getTime() - self.lastRequestTime > 1: #Defino acá cada cuánto quiero que me actualice los datos
-            self.gameScore, self.timeRemaining, self.realTimeRemaining = self.comm.getGameScoreAndtimeRemaining()
+            auxGameScore, auxTimeRemaining, auxRealTimeRemaining = self.comm.getGameScoreAndtimeRemaining()
+            if auxGameScore is not None:
+                self.gameScore = auxGameScore
+                self.timeRemaining = auxTimeRemaining
+                self.realTimeRemaining = auxRealTimeRemaining
             self.lastRequestTime = self.robot.getTime()
 
     def updateTiles(self):
