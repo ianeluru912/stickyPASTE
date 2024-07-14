@@ -421,6 +421,12 @@ class Tile:
         if not(self.tokensHorizontalInternalWall[1]==0):
             rep[2,3]=self.tokensHorizontalInternalWall[1]
         
+        #Si es un black hole no me importa si detectó paredes internas o lo que sea, el formato es siempre el mismo.
+        if self.type==TileType.BLACK_HOLE:
+            rep[1,1:4]=['2','0','2']
+            rep[2,1:4]=['0','0','0']
+            rep[3,1:4]=['2','0','2']	
+        
         for fil in range(1,rep.shape[0]-1):
                 for colum in range(1,rep.shape[1]-1):
                     if rep[fil, colum] is None:
