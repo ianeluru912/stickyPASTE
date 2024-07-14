@@ -42,7 +42,7 @@ class Navigator:
         tiles = self._robot.map.getTilesIntersecting(rect)
 
         for tile in tiles:
-            if tile.type == TileType.BLACK_HOLE or not tile.isOpenAt(minitile_pos):
+            if tile.dangerous or tile.type == TileType.BLACK_HOLE or not tile.isOpenAt(minitile_pos):
                 self.obstructed.add(minitile)
                 return True
             
