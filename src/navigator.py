@@ -3,6 +3,7 @@ from point import Point
 from rectangle import Rectangle
 from collections import deque 
 from dataclasses import dataclass
+import time
 
 @dataclass(frozen=True)
 class Movement:
@@ -141,7 +142,10 @@ class Navigator:
         self._robot.mapvis.send_minitiles(self._robot)
         
         print("-------")
+        begin_time = time.time()
         path = self.findPath()
+        end_time = time.time()
+        print(f"Elapsed time: {(end_time - begin_time) * 1000} ms")
         target = path[1] if len(path) > 1 else path[0]
         print(f"Actual target: {target}")
 

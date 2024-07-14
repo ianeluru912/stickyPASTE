@@ -19,14 +19,15 @@ robot = Robot()
 
 
 while robot.step() != -1:
-    # b,g,r,_=robot.colorSensor.getImage()
-    # print(r,g,b)
     navigator = robot.getNavigator()
     point = navigator.whereToGo()
 
-    robot.moveToPoint(point)
-
-    if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
+    sendMapNow = robot.position.distance_to(point) < 0.025
+    
+    if not sendMapNow:
+        robot.moveToPoint(point)
+    
+    if sendMapNow or robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
         rep=robot.map.getRepresentation()
         robot.comm.sendMap(rep)
         # print(rep)
