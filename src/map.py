@@ -253,6 +253,7 @@ class Tile:
 
         self.type=None
         self.area = None
+        self.dangerous=False
     
     def __str__(self) -> str:
         return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"
@@ -272,17 +273,30 @@ class Tile:
     def getWestTile(self):
         return self.__map.getTileAt(self.col - 1, self.row)
     
-
+    def isNVOrA4OrAN(self):
+        return not(self.isValid()) or self.area==4 or self.area==None
     
+    def oneOrMoreNeighborsAreArea4(self):
+        return self.getNorthTile().area==4 or self.getEastTile().area==4 or self.getSouthTile().area==4 or self.getWestTile().area==4
+
     def getRepresentation(self):
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles 
         # Agregar paredes internas
+
+        if self.col==5 and self.row==4:
+            print("Yo",self.area)            
+            print("N",self.getNorthTile().isNVOrA4OrAN())
+            print("E",self.getEastTile().isNVOrA4OrAN())
+            print("S",self.getSouthTile().isNVOrA4OrAN())
+            print("O", self.getWestTile().isNVOrA4OrAN())
   
         # si es area 4, hacer todos * y retornarlo
         if self.area == 4:
             return np.full((5,5), "*")
-           
+        
+        if self.area == None and self.oneOrMoreNeighborsAreArea4() and self.getNorthTile().isNVOrA4OrAN() and self.getEastTile().isNVOrA4OrAN() and self.getSouthTile().isNVOrA4OrAN() and self.getWestTile().isNVOrA4OrAN():
+            return np.full((5,5), "*")
         
 
         rep=np.full((5,5), None)
@@ -407,6 +421,12 @@ class Tile:
             rep[2,1]=self.tokensHorizontalInternalWall[0]
         if not(self.tokensHorizontalInternalWall[1]==0):
             rep[2,3]=self.tokensHorizontalInternalWall[1]
+        
+        #Si es un black hole no me importa si detectó paredes internas o lo que sea, el formato es siempre el mismo.
+        if self.type==TileType.BLACK_HOLE:
+            rep[1,1:4]=['2','0','2']
+            rep[2,1:4]=['0','0','0']
+            rep[3,1:4]=['2','0','2']	
         
         for fil in range(1,rep.shape[0]-1):
                 for colum in range(1,rep.shape[1]-1):
