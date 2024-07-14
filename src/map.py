@@ -253,6 +253,7 @@ class Tile:
 
         self.type=None
         self.area = None
+        self.dangerous=False
     
     def __str__(self) -> str:
         return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"

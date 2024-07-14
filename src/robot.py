@@ -320,6 +320,8 @@ class Robot:
                 # print("LOP")
                 self.doingLOP = True
                 self.current_area = currentTile.get_area()
+                tileDangerous=self.map.getTileAtPosition(self.lastPosition)
+                tileDangerous.dangerous=True
                 self.lastPosition = self.position
             else:
                 self.lastPosition = self.position
