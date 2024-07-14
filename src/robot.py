@@ -571,15 +571,16 @@ class Robot:
         # print(tile.type)
         b, g, r, _ = self.colorSensor.getImage()
         m = Piso(r, g, b)
-        if tile.col==8 and tile.row==2:
-            print(f"Tile en ({tile.col}, {tile.row})")
-            print(f"Color: {r}, {g}, {b}")
-            print(utils.targetPoint(self.position, self.rotation, 0.083))
+        # if tile.col==8 and tile.row==2:
+        #     print(f"Tile en ({tile.col}, {tile.row})")
+        #     print(f"Color: {r}, {g}, {b}")
+        #     print(utils.targetPoint(self.position, self.rotation, 0.084))
 
         
         if tile.type is None:
             if m.blackHole():
-                tile.type = TileType.BLACK_HOLE         
+                tile.type = TileType.BLACK_HOLE
+                tile.set_area(self.current_area)      
             elif m.pantano():
                 tile.type = TileType.SWAMP
             elif m.blue():
@@ -628,7 +629,7 @@ class Robot:
     def getTilePointedByColorSensor(self):
     
         if(self.lidar.rangeImage[256]>0.083):
-            pointCS=utils.targetPoint(self.position, self.rotation, 0.083)
+            pointCS=utils.targetPoint(self.position, self.rotation, 0.084)
             # print(f"Yo estoy en {self.position}, con rotación {self.rotation}, y voy a ver en {pointCS}")
             
             return self.map.getTileAtPosition(pointCS)
