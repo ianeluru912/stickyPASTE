@@ -402,10 +402,12 @@ class Robot:
                     bottom = self.targetPoint.y + 0.02
                     right = self.targetPoint.x + 0.02
                     tiles = self.map.getTilesIntersecting(Rectangle(top, left, bottom, right))
+                    count = 0
                     for tile in tiles:
                         if tile.type == TileType.BLACK_HOLE:
-                            goBack = True
-                    if goBack:
+                            count += 1
+                    if count >= len(tiles) / 2:
+                        goBack = True
                         break
 
             if diff < 0.001:
