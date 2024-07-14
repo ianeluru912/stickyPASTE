@@ -15,6 +15,7 @@ class Navigator:
         self._robot = robot
         self.blockedPaths = set()
         self.minitiles = {} # (c,r) -> visits
+        self.obstructed = set()
 
     def addBlockedPath(self, start, dest):
         start_coords = self.positionToMiniGrid(start)
@@ -31,21 +32,24 @@ class Navigator:
         return (columna, fila)
 
     def isObstructed(self, minitile):
+        if minitile in self.minitiles: 
+            return False
+        if minitile in self.obstructed:
+            return True
+        
         minitile_pos = self.getPosition(minitile)
-
         rect = self.getRectangle(minitile_pos)
-
         tiles = self._robot.map.getTilesIntersecting(rect)
 
         for tile in tiles:
-            if not tile.isOpenAt(minitile_pos):
-                return True
-            if tile.type == TileType.BLACK_HOLE:
+            if tile.type == TileType.BLACK_HOLE or not tile.isOpenAt(minitile_pos):
+                self.obstructed.add(minitile)
                 return True
             
         for obstacle in self._robot.map.obstacles:
             obstacle_rect = self._robot.map.getObstacleRectangle(obstacle)
             if obstacle_rect.intersects(rect):
+                self.obstructed.add(minitile)
                 return True
             
         return False
@@ -101,7 +105,7 @@ class Navigator:
         while len(frontier) > 0:
             current = frontier.popleft()
 
-            if self.minitiles.get(current, 0) == 0:
+            if current != start and self.minitiles.get(current, 0) == 0:
                 target = current
                 break
 
@@ -124,10 +128,9 @@ class Navigator:
         # (incluida target)
         current = target 
         path = []
-        while current != start: 
+        while current is not None: 
             path.append(current)
-            current = came_from[current]
-        path.append(start) # optional
+            current = came_from.get(current)
         path.reverse() # optional
 
         print(f"Target: {target}")
