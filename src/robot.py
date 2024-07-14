@@ -362,7 +362,7 @@ class Robot:
         self.wheelL.setVelocity(0)
         self.wheelR.setVelocity(0)
 
-    def avanzar(self, distance):
+    def avanzar(self, distance, shouldBrake):
         initPos = self.position
         goBack = False
 
@@ -371,9 +371,13 @@ class Robot:
                 self.wheelL.setVelocity(0)
                 self.wheelR.setVelocity(0)
                 break
+
             diff = abs(distance) - initPos.distance_to(self.position)
-            vel = min(max(diff/0.01, 0.1), 1)
-            
+
+            vel = 1
+            if shouldBrake:
+                vel = min(max(diff/0.01, 0.1), 1)
+                
             if distance < 0: vel *= -1
 
             self.wheelL.setVelocity(vel*MAX_VEL)
@@ -413,12 +417,13 @@ class Robot:
             if diff < 0.001:
                 break
 
-        self.wheelL.setVelocity(0)
-        self.wheelR.setVelocity(0)
+        if shouldBrake or goBack:
+            self.wheelL.setVelocity(0)
+            self.wheelR.setVelocity(0)
 
         if goBack:
             dist = initPos.distance_to(self.position)
-            self.avanzar(-dist)
+            self.avanzar(-dist, True)
 
     def addBlockedPath(self, start, dest):
         navigator = self.getNavigator()
@@ -639,13 +644,13 @@ class Robot:
             # Tengo algo delante que no me deja ver el tile
             return None
 
-    def moveToPoint(self, target_pos):
+    def moveToPoint(self, target_pos, shouldBrake):
         self.targetPoint = target_pos
         target_vector = Point(target_pos.x - self.position.x, target_pos.y - self.position.y)
         target_ang = target_vector.angle()
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
-        self.avanzar(target_vector.length())
+        self.avanzar(target_vector.length(), shouldBrake)
 
     def getRectangle(self):
         diameter = 0.07

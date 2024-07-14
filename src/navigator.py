@@ -152,4 +152,14 @@ class Navigator:
         target = path[1] if len(path) > 1 else path[0]
         print(f"Actual target: {target}")
 
-        return self.getPosition(target)
+        shouldBrake = True
+        if len(path) > 2:
+            delta1 = (path[1][0] - path[0][0], path[1][1] - path[0][1])
+            # print(f"D1: {delta1}")
+            delta2 = (path[2][0] - path[1][0], path[2][1] - path[1][1])
+            # print(f"D2: {delta2}")
+            if delta1 == delta2:
+                # print("PODEMOS NO FRENAR")
+                shouldBrake = False
+            
+        return self.getPosition(target), shouldBrake
