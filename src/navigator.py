@@ -117,11 +117,11 @@ class Navigator:
                     came_from[next] = current
 
 
-        print(f"Buscando camino desde: {start}")
+        # print(f"Buscando camino desde: {start}")
 
         if target is None:
-            print("Exploramos todo el mapa!!")
-            print("Volvamos al inicio...")
+            # print("Exploramos todo el mapa!!")
+            # print("Volvamos al inicio...")
             target = (0, 0)
 
         # En came_from tenemos el camino desde el robot hasta cualquier baldosa
@@ -133,8 +133,8 @@ class Navigator:
             current = came_from.get(current)
         path.reverse() # optional
 
-        print(f"Target: {target}")
-        print(path)
+        # print(f"Target: {target}")
+        # print(path)
         
         return path
 
@@ -144,13 +144,13 @@ class Navigator:
 
         self._robot.mapvis.send_minitiles(self._robot)
         
-        print("-------")
+        # print("-------")
         begin_time = time.time()
         path = self.findPath()
         end_time = time.time()
-        print(f"Elapsed time: {(end_time - begin_time) * 1000} ms")
+        # print(f"Elapsed time: {(end_time - begin_time) * 1000} ms")
         target = path[1] if len(path) > 1 else path[0]
-        print(f"Actual target: {target}")
+        # print(f"Actual target: {target}")
 
         shouldBrake = True
         if len(path) > 2:

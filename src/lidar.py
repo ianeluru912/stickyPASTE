@@ -510,10 +510,10 @@ class Lidar:
         if value < 0: return 
         
         # si ya hay un 1 o un 0, en una pared, confiamos en el valor que ya tiene (Gonzalo)
-        if tile_wall[idx] == 0 and value != 0:
-            print("VEO PARED DONDE ANTES NO VEIA")
-        if tile_wall[idx] == 1 and value != 1:
-            print("NO VEO PARED DONDE ANTES SI VEIA")
+        # if tile_wall[idx] == 0 and value != 0:
+        #     print("VEO PARED DONDE ANTES NO VEIA")
+        # if tile_wall[idx] == 1 and value != 1:
+        #     print("NO VEO PARED DONDE ANTES SI VEIA")
             
         tile_wall[idx] = value 
 
