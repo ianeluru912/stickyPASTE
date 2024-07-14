@@ -272,17 +272,30 @@ class Tile:
     def getWestTile(self):
         return self.__map.getTileAt(self.col - 1, self.row)
     
-
+    def isNVOrA4OrAN(self):
+        return not(self.isValid()) or self.area==4 or self.area==None
     
+    def oneOrMoreNeighborsAreArea4(self):
+        return self.getNorthTile().area==4 or self.getEastTile().area==4 or self.getSouthTile().area==4 or self.getWestTile().area==4
+
     def getRepresentation(self):
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles 
         # Agregar paredes internas
+
+        if self.col==5 and self.row==4:
+            print("Yo",self.area)            
+            print("N",self.getNorthTile().isNVOrA4OrAN())
+            print("E",self.getEastTile().isNVOrA4OrAN())
+            print("S",self.getSouthTile().isNVOrA4OrAN())
+            print("O", self.getWestTile().isNVOrA4OrAN())
   
         # si es area 4, hacer todos * y retornarlo
         if self.area == 4:
             return np.full((5,5), "*")
-           
+        
+        if self.area == None and self.oneOrMoreNeighborsAreArea4() and self.getNorthTile().isNVOrA4OrAN() and self.getEastTile().isNVOrA4OrAN() and self.getSouthTile().isNVOrA4OrAN() and self.getWestTile().isNVOrA4OrAN():
+            return np.full((5,5), "*")
         
 
         rep=np.full((5,5), None)
