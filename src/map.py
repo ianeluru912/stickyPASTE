@@ -283,13 +283,6 @@ class Tile:
         # create a numpy array 5x5
         # Agregar en la tile las víctimas y carteles 
         # Agregar paredes internas
-
-        if self.col==5 and self.row==4:
-            print("Yo",self.area)            
-            print("N",self.getNorthTile().isNVOrA4OrAN())
-            print("E",self.getEastTile().isNVOrA4OrAN())
-            print("S",self.getSouthTile().isNVOrA4OrAN())
-            print("O", self.getWestTile().isNVOrA4OrAN())
   
         # si es area 4, hacer todos * y retornarlo
         if self.area == 4:
@@ -432,6 +425,8 @@ class Tile:
                 for colum in range(1,rep.shape[1]-1):
                     if rep[fil, colum] is None:
                         rep[fil, colum] = '0'
+        
+            
         return rep
 
     def maxWall(self, v1, v2):
