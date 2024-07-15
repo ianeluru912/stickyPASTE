@@ -25,7 +25,7 @@ class ImageProcessor:
     
     def devolver_letra_victimas(self):
         self.salida = None
-        recorte=0 # Este recorte lo vamos a utilizar cuando realizamos una transformación del cartel deformado
+        recorte=1 # Este recorte lo vamos a utilizar cuando realizamos una transformación del cartel deformado
         # para sacarle algunos bordes negritos que nos quedan
 
         
@@ -98,7 +98,7 @@ class ImageProcessor:
 
 
                     # print("Quedó de ", len(contours), len(contours[0]))
-                    recorte=2 # cantidad de pixels que recorto de cada lado para sacar bordes negros
+                    recorte=3 # cantidad de pixels que recorto de cada lado para sacar bordes negros
                     # print("MinXPoint: ",minXPoint)
                     # print("MaxXPoint: ",maxXPoint)
             else:
