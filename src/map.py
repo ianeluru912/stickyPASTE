@@ -582,11 +582,15 @@ class Tile:
                 self.tokensWest[2]=token
             else:
                 # print("Oeste Medio")
-                self.tokensWest[1]=token
+                # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER ARRIBA
+                # self.tokensWest[1]=token # ACAACA ESTO ES LO CORRECTO!!!!!!!!
+                self.tokensWest[0]=token
         elif difx<=umbralChico and difx>=-umbralChico:
             if dify>umbralGrande:
                 # print("Norte Medio")
-                self.tokensNorth[1]=token
+                # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER A LA IZQUIERDA
+                # self.tokensNorth[1]=token # ACAACA ESTO ES LO CORRECTO!!!!!!!!
+                self.tokensNorth[0]=token
             elif dify>=umbralChico and dify<=umbralGrande:
                 # print("Interna Arriba")
                 self.tokensVerticalInternalWall[0]=token
@@ -595,7 +599,9 @@ class Tile:
                 self.tokensVerticalInternalWall[1]=token
             else:
                 # print("Sur Medio")
-                self.tokensSouth[1]=token
+                # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER A LA IZQUIERDA
+                # self.tokensSouth[1]=token # ACAACA ESTO ES LO CORRECTO!!!!!!!!
+                self.tokensSouth[0]=token
         elif difx<-umbralChico and difx>-umbralGrande:
             if dify>umbralGrande:
                 # print("Norte derecha")
@@ -615,7 +621,9 @@ class Tile:
                 self.tokensEast[2]=token
             else:
                 # print("Este Medio")
-                self.tokensEast[1]=token
+                # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER ARRIBA
+                #self.tokensEast[1]=token # ACAACA ESTO ES LO CORRECTO!!!!!!!!
+                self.tokensEast[0]=token
             
 
  

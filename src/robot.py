@@ -51,6 +51,7 @@ class Robot:
     
         self.position = None
         self.lastPosition=None
+        self.lastZ=None
         self.rotation = 0
         self.posicion_inicial = None
         self.targetPoint = None
@@ -293,8 +294,20 @@ class Robot:
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
-        
+        _, z, _ = self.gps.getValues()
         self.position = Point(x, y)
+        if self.lastZ is None:
+            self.lastZ = z
+        else:
+            # if self.lastZ-z>0.002: # se fue a un z más bajo, se cayó...
+            if z<-0.03:
+                # print("Me caí")
+                self.position = Point(x, y)
+                tile=self.map.getTileAtPosition(self.position)
+                # print(f"Me caí en el tile ({tile.col}, {tile.row})")
+                tile.type=TileType.BLACK_HOLE
+            self.lastZ = z
+
         if self.lastPosition is None:
             self.lastPosition = self.position
         else:
@@ -597,6 +610,7 @@ class Robot:
         
         if tile.type is None:
             if m.blackHole():
+                # print(f"Tile ({tile.col}, {tile.row})")
                 tile.type = TileType.BLACK_HOLE
                 tile.set_area(self.current_area)      
             elif m.pantano():
