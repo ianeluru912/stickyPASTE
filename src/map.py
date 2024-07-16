@@ -558,7 +558,7 @@ class Tile:
         # print(token)
         # print(self.col, self.row)
         center = self.__map.gridToPosition(self.col, self.row)
-        umbralChico = 0.02
+        umbralChico = 0.015
         umbralGrande = 0.05
         difx=center.x-point.x
         dify=center.y-point.y
