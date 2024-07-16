@@ -14,9 +14,10 @@ robot = Robot()
 # robot.parar()
 # robot.delay(10000)
 
-# robot.moveToPoint(Point(robot.position.x+0.36, robot.position.y))
+# robot.moveToPoint(Point(robot.position.x+0.36, robot.position.y), False)
 # robot.moveToPoint(Point(robot.position.x, robot.position.y+0.24))
-
+# robot.girar(-PI)
+# robot.avanzar(0.60, True)
 
 while robot.step() != -1:
     navigator = robot.getNavigator()

@@ -80,6 +80,7 @@ class Robot:
         self.timeRemaining=None
         self.realTimeRemaining=None
 
+
     def getNavigator(self):
         return self.navigator
 
@@ -580,11 +581,19 @@ class Robot:
         # print(tile.type)
         b, g, r, _ = self.colorSensor.getImage()
         m = Piso(r, g, b)
-        # if tile.col==8 and tile.row==2:
-        #     print(f"Tile en ({tile.col}, {tile.row})")
-        #     print(f"Color: {r}, {g}, {b}")
-        #     print(utils.targetPoint(self.position, self.rotation, 0.084))
 
+        # if tile.col == 0 and tile.row == 5:
+        #     print(f"Tile ({tile.col}, {tile.row})")
+        #     print(f"Posicion robot: {self.position}")
+        #     print(f"Color sensor: {r}, {g}, {b}")
+        #     print(f"Target point: {utils.targetPoint(self.position, self.rotation, 0.084)}")
+
+        # if tile.col == 0 and tile.row == 4:
+        #     print(f"Tile ({tile.col}, {tile.row})")
+        #     print(f"Posicion robot: {self.position}")
+        #     print(f"Color sensor: {r}, {g}, {b}")
+        #     print(f"Target point: {utils.targetPoint(self.position, self.rotation, 0.084)}")
+        
         
         if tile.type is None:
             if m.blackHole():
@@ -637,10 +646,43 @@ class Robot:
 
     def getTilePointedByColorSensor(self):
     
-        if(self.lidar.rangeImage[256]>0.083):
+        if(self.lidar.rangeImage[256]>0.084): #Entonces no tengo nada que me tape el piso a 0.084 de distancia
             pointCS=utils.targetPoint(self.position, self.rotation, 0.084)
-            # print(f"Yo estoy en {self.position}, con rotación {self.rotation}, y voy a ver en {pointCS}")
-            
+            enBordeEnX=utils.puntoEnBordeX(self.posicion_inicial, pointCS)
+            enBordeEnY=utils.puntoEnBordeY(self.posicion_inicial, pointCS)
+
+            if enBordeEnX or enBordeEnY:
+                print("No te clasifico, tile")
+                return None
+
+            # # Si está apuntando a un borde de baldosa, también retorno none (borde es que o x o y son múltiplo de 0.06)
+            # pointCSRel=Point(abs(pointCS.x-self.map.origin.x), abs(pointCS.y-self.map.origin.y))
+            # pointRobotRel=Point(abs(self.position.x-self.map.origin.x), abs(self.position.y-self.map.origin.y))
+
+            # tpNearX = utils.near_multiple(pointCSRel.x, 0.12, 0.0025)
+            # tpNearY = utils.near_multiple(pointCSRel.y, 0.12, 0.0025)
+            # robotNearX = utils.near_multiple(pointRobotRel.x, 0.12, 0.0025)
+            # robotNearY = utils.near_multiple(pointRobotRel.y, 0.12, 0.0025)
+            # difX=abs(pointCSRel.x-pointRobotRel.x)
+            # difY=abs(pointCSRel.y-pointRobotRel.y)
+
+            # # if robotNearY and difY<0.005 and not tpNearX:
+            # #     return self.map.getTileAtPosition(pointCS)
+            # # elif robotNearX and difX<0.005 and not tpNearY:
+            # #     return self.map.getTileAtPosition(pointCS)
+            # # elif tpNearX or tpNearY:
+            # #     return None
+
+            # if difY<0.005 and tpNearY:
+            #     print("Estoy en un borde horizontal de baldosa y lo mando a ver más arriba", pointCSRel, pointRobotRel)
+            #     pointCS=Point(pointCS.x, self.position.y-0.01)
+            #     return self.map.getTileAtPosition(pointCS)
+            # elif difX<0.005 and tpNearX:
+            #     print("Estoy en un borde vertical de baldosa y lo mando a ver más a la izquierda", pointCSRel, pointRobotRel)
+            #     pointCS=Point(self.position.x-0.01, pointCS.y)
+            #     return self.map.getTileAtPosition(pointCS)
+            # elif tpNearX or tpNearY:
+            #     return None
             return self.map.getTileAtPosition(pointCS)
         else:
             # Tengo algo delante que no me deja ver el tile

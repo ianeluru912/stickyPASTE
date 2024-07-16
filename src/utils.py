@@ -13,7 +13,13 @@ def targetPoint(position, angle, distance):
     y = position.y - distance * math.sin(angle)
     return Point(x, y)
 
+def puntoEnBordeY(origRobot, puntoAAveriguar):
+    aux=puntoAAveriguar.y-(origRobot.y-0.06)
+    return near_multiple(aux, 0.12, 0.0025)
 
+def puntoEnBordeX(origRobot, puntoAAveriguar):
+    aux=puntoAAveriguar.x-(origRobot.x-0.06)
+    return near_multiple(aux, 0.12, 0.0025)
 
 def near_multiple(num, base=0.12, tolerance=1e-6):
     # Encuentra el múltiplo más cercano de la base
