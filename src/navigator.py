@@ -11,6 +11,8 @@ class Movement:
     dest : tuple[int, int]
 
 class Navigator:
+    # Calcula el camino a seguir por el robot
+    # Busca a qué minitile ir, qué camino hacer para alcanzarlo, 
     def __init__(self, robot) -> None:
         self._robot = robot
         self.blockedPaths = set()
@@ -95,7 +97,7 @@ class Navigator:
     def findPath(self):
         # Hace un camino hasta encontrar una baldosa no visitada y lo devuelve
         # Si no hay baldosas no visitadas, devuelve el camino hasta el inicio
-        
+
         frontier = deque()
 
         start = self.positionToMiniGrid(self._robot.position)
@@ -142,6 +144,11 @@ class Navigator:
         return path
 
     def whereToGo(self):
+        # devuelve el punto al que debería ir el robot
+        # un minitile hacia el target o una posición intermedia
+        # y devuelve si conviene frenar antes de llegar al target
+        # si pasa por minitiles conocidas, va más rápido.
+
         minitile_coord = self.positionToMiniGrid(self._robot.position)
         self.incrementVisits(minitile_coord)
 

@@ -3,6 +3,7 @@ from point import Point
 import numpy as np
 
 # Librería de funciones útiles
+
 def angle_diff(a, b):
     clockwise = (a - b) % math.tau
     counterclockwise = (b - a) % math.tau
