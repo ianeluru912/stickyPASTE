@@ -601,6 +601,7 @@ class Robot:
                 tile.set_area(self.current_area)      
             elif m.pantano():
                 tile.type = TileType.SWAMP
+                tile.set_area(self.current_area) 
             elif m.blue():
                 tile.type = TileType.BLUE   
             elif m.green():
@@ -615,8 +616,10 @@ class Robot:
                 tile.type = TileType.YELLOW
             elif m.checkpoint():
                 tile.type = TileType.CHECKPOINT
+                tile.set_area(self.current_area) 
             elif m.estandar():
                 tile.type = TileType.STANDARD
+                tile.set_area(self.current_area) 
 
             # if tile.type is not None:
             #     print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
@@ -652,7 +655,7 @@ class Robot:
             enBordeEnY=utils.puntoEnBordeY(self.posicion_inicial, pointCS)
 
             if enBordeEnX or enBordeEnY:
-                print("No te clasifico, tile")
+                # print("No te clasifico, tile")
                 return None
 
             # # Si está apuntando a un borde de baldosa, también retorno none (borde es que o x o y son múltiplo de 0.06)
