@@ -637,10 +637,15 @@ class Robot:
 
     def getTilePointedByColorSensor(self):
     
-        if(self.lidar.rangeImage[256]>0.083):
+        if(self.lidar.rangeImage[256]>0.084):
             pointCS=utils.targetPoint(self.position, self.rotation, 0.084)
-            # print(f"Yo estoy en {self.position}, con rotación {self.rotation}, y voy a ver en {pointCS}")
-            
+            enBordeEnX=utils.puntoEnBordeX(self.posicion_inicial, pointCS)
+            enBordeEnY=utils.puntoEnBordeY(self.posicion_inicial, pointCS)
+
+            if enBordeEnX or enBordeEnY:
+                # print("No te clasifico, tile")
+                return None
+
             return self.map.getTileAtPosition(pointCS)
         else:
             # Tengo algo delante que no me deja ver el tile
