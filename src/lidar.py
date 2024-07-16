@@ -1,6 +1,8 @@
 import math
 
 class Lidar:
+    # Encapsula el lidar original, y permite obtener la información de las paredes y obstáculos
+    
     shift ={'N': 0, 'E': 384, 'S': 256, 'W':128}
 
     rays_1 ={0:[210, 0.095, 0.12],1:[210, 0.06, 0.08], 2:[256, 0.05, 0.075], 3:[302, 0.06, 0.08],\

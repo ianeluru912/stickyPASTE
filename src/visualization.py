@@ -5,6 +5,7 @@ import traceback
 import json
 from enum import Enum
 
+# Nos permite testear mostrando cómo está configurado el mapa dentro de un visualizador que se programó en Godot.
 
 def to_json_dict(obj):
     if obj is None: return obj

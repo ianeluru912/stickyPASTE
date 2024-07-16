@@ -1,6 +1,6 @@
 import math
 class Point:
-    
+    # Representa un punto en el plano y no mucho más (algunos calculitos útiles)
     def __init__(self, x, y):
         self.x = x
         self.y = y

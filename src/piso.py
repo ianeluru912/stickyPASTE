@@ -1,4 +1,5 @@
 class Piso:
+    # Permite detectar el tipo de tile solicitado
     def __init__(self, r, g, b):
         self.redValue = r
         self.greenValue = g

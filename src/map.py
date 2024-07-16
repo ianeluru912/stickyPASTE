@@ -17,6 +17,11 @@ class TileType(Enum):
     STANDARD = 's'
 
 class Map:
+    # Representa un conjunto de tiles, y me da información sobre ellos.
+    # También hace conversiones entre puntos del mapa y tiles.
+    # ME genera la representación del mapa para mandar al supervisor
+
+
     def __init__(self, origin) -> None:
         self.origin = origin
         self.tiles = {}
@@ -229,6 +234,9 @@ class Map:
 
   
 class Tile:
+    # Representa cada baldosa y encapsula sus propiedades, colores, si son agujeros, pantanos, etc.
+    # También tiene métodos para obtener información de las baldosas vecinas y para obtener su representación gráfica.
+
     WIDTH = 0.12  
     HEIGHT = 0.12
 
@@ -345,7 +353,7 @@ class Tile:
         rep[0:5,0]=self.combinesWall(rep[0:5,0], westWall)
 
 
-        # TODO:Agregar las paredes internas
+
         # Pared interna vertical superior, es el valor del medio de self.north
         if self.north[1]==1:
             rep[0:3,2]=self.combinesWall(rep[0:3,2], ['1', '1', '1'])

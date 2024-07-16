@@ -19,6 +19,8 @@ TIME_STEP = 16
 MAX_VEL = 6.28
 
 class Robot:
+    # Encapsula el robot original de Erebus, y le agrega propiedades y funcionalidades varias.
+    
     def __init__(self):
         self.robot = WebotsRobot()
         receiver = self.robot.getDevice("receiver")

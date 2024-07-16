@@ -1,6 +1,7 @@
 import struct
 
 class Comm:
+    # Encapsula el emmiter y receiver para enviar y recibir mensajes
     def __init__(self, emitter, receiver, robot):
         self.emitter = emitter
         self.receiver = receiver

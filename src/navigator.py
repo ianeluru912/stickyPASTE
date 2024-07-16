@@ -93,6 +93,9 @@ class Navigator:
         return result
     
     def findPath(self):
+        # Hace un camino hasta encontrar una baldosa no visitada y lo devuelve
+        # Si no hay baldosas no visitadas, devuelve el camino hasta el inicio
+        
         frontier = deque()
 
         start = self.positionToMiniGrid(self._robot.position)

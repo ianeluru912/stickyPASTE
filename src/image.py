@@ -4,6 +4,7 @@ from datetime import datetime
 import utils
 
 class ImageProcessor:
+    # Realiza el procesamiento de la imagen para determinar si es algo a analizar, y si es así, si es una víctima o un cartel
     def __init__(self):
         self.img = None
         self.salida = None

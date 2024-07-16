@@ -2,6 +2,7 @@ from point import Point
 import math
 
 class Rectangle:
+    # Representa un rectángulo en el plano y provee métodos para saber si interseca con otro rectáng
     def __init__(self, top, left, bottom, right):
         self.top = top
         self.bottom = bottom
