@@ -321,6 +321,31 @@ class Tile:
         #     tile=self.__map.getTileAt(self.col-1, self.row)
         #     print(tile.isValid())
 
+        if self.curvedWalls[0]==1:
+            rep[0,0]='0'
+            rep[0,1]='1'
+            rep[0,2]='1'
+            rep[1,0]='1'
+            rep[2,0]='1'
+        if self.curvedWalls[1]==1:
+            rep[0,2]='1'
+            rep[0,3]='1'
+            rep[0,4]='0'
+            rep[1,4]='1'
+            rep[2,4]='1'
+        if self.curvedWalls[2]==1:
+            rep[2,4]='1'
+            rep[3,4]='1'
+            rep[4,4]='0'
+            rep[4,3]='1'
+            rep[4,2]='1'
+        if self.curvedWalls[3]==1:
+            rep[4,2]='1'
+            rep[4,1]='1'
+            rep[4,0]='0'
+            rep[3,0]='1'
+            rep[2,0]='1'
+
         if self.__map.getTileAt(self.col, self.row-1).isValid():
             northWall=self.getWallRepresentation(self.north)
         else:
