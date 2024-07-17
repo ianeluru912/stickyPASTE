@@ -20,19 +20,22 @@ robot = Robot()
 # robot.avanzar(0.60, True)
 
 while robot.step() != -1:
-    navigator = robot.getNavigator()
-    point, shouldBrake = navigator.whereToGo()
+    # navigator = robot.getNavigator()
+    # point, shouldBrake = navigator.whereToGo()
 
-    sendMapNow = robot.position.distance_to(point) < 0.025
+    # sendMapNow = robot.position.distance_to(point) < 0.025
     
-    if not sendMapNow:
-        robot.moveToPoint(point, shouldBrake)
+    # if not sendMapNow:
+    #     robot.moveToPoint(point, shouldBrake)
     
-    if sendMapNow or robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
-        rep=robot.map.getRepresentation()
-        robot.comm.sendMap(rep)
-        # print(rep)
-        robot.comm.sendExit()
+    # if sendMapNow or robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
+    #     rep=robot.map.getRepresentation()
+    #     robot.comm.sendMap(rep)
+    #     # print(rep)
+    #     robot.comm.sendExit()
+    
+    print(robot.lidar.get_walls_1_caso_3(robot.rotation))
+    print('---')
     
     # # for tiles in robot.map.getValidTiles():
     #     print(tiles)

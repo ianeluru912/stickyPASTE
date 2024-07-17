@@ -632,6 +632,3 @@ class Tile:
                 # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER ARRIBA
                 #self.tokensEast[1]=token # ACAACA ESTO ES LO CORRECTO!!!!!!!!
                 self.tokensEast[0]=token
-            
-
- 

@@ -19,6 +19,7 @@ def puntoEnBordeY(origRobot, puntoAAveriguar):
     aux=puntoAAveriguar.y-(origRobot.y-0.06)
     return near_multiple(aux, 0.12, 0.0025)
 
+ 
 def puntoEnBordeX(origRobot, puntoAAveriguar):
     aux=puntoAAveriguar.x-(origRobot.x-0.06)
     return near_multiple(aux, 0.12, 0.0025)
