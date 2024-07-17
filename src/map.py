@@ -262,6 +262,7 @@ class Tile:
 
         self.tokensVerticalInternalWall=[0,0]
         self.tokensHorizontalInternalWall=[0,0]
+        self.curvedWalls= [-1,-1,-1,-1]
 
         self.type=None
         self.area = None
