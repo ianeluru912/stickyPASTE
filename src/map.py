@@ -264,7 +264,7 @@ class Tile:
         self.dangerous=False
     
     def __str__(self) -> str:
-        return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"
+        return f"Tile ({self.col}, {self.row}) Pared Norte: {self.north}, Pared Oeste: {self.west}, Pared Este: {self.east}, Pared Sur: {self.south}"
         
     def getRectangle(self):
         return self.__map.getTileRectangle(self.col, self.row)
@@ -292,7 +292,8 @@ class Tile:
         # Agregar en la tile las víctimas y carteles 
         # Agregar paredes internas
   
-        # si es area 4, hacer todos * y retornarlo
+        # si es ar0ea 4, hacer todos * y retornarlo
+        print(self)
         if self.area == 4:
             return np.full((5,5), "*")
         
