@@ -558,7 +558,7 @@ class Tile:
         # print(token)
         # print(self.col, self.row)
         center = self.__map.gridToPosition(self.col, self.row)
-        umbralChico = 0.015 #0.02
+        umbralChico = 0.017 #0.02
         umbralGrande = 0.05
         difx=center.x-point.x
         dify=center.y-point.y
@@ -588,9 +588,9 @@ class Tile:
         elif difx<=umbralChico and difx>=-umbralChico:
             if dify>umbralGrande:
                 # print("Norte Medio")
-                # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER A LA IZQUIERDA
+                # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER A LA DERECHA
                 # self.tokensNorth[1]=token # ACAACA ESTO ES LO CORRECTO!!!!!!!!
-                self.tokensNorth[0]=token
+                self.tokensNorth[2]=token
             elif dify>=umbralChico and dify<=umbralGrande:
                 # print("Interna Arriba")
                 self.tokensVerticalInternalWall[0]=token
@@ -599,9 +599,9 @@ class Tile:
                 self.tokensVerticalInternalWall[1]=token
             else:
                 # print("Sur Medio")
-                # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER A LA IZQUIERDA
+                # ACAACA SI NO LO ARREGLAN, LO VAMOS A PONER A LA DERECHA
                 # self.tokensSouth[1]=token # ACAACA ESTO ES LO CORRECTO!!!!!!!!
-                self.tokensSouth[0]=token
+                self.tokensSouth[2]=token
         elif difx<-umbralChico and difx>-umbralGrande:
             if dify>umbralGrande:
                 # print("Norte derecha")
