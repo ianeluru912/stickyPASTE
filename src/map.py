@@ -207,8 +207,6 @@ class Map:
         valid_tiles.sort(key=lambda t: t.row)
 
         for tile in valid_tiles:
-            print(f"({tile.col}, {tile.row})")
-
             # Calcula la columna donde tiene que poner el tile dentro de la representación
             col=(tile.col-colmin)*4
             # Calcula la fila donde tiene que poner el tile dentro de la representación
