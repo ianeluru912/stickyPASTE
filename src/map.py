@@ -157,13 +157,6 @@ class Map:
                     tileMapa[i, j] = tileAUbicar[i, j]
 
                 
-                elif tileMapa[i, j] != "1" and tileMapa[i, j] != "0" and tileAUbicar[i, j] != "1" and tileAUbicar[i, j] != "1":
-                    old = tileMapa[i, j]
-                    new = tileAUbicar[i, j]
-                    if new in "HSU" and not (old in "HSU"):
-                        tileMapa[i, j] = new + old
-                    else:
-                        tileMapa[i, j] = old + new
 
     def combineTilesReal(self, tileMapa, tileAUbicar):
         # en cada casilla del mapa que recibe tengo 1, 0, una letra o un *
@@ -188,6 +181,14 @@ class Map:
                     # print("Caso 4")
                     tileMapa[i, j] = tileAUbicar[i, j]
                 
+                elif tileMapa[i, j] != "1" and tileMapa[i, j] != "0" and tileAUbicar[i, j] != "1" and tileAUbicar[i, j] != "1":
+                    old = tileMapa[i, j]
+                    new = tileAUbicar[i, j]
+                    if new in "HSU" and not (old in "HSU"):
+                        tileMapa[i, j] = new + old
+                    else:
+                        tileMapa[i, j] = old + new
+
                 # Si teníamos un 0 o un 1, y viene un 0 o un 1, debería ser coherente. No hacemos nada
     
     def getRepresentation(self):
