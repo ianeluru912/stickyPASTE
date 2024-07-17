@@ -178,6 +178,14 @@ class Map:
                     tileAUbicar[i, j] != "1"):
                     # print("Caso 4")
                     tileMapa[i, j] = tileAUbicar[i, j]
+
+                elif tileMapa[i, j] != "1" and tileMapa[i, j] != "0" and tileAUbicar[i, j] != "1" and tileAUbicar[i, j] != "1":
+                    old = tileMapa[i, j]
+                    new = tileAUbicar[i, j]
+                    if new in "HSU" and not (old in "HSU"):
+                        tileMapa[i, j] = new + old
+                    else:
+                        tileMapa[i, j] = old + new
                 
                 # Si teníamos un 0 o un 1, y viene un 0 o un 1, debería ser coherente. No hacemos nada
     
@@ -195,7 +203,11 @@ class Map:
         totRow=(rowmax-rowmin+1)*4+1
         repre=np.full((totRow, totCol), None)
 
+        valid_tiles.sort(key=lambda t: t.col)
+        valid_tiles.sort(key=lambda t: t.row)
+
         for tile in valid_tiles:
+            print(f"({tile.col}, {tile.row})")
 
             # Calcula la columna donde tiene que poner el tile dentro de la representación
             col=(tile.col-colmin)*4
