@@ -181,6 +181,10 @@ class ImageProcessor:
         if len(contours) == 0:
             return None
         
+        area=cv2.contourArea(contours[0])
+        if area< 600:
+            return None
+        
         approx = cv2.minAreaRect(contours[0])
         angulo = approx[2]
         if abs(angulo)%45 == 0:
