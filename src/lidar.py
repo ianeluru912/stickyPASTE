@@ -338,10 +338,10 @@ class Lidar:
         if walls_concavas[3]==1 or walls_convexas[3]==1:
             walls[8] = -1
             walls[9] = -1
-        print('paredes cóncavas: ',walls_concavas)
-        print('---')
-        print('paredes convexas: ',walls_convexas)
-        print('---')
+        # print('paredes cóncavas: ',walls_concavas)
+        # print('---')
+        # print('paredes convexas: ',walls_convexas)
+        # print('---')
         return walls
 
     def updateWalls2(self, rotation, map, tiles):

@@ -33,12 +33,25 @@ class ImageProcessor:
         _, thresh = cv2.threshold(gris, 160, 255, cv2.THRESH_BINARY)
         paraMostrarDespues=thresh.copy()
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if len(contours) == 0:
+       
+        # si tiene más de 1 contorno o el perimetro encontrado es muy chic0, no es una letra
+        # calculate perimeter of the contour
+
+
+        if len(contours) != 1:
             return self.salida
 
+        # if area of the contour is less than 800, is not a recognizable letter
+        area=cv2.contourArea(contours[0])
+        if area < 800:
+            return self.salida
 
         if len(contours) == 1:
+            
             if len(contours[0]) > 10:
+                # cv2.drawContours(self.img, contours, -1, (0,0, 255), 1)
+                # self.debugShow(self.img)
+                # self.debugShow(paraMostrarDespues)
                 # print("Encontré un cartel que parece una letra pero tiene demasiados puntos su contorno")
 
                 # ¿Tiene thresh una cantidad de pixeles blancos razonables?
@@ -162,13 +175,13 @@ class ImageProcessor:
                         self.salida = 'U'
                     elif pixeles_negros_abajo >= 1 and pixeles_negros_arriba >= 1:
                         return self.salida
-                    # print("Pixeles")
-                    # print(pixeles_negros_arriba, pixeles_negros_central, pixeles_negros_abajo)
-                    # print(self.salida)
-                    # # Descomentar para ver si hay falsos positivos
-                    # self.debugShow(self.img)
-                    # self.debugShow(paraMostrarDespues)
-                    # self.debugShow(rect)
+                    print("Pixeles")
+                    print(pixeles_negros_arriba, pixeles_negros_central, pixeles_negros_abajo)
+                    print(self.salida)
+                    # Descomentar para ver si hay falsos positivos
+                    self.debugShow(self.img)
+                    self.debugShow(paraMostrarDespues)
+                    self.debugShow(rect)
             return self.salida
         
     def reconocer_limpiar_cartel(self):
