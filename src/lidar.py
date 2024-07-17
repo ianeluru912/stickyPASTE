@@ -9,15 +9,20 @@ class Lidar:
             4: [302, 0.095, 0.12], 5: [338, 0.095, 0.12], 6:[338,0.06, 0.085], 7:[384,0.045, 0.075], \
             8:[430,0.06, 0.085],9:[430,0.095, 0.12],10:[466,0.095, 0.12],11:[466,0.06, 0.085], 12:[0,0.05, 0.075], \
             13:[46,0.06, 0.085], 14:[46,0.095, 0.12], 15:[82,0.095, 0.12], 16:[82,0.06, 0.085], 17:[128,0.045, 0.075], \
-            18:[174,0.06, 0.085], 19:[174,0.095, 0.12], 20: [64, 0.045, 0.065], 21:[192, 0.045, 0.065], \
-            22:[320, 0.045, 0.065], 23:[448,0.045, 0.065]}
+            18:[174,0.06, 0.085], 19:[174,0.095, 0.12]}
     """rays_1 ={0:[210, 0.095, 0.12],1:[210, 0.06, 0.08], 2:[256, 0.05, 0.075], 3:[299, 0.06, 0.08],\
             4: [302, 0.095, 0.12], 5: [338, 0.095, 0.12], 6:[338, 0.06,], 7:[0, 0,0], \
             8:[43, 0.06, 0.08],9:[86,0.057, 0.08],10:[128,0,0],11:[171,0.057, 0.08]}"""
     
+    rays_1_paredes_curvas = {0: [64, 0.045, 0.065], 1:[192, 0.045, 0.065], \
+            2:[320, 0.045, 0.065], 3:[448,0.045, 0.065]}
+    
     rays_2 ={0: [230,0.112, 0.1354], 1: [256, 0.05, 0.075], 2: [282,0.112, 0.1354], 3:[302,0.095, 0.12], 4:[302,0.06, 0.085], 5:[340,0.057, 0.077], 6:[428,0.057, 0.077],\
             7:[466,0.06, 0.085], 8:[466,0.095, 0.12], 9:[486,0.112, 0.1354], 10:[0,0.05, 0.075], 11:[26,0.112, 0.1354], 12:[46,0.095, 0.12], 13:[46,0.06, 0.085],\
             14:[84,0.057, 0.077], 15:[172,0.057, 0.077], 16:[210,0.06, 0.085], 17:[210,0.095, 0.12]}
+    
+    # En los ínidices 1 y 2 están los umbrales para paredes concavas, en el 3 y 4 para paredes convexas 
+    rays_2_paredes_curvas = {0: [24, 0.1, 0.115, 0.055, 0.075], 1:[232, 0.1, 0.115, 0.055, 0.075], 2:[280, 0.1, 0.115, 0.055, 0.075], 3: [488, 0.1, 0.115, 0.055, 0.075]}
     
     rays_3 ={0: [174,0.095, 0.12], 1: [174,0.06, 0.085], 2: [212,0.057, 0.077], 3:[300,0.057, 0.077], 4:[338,0.06, 0.085], 5:[338,0.095, 0.12], 6:[358,0.112, 0.135],\
             7:[384,0.045, 0.075], 8:[410,0.112, 0.135], 9:[430,0.095, 0.12], 10:[430,0.06, 0.085], 11:[468,0.057, 0.077], 12:[44,0.057, 0.077], 13:[82,0.06, 0.085],\
@@ -31,8 +36,6 @@ class Lidar:
               25: [149, 0.112, 0.135], 26: [179, 0.085, 0.12], 27: [179, 0.13, 0.16], 28: [235, 0.05, 0.077], 29: [277, 0.05, 0.077],\
               30: [363, 0.05, 0.075], 31: [405, 0.05, 0.075], 32: [491, 0.05, 0.077], 33: [21, 0.05, 0.077], 34: [107,0.05, 0.075],\
               35: [149,0.05, 0.075]}
-
-    rays_2_caso_3 = {0: [32, 0, 0], 1:[224, 0, 0], 2:[288, 0, 0], 3: [480, 0, 0]}
     
     def __init__(self, lidar, time_step):
         self.lidar = lidar
@@ -83,8 +86,8 @@ class Lidar:
         # gira los rayos para que estén en orientación Norte
         rangeLocal = self.rangeImage[shift:] + self.rangeImage[:shift]
         walls = {}
-        for i in self.rays_2_caso_3.keys():
-            walls[i]=(rangeLocal[self.rays_2_caso_3[i][0]])
+        for i in self.rays_2_paredes_curvas.keys():
+            walls[i]=(rangeLocal[self.rays_2_paredes_curvas[i][0]])
         return walls
 
     def get_walls_1(self, rotation):
@@ -93,6 +96,7 @@ class Lidar:
         rangeLocal = self.rangeImage[shift:] + self.rangeImage[:shift]
         # create a dictionary with the walls
         walls = {}
+        walls_curvas = {}
         for i in self.rays_1.keys():
             ray=self.rays_1[i][0]
             rayDistance=rangeLocal[ray]
@@ -108,6 +112,31 @@ class Lidar:
             else:
                 walls[i]=0
                 # walls[i]=(0,lowerLimit,upperLimit,rayDistance)
+                
+        for i in self.rays_1_paredes_curvas.keys():
+            ray=self.rays_1_paredes_curvas[i][0]
+            rayDistance=rangeLocal[ray]
+            lowerLimit=self.rays_1_paredes_curvas[i][1]
+            upperLimit=self.rays_1_paredes_curvas[i][2]
+            
+            if rayDistance>=lowerLimit and rayDistance<=upperLimit:
+                walls_curvas[i] = 1
+            else:
+                walls_curvas[i] = 0
+                
+        if walls_curvas[0] == 1:
+            walls[17] = 2
+            walls[12] = 2
+        if walls_curvas[1] == 1:
+            walls[17] = 2
+            walls[2] = 2
+        if walls_curvas[2] == 1:
+            walls[2] = 2
+            walls[7] = 2
+        if walls_curvas[3] == 1:
+            walls[7] = 2
+            walls[12] = 2
+
         if walls[3] == 1:
             walls[2] = -1
             walls[4] = -1
@@ -132,38 +161,26 @@ class Lidar:
         if walls[18] == 1:
             walls[17] = -1
             walls[19] = -1
-        if walls[20] == 1:
-            walls[12] = -1
+        if walls_curvas[0] == 1:
             walls[13] = -1
             walls[14] = -1
             walls[15] = -1
             walls[16] = -1
-            walls[17] = -1
-            walls[20] = 2
-        if walls[21] == 1:
-            walls[17] = -1
+        if walls_curvas[1] == 1:
             walls[18] = -1
             walls[19] = -1
             walls[0] = -1
             walls[1] = -1
-            walls[2] = -1
-            walls[21] = 2
-        if walls[22] == 1:
-            walls[2] = -1
+        if walls_curvas[2] == 1:
             walls[3] = -1
             walls[4] = -1
             walls[5] = -1
             walls[6] = -1
-            walls[7] = -1
-            walls[22] = 2
-        if walls[23] == 1:
-            walls[7] = -1
+        if walls_curvas[3] == 1:
             walls[8] = -1
             walls[9] = -1
             walls[10] = -1
             walls[11] = -1
-            walls[12] = -1
-            walls[23] = 2
             
         return walls
     
@@ -185,12 +202,6 @@ class Lidar:
         self.setWall(tile.west, 0, walls[16])
         self.setWall(tile.west, 1, 0)
         self.setWall(tile.west, 2, walls[18])
-        
-        # self.setWall3(tile, walls[20])
-        # self.setWall3(tile, walls[21])
-        # self.setWall3(tile, walls[22])
-        # self.setWall3(tile, walls[23])
-        
         
         north_tile = tile.getNorthTile()
         east_tile = tile.getEastTile()
@@ -228,18 +239,22 @@ class Lidar:
         self.setWall(west_tile.east, 2, walls[16])
 
         self.setWall(west_tile.north, 2, walls[19])
+    
 
         self.fixNeighbours(tile)
         self.fixNeighbours(north_tile)
         self.fixNeighbours(south_tile)
         self.fixNeighbours(east_tile)
         self.fixNeighbours(west_tile)
-    
+        
+        
     def get_walls_2(self, rotation):
         shift = self.rotToLidar(rotation)
         # gira los rayos para que estén en orientación Norte
         rangeLocal = self.rangeImage[shift:] + self.rangeImage[:shift]
         walls = {}
+        walls_concavas = {}
+        walls_convexas = {}
         for i in self.rays_2.keys():
             ray=self.rays_2[i][0]
             rayDistance=rangeLocal[ray]
@@ -254,6 +269,58 @@ class Lidar:
             else:
                 walls[i]=0
                 # walls[i]=(0,lowerLimit,upperLimit,rayDistance)
+        for i in self.rays_2_paredes_curvas.keys():
+            ray=self.rays_2_paredes_curvas[i][0]
+            rayDistance=rangeLocal[ray]
+            lowerLimit_concavas=self.rays_2_paredes_curvas[i][1]
+            upperLimit_concavas=self.rays_2_paredes_curvas[i][2]
+            
+            if rayDistance>=lowerLimit_concavas and rayDistance<=upperLimit_concavas:
+                walls_concavas[i]=1
+            elif rayDistance<lowerLimit_concavas:
+                walls_concavas[i]=-1
+            else:
+                walls_concavas[i]=0
+                
+        for i in self.rays_2_paredes_curvas.keys():
+            ray=self.rays_2_paredes_curvas[i][0]
+            rayDistance=rangeLocal[ray]
+            lowerLimit_convexas=self.rays_2_paredes_curvas[i][3]
+            upperLimit_convexas=self.rays_2_paredes_curvas[i][4]
+            
+            if rayDistance>=lowerLimit_convexas and rayDistance<=upperLimit_convexas:
+                walls_convexas[i]=1
+            elif rayDistance<lowerLimit_convexas:
+                walls_convexas[i]=-1
+            else:
+                walls_convexas[i]=0
+                
+        if walls_convexas[0]==1:
+            walls[10] = 2
+            walls[13] = 2
+        if walls_convexas[1]==1:
+            walls[16] = 2
+            walls[1] = 2
+        if walls_convexas[2]==1:
+            walls[4] = 2
+            walls[1] = 2
+        if walls_convexas[3]==1:
+            walls[7] = 2
+            walls[10] = 2
+            
+        if walls_concavas[0]==1:
+            walls[10] = 2
+            walls[13] = 2
+        if walls_concavas[1]==1:
+            walls[16] = 2
+            walls[1] = 2
+        if walls_concavas[2]==1:
+            walls[4] = 2
+            walls[1] = 2
+        if walls_concavas[3]==1:
+            walls[7] = 2
+            walls[10] = 2
+            
         if walls[4]==1:
             walls[1]=-1
             walls[2]=-1
@@ -269,7 +336,23 @@ class Lidar:
         if walls[16]==1:
             walls[17]=-1
             walls[0]=-1
-            walls[1]=-1    
+            walls[1]=-1
+        if walls_concavas[0]==1 or walls_convexas[0]==1:
+            walls[11] = -1
+            walls[12] = -1
+        if walls_concavas[1]==1 or walls_convexas[1]==1:
+            walls[17] = -1
+            walls[0] = -1
+        if walls_concavas[2]==1 or walls_convexas[2]==1:
+            walls[2] = -1
+            walls[3] = -1
+        if walls_concavas[3]==1 or walls_convexas[3]==1:
+            walls[8] = -1
+            walls[9] = -1
+        print('paredes cóncavas: ',walls_concavas)
+        print('---')
+        print('paredes convexas: ',walls_convexas)
+        print('---')
         return walls
 
     def updateWalls2(self, rotation, map, tiles):
@@ -560,8 +643,6 @@ class Lidar:
             
         tile_wall[idx] = value 
         
-    def setWall3(self, value):
-        if value < 0: return
 
     def fixNeighbours(self, tile):
         if tile.north[0] != -1:

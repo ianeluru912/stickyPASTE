@@ -264,7 +264,8 @@ class Tile:
         self.dangerous=False
     
     def __str__(self) -> str:
-        return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"
+        #return f"Tile ({self.col}, {self.row}) {self.getRepresentation()}"
+        return f"TIle ({self.col}, {self.row}), Pared Norte {self.north}, Pared Oeste {self.west}, Pared Este {self.east}, Pared Sur {self.south}, Paredinterna veritcal {self.tokensVerticalInternalWall}, Pared interna horizontal {self.tokensHorizontalInternalWall}"
         
     def getRectangle(self):
         return self.__map.getTileRectangle(self.col, self.row)
