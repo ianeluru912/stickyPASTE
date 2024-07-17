@@ -293,7 +293,8 @@ class Tile:
         # Agregar en la tile las víctimas y carteles 
         # Agregar paredes internas
   
-        # si es area 4, hacer todos * y retornarlo
+        # si es ar0ea 4, hacer todos * y retornarlo
+        print(self)
         if self.area == 4:
             return np.full((5,5), "*")
         
