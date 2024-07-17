@@ -14,14 +14,14 @@ class Lidar:
             4: [302, 0.095, 0.12], 5: [338, 0.095, 0.12], 6:[338, 0.06,], 7:[0, 0,0], \
             8:[43, 0.06, 0.08],9:[86,0.057, 0.08],10:[128,0,0],11:[171,0.057, 0.08]}"""
     
-    rays_1_paredes_curvas = {(12,17): [64, 0.045, 0.065], (2,17):[192, 0.045, 0.065], \
-            (2,7):[320, 0.045, 0.065], (7,12):[448,0.045, 0.065]}
+    rays_1_paredes_curvas = {3: [64, 0.045, 0.065], 0:[192, 0.045, 0.065], \
+            1:[320, 0.045, 0.065], 2:[448,0.045, 0.065]}
     
     rays_2 ={0: [230,0.112, 0.1354], 1: [256, 0.05, 0.075], 2: [282,0.112, 0.1354], 3:[302,0.095, 0.12], 4:[302,0.06, 0.085], 5:[340,0.057, 0.077], 6:[428,0.057, 0.077],\
             7:[466,0.06, 0.085], 8:[466,0.095, 0.12], 9:[486,0.112, 0.1354], 10:[0,0.05, 0.075], 11:[26,0.112, 0.1354], 12:[46,0.095, 0.12], 13:[46,0.06, 0.085],\
             14:[84,0.057, 0.077], 15:[172,0.057, 0.077], 16:[210,0.06, 0.085], 17:[210,0.095, 0.12]}
     
-    # En los ínidices 1 y 2 están los umbrales para paredes concavas, en el 3 y 4 para paredes convexas 
+    # 0 es NW, 1 es NE, 2 es SE, 3 es SW 
     rays_2_paredes_curvas = {0: [24, 0.1, 0.115, 0.055, 0.075], 1:[232, 0.1, 0.115, 0.055, 0.075], 2:[280, 0.1, 0.115, 0.055, 0.075], 3: [488, 0.1, 0.115, 0.055, 0.075]}
     
     rays_3 ={0: [174,0.095, 0.12], 1: [174,0.06, 0.085], 2: [212,0.057, 0.077], 3:[300,0.057, 0.077], 4:[338,0.06, 0.085], 5:[338,0.095, 0.12], 6:[358,0.112, 0.135],\
@@ -96,7 +96,7 @@ class Lidar:
         rangeLocal = self.rangeImage[shift:] + self.rangeImage[:shift]
         # create a dictionary with the walls
         walls = {}
-        # walls_curvas = {}
+        curvedWalls = {}
         for i in self.rays_1.keys():
             ray=self.rays_1[i][0]
             rayDistance=rangeLocal[ray]
@@ -113,7 +113,6 @@ class Lidar:
                 walls[i]=0
                 # walls[i]=(0,lowerLimit,upperLimit,rayDistance)
                 
-        # Recorro las paredes curvas del caso 1, y si me dan en el rango, le pongo 2 a las paredes asociadas (clave del diccionario)
         for i in self.rays_1_paredes_curvas.keys():
             ray=self.rays_1_paredes_curvas[i][0]
             rayDistance=rangeLocal[ray]
@@ -121,9 +120,9 @@ class Lidar:
             upperLimit=self.rays_1_paredes_curvas[i][2]
             
             if rayDistance>=lowerLimit and rayDistance<=upperLimit:
-                # first element of the key of the dictionary is 2
-                walls[i[0]] = 2
-                walls[i[1]] = 2
+                curvedWalls[i]=1
+            elif rayDistance>upperLimit:
+                curvedWalls[i]=0
                 
         if walls[3] == 1:
             walls[2] = -1
@@ -150,32 +149,32 @@ class Lidar:
             walls[17] = -1
             walls[19] = -1
 
-        # Marcamos las curvas
-        if walls[12] == 2 and walls[17] == 2:
+        # Marcamos las tapadas por las curvas
+        if curvedWalls[3] == 1:
             walls[13] = -1
             walls[14] = -1
             walls[15] = -1
             walls[16] = -1
-        if walls[2] == 2 and walls[17] == 2:
+        if curvedWalls[0] == 1:
             walls[18] = -1
             walls[19] = -1
             walls[0] = -1
             walls[1] = -1
-        if walls[2] == 2 and walls[7] == 2:
+        if curvedWalls[1] == 1:
             walls[3] = -1
             walls[4] = -1
             walls[5] = -1
             walls[6] = -1
-        if walls[7] == 2 and walls[12] == 2:
+        if curvedWalls[2] == 1:
             walls[8] = -1
             walls[9] = -1
             walls[10] = -1
             walls[11] = -1
             
-        return walls
+        return walls, curvedWalls
     
     def updateWalls1(self, rotation, map, tile):
-        walls = self.get_walls_1(rotation)
+        walls, curvedWalls  = self.get_walls_1(rotation)
 
         self.setWall(tile.north, 0, walls[1])
         self.setWall(tile.north, 1, 0)
