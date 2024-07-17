@@ -213,7 +213,7 @@ class ImageProcessor:
             return None
         
         area=cv2.contourArea(contornos[0])
-        print("Area: ", area)
+        # print("Area: ", area)
         if area< 300:
             return None
         
