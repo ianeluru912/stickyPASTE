@@ -156,6 +156,15 @@ class Map:
                     # print("Caso 4")
                     tileMapa[i, j] = tileAUbicar[i, j]
 
+                
+                elif tileMapa[i, j] != "1" and tileMapa[i, j] != "0" and tileAUbicar[i, j] != "1" and tileAUbicar[i, j] != "1":
+                    old = tileMapa[i, j]
+                    new = tileAUbicar[i, j]
+                    if new in "HSU" and not (old in "HSU"):
+                        tileMapa[i, j] = new + old
+                    else:
+                        tileMapa[i, j] = old + new
+
     def combineTilesReal(self, tileMapa, tileAUbicar):
         # en cada casilla del mapa que recibe tengo 1, 0, una letra o un *
         # None<*<0,1<letra
@@ -194,6 +203,9 @@ class Map:
         totCol=(colmax-colmin+1)*4+1
         totRow=(rowmax-rowmin+1)*4+1
         repre=np.full((totRow, totCol), None)
+
+        valid_tiles.sort(key=lambda t: t.col)
+        valid_tiles.sort(key=lambda t: t.row)
 
         for tile in valid_tiles:
 
