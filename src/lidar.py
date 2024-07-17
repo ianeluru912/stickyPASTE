@@ -29,6 +29,9 @@ class Lidar:
               30: [363, 0.05, 0.075], 31: [405, 0.05, 0.075], 32: [491, 0.05, 0.077], 33: [21, 0.05, 0.077], 34: [107,0.05, 0.075],\
               35: [149,0.05, 0.075]}
     
+    
+    rays_1_caso_3 = {0: [64, 0.035, 0.065], 1:[192, 0.035, 0.065], 2:[320, 0.035, 0.065], 3:[448,0.035, 0.065]}
+    
     def __init__(self, lidar, time_step):
         self.lidar = lidar
         self.lidar.enable(time_step)
@@ -73,13 +76,13 @@ class Lidar:
         dist = self.rangeImage[lidar_idx[orient]]
         return dist >= 0.08
     
-    def ver_walls(self, rotation): # caso 4
+    def ver_walls(self, rotation): # caso 1 (paredes curvas)
         shift = self.rotToLidar(rotation)
         # gira los rayos para que estén en orientación Norte
         rangeLocal = self.rangeImage[shift:] + self.rangeImage[:shift]
         walls = {}
-        for i in self.rays_4.keys():
-            walls[i]=(rangeLocal[self.rays_4[i][0]])
+        for i in self.rays_1_caso_3.keys():
+            walls[i]=(rangeLocal[self.rays_1_caso_3[i][0]])
         return walls
 
     def get_walls_1(self, rotation):
@@ -191,6 +194,26 @@ class Lidar:
         self.fixNeighbours(south_tile)
         self.fixNeighbours(east_tile)
         self.fixNeighbours(west_tile)
+        
+    def get_walls_1_caso_3(self, rotation):
+        shift = self.rotToLidar(rotation)
+        # gira los rayos para que estén en orientación Norte
+        rangeLocal = self.rangeImage[shift:] + self.rangeImage[:shift]
+        # create a dictionary with the walls
+        walls = {}
+        for i in self.rays_1_caso_3.keys():
+            ray=self.rays_1_caso_3[i][0]
+            rayDistance=rangeLocal[ray]
+            lowerLimit=self.rays_1_caso_3[i][1]
+            upperLimit=self.rays_1_caso_3[i][2]
+            if rayDistance>=lowerLimit and rayDistance<=upperLimit:
+                walls[i]=1
+                # walls[i]=(1, lowerLimit,upperLimit,rayDistance)
+            else:
+                walls[i]=0
+                # walls[i]=(0,lowerLimit,upperLimit,rayDistance)
+        return walls
+        
     
     def get_walls_2(self, rotation):
         shift = self.rotToLidar(rotation)
