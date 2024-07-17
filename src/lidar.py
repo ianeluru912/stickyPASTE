@@ -186,10 +186,10 @@ class Lidar:
         self.setWall(tile.west, 1, 0)
         self.setWall(tile.west, 2, walls[18])
         
-        self.setWall3(tile, walls[20])
-        self.setWall3(tile, walls[21])
-        self.setWall3(tile, walls[22])
-        self.setWall3(tile, walls[23])
+        # self.setWall3(tile, walls[20])
+        # self.setWall3(tile, walls[21])
+        # self.setWall3(tile, walls[22])
+        # self.setWall3(tile, walls[23])
         
         
         north_tile = tile.getNorthTile()
