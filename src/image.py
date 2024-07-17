@@ -181,10 +181,7 @@ class ImageProcessor:
         if len(contours) == 0:
             return None
         
-        area=cv2.contourArea(contours[0])
-        if area< 600:
-            return None
-        
+            
         approx = cv2.minAreaRect(contours[0])
         angulo = approx[2]
         if abs(angulo)%45 == 0:
@@ -213,6 +210,11 @@ class ImageProcessor:
         _, thresh = cv2.threshold(gris, 120, 255, cv2.THRESH_BINARY)
         contornos, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(contornos) == 0:
+            return None
+        
+        area=cv2.contourArea(contornos[0])
+        print("Area: ", area)
+        if area< 300:
             return None
         
         approx = cv2.minAreaRect(contornos[0])
