@@ -59,3 +59,12 @@ def sortCw(listPoints):
         pos2=listAux[1]
         pos4=listAux[0]
     return np.array([pos1, pos2, pos3, pos4],dtype=np.float32)
+
+def normalizacion_radianes(radianes):
+    if radianes > math.pi:
+        radianes -= math.pi*2
+        return radianes
+    elif radianes < -math.pi:
+        radianes += math.pi*2
+        return radianes
+    return radianes

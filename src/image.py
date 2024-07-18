@@ -1,12 +1,18 @@
 import cv2
-import numpy as np
-from datetime import datetime
+import math
 import utils
+import numpy as np
+from point import Point
+from datetime import datetime
+
 
 class ImageProcessor:
     def __init__(self):
         self.img = None
         self.salida = None
+        self.lastTokenPosition = Point(10000, 10000)
+        self.lastTokenRotation = 150.8
+        self.lastCamera = 'j'
 
     def debugShow(self, image):
         cv2.imshow("V", image)
@@ -271,19 +277,34 @@ class ImageProcessor:
                 self.salida = 'O'
             return self.salida
         
-    def procesar(self, converted_img):
+    def procesar(self, converted_img, lastPosition, lastRotation, camera):
         # if converted_img is None or converted_img.size == 0:
         #     return None
+        # # si es la misma cámara, se movió y rotó poquito: None!!
+        # print(utils.normalizacion_radianes(self.lastTokenRotation - lastRotation))
+        if camera == self.lastCamera and lastPosition.distance_to(self.lastTokenPosition) < 0.015 and utils.normalizacion_radianes(self.lastTokenRotation - lastRotation) < math.pi/8:
+            # print('no analizo', lastPosition.distance_to(self.lastTokenPosition))
+            return None
+        # si no, antes de procesar, guardamos la última, cámara, 
+        # #posición y rotación, luego procesamos
+
         self.img = converted_img
         victima = self.devolver_letra_victimas()
         if victima is not None:
-            #print('letra', victima)
+            # print('letra', victima, lastPosition)
+            self.lastTokenPosition = lastPosition
+            self.lastTokenRotation = lastRotation
+            self.lastCamera = camera
             return victima
         else:
             cartel = self.reconocer_limpiar_cartel()
             if cartel is not None:
                 salida = self.devolver_letra_carteles()
-                #print('cartel', salida)
+                if salida is not None:
+                    # print('salida', salida, lastPosition)
+                    self.lastTokenPosition = lastPosition
+                    self.lastTokenRotation = lastRotation
+                    self.lastCamera = camera
                 return salida
         return None
     

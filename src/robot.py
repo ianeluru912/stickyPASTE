@@ -80,6 +80,7 @@ class Robot:
         self.timeRemaining=10000
         self.realTimeRemaining=10000
 
+
     def getNavigator(self):
         return self.navigator
 
@@ -278,14 +279,17 @@ class Robot:
                     wall[1]=token 
 
     def enviar_mensaje_imgs(self):
+
+        
+
         if self.lidar.hayAlgoIzquierda():
-            entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
+            entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64), self.position, self.rotation, "L"	)
             if entrada_I is not None:
                 self.mappingVictim2("L", entrada_I)
                 self.enviarMensajeVoC(entrada_I)
         
         if self.lidar.hayAlgoDerecha():
-            entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
+            entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64), self.position, self.rotation, "R")
             if entrada_D is not None:
                 self.mappingVictim2("R", entrada_D)
                 self.enviarMensajeVoC(entrada_D)
