@@ -76,9 +76,9 @@ class Robot:
         self.mapvis = MapVisualizer()
         self.lastRequestTime = 0
 
-        self.gameScore=None
-        self.timeRemaining=None
-        self.realTimeRemaining=None
+        self.gameScore=0
+        self.timeRemaining=10000
+        self.realTimeRemaining=10000
 
     def getNavigator(self):
         return self.navigator
