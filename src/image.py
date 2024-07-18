@@ -214,7 +214,7 @@ class ImageProcessor:
         
         area=cv2.contourArea(contornos[0])
         # print("Area: ", area)
-        if area< 300:
+        if area< 100:
             return None
         
         approx = cv2.minAreaRect(contornos[0])
