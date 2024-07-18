@@ -11,7 +11,7 @@ import math
 import utils
 import struct
 import numpy as np
-
+import random
 from visualization import MapVisualizer
 
 
@@ -330,8 +330,12 @@ class Robot:
                         self.update_area_by_color(color)
                         currentTile.set_area(self.current_area)
 
-            if self.lastPosition.distance_to(self.position) > 0.06:
+            if self.lastPosition.distance_to(self.position) > 0.02:
                 # print("LOP")
+                # generate a random number betweeen -pi and pi
+                angle = random.uniform(-math.pi, math.pi)
+                # rotate the robot by that angle
+                # self.girar(angle)
                 self.doingLOP = True
                 self.current_area = currentTile.get_area()
                 tileDangerous=self.map.getTileAtPosition(self.lastPosition)
