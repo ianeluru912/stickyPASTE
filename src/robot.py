@@ -58,7 +58,7 @@ class Robot:
         self.step_counter = 0
 
         self.navigator = Navigator(self)
-
+        self.lastZ = None
         # self.holeIZ = self.imageProcessor.see_hole()
         # self.holeDER = self.imageProcessor.see_hole()
         self.wheelL.setVelocity(0)
@@ -292,8 +292,22 @@ class Robot:
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
-        
+        _, z, _ = self.gps.getValues()
         self.position = Point(x, y)
+  
+        if self.lastZ is None:
+            self.lastZ = z
+        else:
+            # if self.lastZ-z>0.002: # se fue a un z más bajo, se cayó...
+            if z<-0.015:
+                #print("Me caí")
+                self.position = Point(x, y)
+                tile=self.map.getTileAtPosition(self.position)
+                # print(f"Me caí en el tile ({tile.col}, {tile.row})")
+                tile.type=TileType.BLACK_HOLE
+            self.lastZ = z
+
+            
         if self.lastPosition is None:
             self.lastPosition = self.position
         else:
