@@ -16,8 +16,16 @@ robot = Robot()
 
 # robot.moveToPoint(Point(robot.position.x+0.36, robot.position.y))
 # robot.moveToPoint(Point(robot.position.x, robot.position.y+0.24))
+# path=[('t',-1,0),('t',1,-1), ('t',0,1)]
+# #while path is not None:
+# while path != []:
+#     dest=path.pop(0)
+#     if dest[0]=='t':
+#         position=robot.map.gridToPosition()
+#         robot.moveToTile(dest[1],dest[2])
 
-
+# position=robot.map.gridToPosition()
+# robot.mov
 while robot.step() != -1:
     navigator = robot.getNavigator()
     point, shouldBrake = navigator.whereToGo()

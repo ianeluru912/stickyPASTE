@@ -553,7 +553,7 @@ class Lidar:
         min_ray = None
         # Si achicamos el offset corremos el riesgo de quedarnos trabados por un 
         # obstáculo, mejor ser conservador...
-        offset = 60
+        offset = 10
         for ray_idx in range(256-offset, 257+offset):
             dist = self.rangeImage[ray_idx]
             if dist < threshold and dist < min_dist:
