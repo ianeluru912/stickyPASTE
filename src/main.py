@@ -4,18 +4,30 @@ from math import pi as PI
 robot = Robot()
 
 while robot.step() != -1:
-    if not robot.lidar.hayAlgoIzquierda():
-        robot.girar(PI/2)
-        robot.avanzar(0.12, True)
-    elif not robot.lidar.hayAlgoDerecha():
-        robot.girar(-PI/2)
-        robot.avanzar(0.12, True)
-    elif not robot.lidar.hayAlgoAdelante():
-        robot.avanzar(0.12, True)
+    navigator = robot.getNavigator()
+    point, shouldBrake = navigator.whereToGo()
+
+    sendMapNow = robot.position.distance_to(point) < 0.025
+    me_aleje = False
+    
+    if not sendMapNow:
+        me_aleje = True
+        if not robot.lidar.hayAlgoIzquierda():
+            robot.girar(PI/2)
+            robot.avanzar(0.12, True)
+        elif not robot.lidar.hayAlgoAdelante():
+            robot.avanzar(0.12, True)
+        elif not robot.lidar.hayAlgoDerecha():
+            robot.girar(-PI/2)
+            robot.avanzar(0.12, True)
+        else:
+            robot.girar(PI)
+            robot.avanzar(0.12, True)
+        if me_aleje and robot.map.positionToGrid(robot.position) == (0,0):
+            break
     else:
-        robot.girar(PI)
-        robot.avanzar(0.12, True)
-    break
+        
+        break
 
 while robot.step() != -1:
     navigator = robot.getNavigator()
@@ -26,7 +38,6 @@ while robot.step() != -1:
     if not sendMapNow:
         robot.moveToPoint(point, shouldBrake)
 
-    # if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
     if robot.timeRemaining < 10 or robot.realTimeRemaining < 10 or sendMapNow:
         robot.comm.sendExit()
         print(f'I got milk {robot.h_counts} times ')
