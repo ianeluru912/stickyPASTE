@@ -17,9 +17,6 @@ while robot.step() != -1:
         robot.moveToPoint(point, shouldBrake)
     
     if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
-        rep=robot.map.getRepresentation()
-        robot.comm.sendMap(rep)
-        # print(rep)
         robot.comm.sendExit()
         print(f'I got milk {robot.h_counts} times ')
         print(f'I picked up bread {robot.s_counts} times')
