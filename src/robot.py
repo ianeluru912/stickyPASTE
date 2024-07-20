@@ -55,6 +55,9 @@ class Robot:
         self.posicion_inicial = None
         self.targetPoint = None
 
+        self.estoy_en_segunda_vuelta = False
+        
+
         self.step_counter = 0
 
         self.navigator = Navigator(self)
@@ -73,7 +76,6 @@ class Robot:
         inicio.type = TileType.STARTING
         self.doingLOP = False
         
-        self.estoy_en_segunda_vuelta = False
         
         self.h_counts = 0
         self.s_counts = 0
@@ -285,43 +287,41 @@ class Robot:
                     wall[1]=token 
 
     def enviar_mensaje_imgs(self):
+        if self.lidar.hayAlgoIzquierda():
+            entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
+            if entrada_I == 'H'or entrada_I == 'S' or entrada_I == 'F' or entrada_I == 'O' and self.estoy_en_segunda_vuelta:
+                if entrada_I == 'H':
+                    print('I got the milk')
+                    self.h_counts += 1
+                elif entrada_I == 'S':
+                    print('I picked up bread')
+                    self.s_counts += 1
+                elif entrada_I == 'F':
+                    print('I took some eggs')
+                    self.f_counts += 1
+                elif entrada_I == 'O':
+                    print('I picked the pinneaple juice')
+                    self.o_counts += 1
+                self.mappingVictim2("L", entrada_I)
+                self.enviarMensajeVoC(entrada_I)
         
-        if self.estoy_en_segunda_vuelta:
-            if self.lidar.hayAlgoIzquierda():
-                entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
-                if entrada_I == 'H'or entrada_I == 'S' or entrada_I == 'F' or entrada_I == 'O':
-                    if entrada_I == 'H':
-                        print('I got the milk')
-                        self.h_counts += 1
-                    elif entrada_I == 'S':
-                        print('I picked up bread')
-                        self.s_counts += 1
-                    elif entrada_I == 'F':
-                        print('I took some eggs')
-                        self.f_counts += 1
-                    elif entrada_I == 'O':
-                        print('I picked the pinneaple juice')
-                        self.o_counts += 1
-                    self.mappingVictim2("L", entrada_I)
-                    self.enviarMensajeVoC(entrada_I)
-            
-            if self.lidar.hayAlgoDerecha():
-                entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
-                if entrada_D == 'H'or entrada_D == 'S' or entrada_D == 'F' or entrada_D == 'O' :
-                    if entrada_D == 'H':
-                        print('I got the milk')
-                        self.h_counts += 1
-                    elif entrada_D == 'S':
-                        print('I picked up bread')
-                        self.s_counts += 1
-                    elif entrada_D == 'F':
-                        print('I took some eggs')
-                        self.f_counts += 1
-                    elif entrada_D == 'O':
-                        print('I picked the pinneaple juice')
-                        self.o_counts += 1
-                    self.mappingVictim2("R", entrada_D)
-                    self.enviarMensajeVoC(entrada_D)
+        if self.lidar.hayAlgoDerecha():
+            entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
+            if entrada_D == 'H'or entrada_D == 'S' or entrada_D == 'F' or entrada_D == 'O' and self.estoy_en_segunda_vuelta:
+                if entrada_D == 'H':
+                    print('I got the milk')
+                    self.h_counts += 1
+                elif entrada_D == 'S':
+                    print('I picked up bread')
+                    self.s_counts += 1
+                elif entrada_D == 'F':
+                    print('I took some eggs')
+                    self.f_counts += 1
+                elif entrada_D == 'O':
+                    print('I picked the pinneaple juice')
+                    self.o_counts += 1
+                self.mappingVictim2("R", entrada_D)
+                self.enviarMensajeVoC(entrada_D)
     
     def updatePosition(self):
         x, _, y = self.gps.getValues()
