@@ -559,5 +559,4 @@ class Lidar:
             if dist < threshold and dist < min_dist:
                 min_dist = dist
                 min_ray = ray_idx
-        return (min_ray, min_dist)
-            
+        return (min_ray, min_dist)           

@@ -72,6 +72,11 @@ class Robot:
         inicio.set_area(self.current_area)
         inicio.type = TileType.STARTING
         self.doingLOP = False
+        
+        self.h_counts = 0
+        self.s_counts = 0
+        self.f_counts = 0
+        self.o_counts = 0
 
         self.mapvis = MapVisualizer()
         self.lastRequestTime = 0
@@ -280,13 +285,37 @@ class Robot:
     def enviar_mensaje_imgs(self):
         if self.lidar.hayAlgoIzquierda():
             entrada_I = self.imageProcessor.procesar(self.convertir_camara(self.camI.getImage(), 64, 64))
-            if entrada_I is not None:
+            if entrada_I == 'H'or entrada_I == 'S' or entrada_I == 'F' or entrada_I == 'O':
+                if entrada_I == 'H':
+                    print('I got the milk')
+                    self.h_counts += 1
+                elif entrada_I == 'S':
+                    print('I picked up bread')
+                    self.s_counts += 1
+                elif entrada_I == 'F':
+                    print('I took some eggs')
+                    self.f_counts += 1
+                elif entrada_I == 'O':
+                    print('I picked the pinneaple juice')
+                    self.o_counts += 1
                 self.mappingVictim2("L", entrada_I)
                 self.enviarMensajeVoC(entrada_I)
         
         if self.lidar.hayAlgoDerecha():
             entrada_D = self.imageProcessor.procesar(self.convertir_camara(self.camD.getImage(), 64, 64))
-            if entrada_D is not None:
+            if entrada_D == 'H'or entrada_D == 'S' or entrada_D == 'F' or entrada_D == 'O' :
+                if entrada_D == 'H':
+                    print('I got the milk')
+                    self.h_counts += 1
+                elif entrada_D == 'S':
+                    print('I picked up bread')
+                    self.s_counts += 1
+                elif entrada_D == 'F':
+                    print('I took some eggs')
+                    self.f_counts += 1
+                elif entrada_D == 'O':
+                    print('I picked the pinneaple juice')
+                    self.o_counts += 1
                 self.mappingVictim2("R", entrada_D)
                 self.enviarMensajeVoC(entrada_D)
     
@@ -426,13 +455,14 @@ class Robot:
                     bottom = self.targetPoint.y + 0.02
                     right = self.targetPoint.x + 0.02
                     tiles = self.map.getTilesIntersecting(Rectangle(top, left, bottom, right))
-                    count = 0
-                    for tile in tiles:
-                        if tile.type == TileType.BLACK_HOLE:
-                            count += 1
-                    if count >= len(tiles) / 2:
-                        goBack = True
-                        break
+                    if len(tiles)>0:
+                        count = 0
+                        for tile in tiles:
+                            if tile.type == TileType.BLACK_HOLE:
+                                count += 1
+                        if count >= len(tiles) / 2:
+                            goBack = True
+                            break
 
             if diff < 0.001:
                 break
@@ -444,6 +474,20 @@ class Robot:
         if goBack:
             dist = initPos.distance_to(self.position)
             self.avanzar(-dist, True)
+            
+    def girar_absoluto(self, rad, tolerance = 0.1):
+
+        while self.step() != -1:
+            lastRot = self.rotation
+            if (abs(lastRot-rad) < tolerance):
+                break
+
+            self.wheelL.setVelocity(1)
+            self.wheelR.setVelocity(-1)
+    
+        self.wheelL.setVelocity(0)
+        self.wheelR.setVelocity(0)
+
 
     def addBlockedPath(self, start, dest):
         navigator = self.getNavigator()
