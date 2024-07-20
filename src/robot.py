@@ -73,6 +73,8 @@ class Robot:
         inicio.type = TileType.STARTING
         self.doingLOP = False
         
+        self.estoy_en_segunda_vuelta = False
+        
         self.h_counts = 0
         self.s_counts = 0
         self.f_counts = 0
@@ -147,7 +149,8 @@ class Robot:
             self.classifyTile(tile)
             
     def updateCamerasDetection(self):
-        return self.enviar_mensaje_imgs()
+        if self.estoy_en_segunda_vuelta:
+            return self.enviar_mensaje_imgs()
 
     def enviarMensajeVoC(self, entrada):
         self.parar()
