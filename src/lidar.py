@@ -546,6 +546,10 @@ class Lidar:
     def hayAlgoDerecha(self):
         rightDist = self.rangeImage[128*3]
         return rightDist < 0.08
+    
+    def hayAlgoAdelante(self):
+        frontDist = self.rangeImage[256]
+        return frontDist < 0.08
 
     def getNearestObstacle(self):
         threshold = 0.05

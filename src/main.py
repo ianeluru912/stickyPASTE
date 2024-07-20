@@ -1,11 +1,21 @@
 from robot import Robot
-from point import Point
-import cv2
 from math import pi as PI
-from map import TileType
-from piso import Piso
 
 robot = Robot()
+
+while robot.step() != -1:
+    if not robot.lidar.hayAlgoIzquierda():
+        robot.girar(PI/2)
+        robot.avanzar(0.12, True)
+    elif not robot.lidar.hayAlgoDerecha():
+        robot.girar(-PI/2)
+        robot.avanzar(0.12, True)
+    elif not robot.lidar.hayAlgoAdelante():
+        robot.avanzar(0.12, True)
+    else:
+        robot.girar(PI)
+        robot.avanzar(0.12, True)
+    break
 
 while robot.step() != -1:
     navigator = robot.getNavigator()
@@ -15,8 +25,9 @@ while robot.step() != -1:
     
     if not sendMapNow:
         robot.moveToPoint(point, shouldBrake)
-    
-    if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
+
+    # if robot.timeRemaining < 10 or robot.realTimeRemaining < 10:
+    if robot.timeRemaining < 10 or robot.realTimeRemaining < 10 or sendMapNow:
         robot.comm.sendExit()
         print(f'I got milk {robot.h_counts} times ')
         print(f'I picked up bread {robot.s_counts} times')
