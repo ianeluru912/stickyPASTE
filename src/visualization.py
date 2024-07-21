@@ -59,6 +59,7 @@ class MapVisualizer:
         self.thread.start()
 
     def accept_connections(self):
+        # return None
         print("Waiting for connections...")
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((self.host, self.port))

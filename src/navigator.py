@@ -123,6 +123,7 @@ class Navigator:
             # print("Exploramos todo el mapa!!")
             # print("Volvamos al inicio...")
             target = (0, 0)
+            self.minitiles = {}
 
         # En came_from tenemos el camino desde el robot hasta cualquier baldosa
         # (incluida target)
@@ -143,7 +144,88 @@ class Navigator:
         self.incrementVisits(minitile_coord)
 
         self._robot.mapvis.send_minitiles(self._robot)
+        # obtener de minitiles, la key del menor value
+       
+        # print("-------")
+        begin_time = time.time()
+        path = self.findPath()
+        end_time = time.time()
+        # print(f"Elapsed time: {(end_time - begin_time) * 1000} ms")
+        target = path[1] if len(path) > 1 else path[0]
+        # print(f"Actual target: {target}")
+
+        shouldBrake = True
+        if len(path) > 2:
+            delta1 = (path[1][0] - path[0][0], path[1][1] - path[0][1])
+            # print(f"D1: {delta1}")
+            delta2 = (path[2][0] - path[1][0], path[2][1] - path[1][1])
+            # print(f"D2: {delta2}")
+            if delta1 == delta2:
+                # print("PODEMOS NO FRENAR")
+                shouldBrake = False
+            
+        return self.getPosition(target), shouldBrake
+    
+    def pathHasta(self, colF, filF):
+        frontier = deque()
+
+        start = self.positionToMiniGrid(self._robot.position)
+        puntoFinal=self._robot.map.gridToPosition(colF, filF)
+        endMinitile=self.positionToMiniGrid(puntoFinal)
+
+        frontier.append(start)
+        # target = self.positionToMiniGrid(self._robot.map.gridToPosition(colF, filF))
+
+        came_from = {} # path A->B is stored as came_from[B] == A
+        came_from[start] = None
+
+        target = None
+        while len(frontier) > 0:
+            current = frontier.popleft()
+
+            # if current != start and self.minitiles.get(current, 0) == 0:
+            if current==endMinitile:
+                target = current
+                break
+
+            neighbours = self.getNeighbours(current)
+            neighbours = self.removeObstructed(current, neighbours)
+            for next in neighbours:
+                if next not in came_from:
+                    frontier.append(next)
+                    came_from[next] = current
+
+
+        # print(f"Buscando camino desde: {start}")
+
+        if target is None:
+            # print("Exploramos todo el mapa!!")
+            # print("Volvamos al inicio...")
+            target = (0, 0)
+            self.minitiles = {}
+
+        # print(f"Came from: {came_from}")
+        # En came_from tenemos el camino desde el robot hasta cualquier baldosa
+        # (incluida target)
+        current = target 
+        path = []
+        while current is not None: 
+            path.append(current)
+            current = came_from.get(current)
+        path.reverse() # optional
+
+        # print(f"Target: {target}")
+        # print(path)
         
+        return path
+
+    def whereToGo(self):
+        minitile_coord = self.positionToMiniGrid(self._robot.position)
+        self.incrementVisits(minitile_coord)
+
+        self._robot.mapvis.send_minitiles(self._robot)
+        # obtener de minitiles, la key del menor value
+       
         # print("-------")
         begin_time = time.time()
         path = self.findPath()

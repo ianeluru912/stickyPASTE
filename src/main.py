@@ -22,7 +22,7 @@ while robot.step() != -1:
     navigator = robot.getNavigator()
     point, shouldBrake = navigator.whereToGo()
 
-    sendMapNow = robot.position.distance_to(point) < 0.025
+    sendMapNow = False #robot.position.distance_to(point) < 0.025
     
     if not sendMapNow:
         robot.moveToPoint(point, shouldBrake)

@@ -13,13 +13,20 @@ import struct
 import numpy as np
 import random
 from visualization import MapVisualizer
-
+import persona
 
 TIME_STEP = 16
 MAX_VEL = 6.28
 
 class Robot:
     def __init__(self):
+        self.yo=persona.YO
+        self.otro=persona.OTRO
+        self.violetasDelOtro=[]
+        self.misVioletas=[]
+        self.hiceMiLaburo=False
+        self.zonaTerminada=False
+        
         self.robot = WebotsRobot()
         receiver = self.robot.getDevice("receiver")
         receiver.enable(TIME_STEP)
@@ -109,13 +116,18 @@ class Robot:
             if (self.robot.getTime() - initTime) * 1000.0 >= ms:
                 break
 
+    def updateVioleta(self):
+        self.comm.recibirMensajes()
+            
+            
     def updateVars(self):
         self.updatePosition()
         self.updateRotation()
         self.updateLidar()
         self.updateCamerasDetection()
         self.updateTiles()
-        self.updateGameScoreAndTimes()
+        self.updateVioleta()
+        # self.updateGameScoreAndTimes()
         
         if self.map != None:
             x = self.position.x - self.posicion_inicial.x
@@ -145,10 +157,23 @@ class Robot:
         return self.enviar_mensaje_imgs()
 
     def enviarMensajeVoC(self, entrada):
+        # print("Enviando mensaje VoC")
+        if self.yo==0 and entrada=='S':
+            return
+        if self.yo==1 and entrada=='H':
+            return
+        
         self.parar()
         self.delay(1500)
-        self.comm.sendToken(int(self.position.x * 100), int(self.position.y * 100), entrada)
+        self.comm.sendToken(int(self.position.x * 100), int(self.position.y * 100), entrada, self.yo)
         self.delay(100)
+        if entrada=="S" and self.yo==1:
+            print(f"Yo {self.yo} apagué el fuego")
+            self.hiceMiLaburo=True
+        if entrada=="H" and self.yo==0: 
+            print(f"Yo {self.yo} saqué el agua")
+            self.hiceMiLaburo=True
+
 
     def convertir_camara(self, img, alto, ancho):  
             img_a_convertir = np.array(np.frombuffer(img, np.uint8).reshape((alto, ancho, 4)))
@@ -370,11 +395,11 @@ class Robot:
             mul = min(max(mul, 0.05), 1)
 
             if rad > 0:
-                self.wheelL.setVelocity(mul*MAX_VEL)
-                self.wheelR.setVelocity(-mul*MAX_VEL)
+                self.wheelL.setVelocity(mul*(MAX_VEL/3))
+                self.wheelR.setVelocity(-mul*(MAX_VEL/3))
             else:
-                self.wheelL.setVelocity(-mul*MAX_VEL)
-                self.wheelR.setVelocity(mul*MAX_VEL)
+                self.wheelL.setVelocity(-mul*(MAX_VEL/3))
+                self.wheelR.setVelocity(mul*(MAX_VEL/3))
 
             if diff <= 0.005:
                 break
@@ -612,13 +637,18 @@ class Robot:
                 tile.type = TileType.SWAMP
                 tile.set_area(self.current_area)
             elif m.blue():
-                tile.type = TileType.BLUE   
+                tile.type = TileType.BLUE
+                if (self.yo==1):
+                    tile.dangerous=True   
             elif m.green():
                 tile.type = TileType.GREEN
             elif m.purple():
                 tile.type = TileType.PURPLE
+
             elif m.red():
                 tile.type = TileType.RED
+                if (self.yo==0):
+                    tile.dangerous=True
             elif m.orange():
                 tile.type = TileType.ORANGE
             elif m.yellow():
@@ -629,6 +659,8 @@ class Robot:
             elif m.estandar():
                 tile.type = TileType.STANDARD
                 tile.set_area(self.current_area)
+                if (tile.dangerous):
+                    tile.dangerous=False
 
             # if tile.type is not None:
             #     print(f"Acabo de clasificar el tile ({tile.col}, {tile.row}) como {tile.type}")    
@@ -679,6 +711,36 @@ class Robot:
         delta_ang = self.normalizar_radianes(target_ang - self.rotation)
         self.girar(delta_ang)
         self.avanzar(target_vector.length(), shouldBrake)
+        tile=self.map.getTileAtPosition(self.position)
+        if tile.type==TileType.PURPLE:
+            if (tile.col, tile.row) not in self.misVioletas:
+                self.misVioletas.append((tile.col, tile.row))
+                print(f"Yo soy {self.yo} Mis violetas Tienen esto:", self.misVioletas)
+                self.comm.llegueAVioleta(tile.col, tile.row)
+            # # si el otro ya había llegado a violeta, y tiene uno distinto al mío,\
+            # # me quedo parado y le doy la orden de que vaya a ese
+            # posiblesDelOtro=self.violetasDelOtro.copy()
+            # if (tile.col, tile.row) in posiblesDelOtro:
+            #     posiblesDelOtro.remove((tile.col, tile.row))
+
+            # if len(posiblesDelOtro)>0:
+            #     self.comm.llegueAVioleta(tile.col, tile.row)
+            #     self.comm.andaPalla(posiblesDelOtro[0][0], posiblesDelOtro[0][1])
+            #     self.parar()
+            #     while(self.step()!=-1):
+            #         # Esperar que el otro me mande mensaje de que llegó a violeta
+            #         if self.zonaTerminada:
+            #             self.zonaTerminada=False
+            #             self.misVioletas=[]
+            #             self.violetasDelOtro=[]
+            #             break
+            # else:
+            # # si no, le mando el mensaje del violeta adonde llegué y sigo navegando
+            #     if (tile.col, tile.row) not in self.misVioletas:
+            #         self.misVioletas.append((tile.col, tile.row))
+            #         self.comm.llegueAVioleta(tile.col, tile.row)
+            
+                
 
     def getRectangle(self):
         diameter = 0.07

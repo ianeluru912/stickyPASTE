@@ -34,13 +34,15 @@ class ImageProcessor:
         paraMostrarDespues=thresh.copy()
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         if len(contours) == 0:
+
             return self.salida
 
 
         if len(contours) == 1:
             if len(contours[0]) > 10:
+                # print(len(contours), len(contours[0]))
                 # print("Encontré un cartel que parece una letra pero tiene demasiados puntos su contorno")
-
+                # self.debugShow(thresh)
                 # ¿Tiene thresh una cantidad de pixeles blancos razonables?
                 # pixeles_blancos = np.count_nonzero(thresh == 255)
                 # tamanio = thresh.shape[0] * thresh.shape[1]
@@ -49,7 +51,6 @@ class ImageProcessor:
                 # print(pixeles_blancos, tamanio, porcentaje_blancos)
                 # if porcentaje_blancos < 0.05: #Si tengo pocos blancos me voy
                 #     return None
-                
 
 
                 # get the convex hull
@@ -170,6 +171,9 @@ class ImageProcessor:
                     # self.debugShow(paraMostrarDespues)
                     # self.debugShow(rect)
             return self.salida
+        else:
+            pass
+            # print(len(contours))
         
     def reconocer_limpiar_cartel(self):
         if self.img is None or self.img.size == 0:
