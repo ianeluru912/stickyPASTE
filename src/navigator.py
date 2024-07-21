@@ -16,6 +16,7 @@ class Navigator:
         self.blockedPaths = set()
         self.minitiles = {} # (c,r) -> visits
         self.obstructed = set()
+        self.floating_tiles = False
 
     def addBlockedPath(self, start, dest):
         start_coords = self.positionToMiniGrid(start)
@@ -27,8 +28,8 @@ class Navigator:
         half_width = Tile.WIDTH/2
         half_height = Tile.HEIGHT/2
 
-        columna = round((pos.x - self._robot.posicion_inicial.x) / half_width)
-        fila = round((pos.y - self._robot.posicion_inicial.y) / half_height)
+        columna = round((self._robot.position.x - self._robot.posicion_inicial.x) / half_width)
+        fila = round((self._robot.position.y - self._robot.posicion_inicial.y) / half_height)
         return (columna, fila)
 
     def isObstructed(self, minitile):
@@ -161,5 +162,8 @@ class Navigator:
             if delta1 == delta2:
                 # print("PODEMOS NO FRENAR")
                 shouldBrake = False
+                
+        if target not in self.minitiles:
+            self.floating_tiles = True
             
         return self.getPosition(target), shouldBrake
