@@ -1,4 +1,5 @@
 from robot import Robot
+from map import TileType
 from math import pi as PI
 
 robot = Robot()
@@ -8,16 +9,20 @@ while robot.step() != -1:
     if not robot.lidar.hayAlgoIzquierda():
         left_tile = robot.get_tile_izq()
         robot.moveToPoint((robot.map.gridToPosition(left_tile.col, left_tile.row)), True)
+        left_tile.type = TileType.LINEAR
     elif not robot.lidar.hayAlgoAdelante():
         next_tile = robot.get_tile_ahead()
         robot.moveToPoint((robot.map.gridToPosition(next_tile.col, next_tile.row)), True)
+        next_tile.type = TileType.LINEAR
     elif not robot.lidar.hayAlgoDerecha():
         right_tile = robot.get_tile_der()
         robot.moveToPoint((robot.map.gridToPosition(right_tile.col, right_tile.row)), True)
+        right_tile.type = TileType.LINEAR
     else:
         robot.girar(PI)
         next_tile = robot.get_tile_ahead()
         robot.moveToPoint((robot.map.gridToPosition(next_tile.col, next_tile.row)), True)
+        next_tile.type = TileType.LINEAR
         
     me_aleje = True
     

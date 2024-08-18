@@ -15,6 +15,7 @@ class TileType(Enum):
     ORANGE = 'o'
     RED = 'r'
     STANDARD = 's'
+    LINEAR = 'l'
 
 class Map:
     def __init__(self, origin) -> None:
