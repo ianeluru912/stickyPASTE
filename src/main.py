@@ -1,5 +1,5 @@
 from robot import Robot
-from map import TileType
+from map import Tile, TileType
 from math import pi as PI
 
 robot = Robot()
@@ -10,19 +10,29 @@ while robot.step() != -1:
         left_tile = robot.get_tile_izq()
         robot.moveToPoint((robot.map.gridToPosition(left_tile.col, left_tile.row)), True)
         left_tile.type = TileType.LINEAR
+        col, row = robot.map.positionToGrid(robot.position)
+        tile = robot.map.getTileAt(col, row)
+        tile.type = TileType.LINEAR
     elif not robot.lidar.hayAlgoAdelante():
         next_tile = robot.get_tile_ahead()
         robot.moveToPoint((robot.map.gridToPosition(next_tile.col, next_tile.row)), True)
-        next_tile.type = TileType.LINEAR
+        col, row = robot.map.positionToGrid(robot.position)
+        tile = robot.map.getTileAt(col, row)
+        tile.type = TileType.LINEAR
     elif not robot.lidar.hayAlgoDerecha():
         right_tile = robot.get_tile_der()
         robot.moveToPoint((robot.map.gridToPosition(right_tile.col, right_tile.row)), True)
         right_tile.type = TileType.LINEAR
+        col, row = robot.map.positionToGrid(robot.position)
+        tile = robot.map.getTileAt(col, row)
+        tile.type = TileType.LINEAR
     else:
         robot.girar(PI)
         next_tile = robot.get_tile_ahead()
         robot.moveToPoint((robot.map.gridToPosition(next_tile.col, next_tile.row)), True)
-        next_tile.type = TileType.LINEAR
+        col, row = robot.map.positionToGrid(robot.position)
+        tile = robot.map.getTileAt(col, row)
+        tile.type = TileType.LINEAR
         
     me_aleje = True
     
@@ -36,13 +46,7 @@ while robot.step() != -1:
 
     sendMapNow = robot.position.distance_to(point) < 0.025
     
-    if robot.estoy_en_segunda_vuelta == True:
-        if robot.map.positionToGrid(point) not in robot.navigator.minitiles:
-            robot.floating_tile = True
-    
     robot.moveToPoint(point, True)
-    robot.floating_tile = False
-
     if robot.timeRemaining < 10 or robot.realTimeRemaining < 10 or sendMapNow:
         robot.comm.sendExit()
         print(f'I got milk {robot.h_counts} times ')
